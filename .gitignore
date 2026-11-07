@@ -1,0 +1,16 @@
+bin/
+obj/
+dist/
+dist-*/
+*.user
+.vs/
+.wrangler/
+_backup_desktop_app/
+*.replay
+*.log
+*.tmp
+*.exe
+*.dll
+*.pdb
+Microsoft.Web.WebView2.*.xml
+node_modules/

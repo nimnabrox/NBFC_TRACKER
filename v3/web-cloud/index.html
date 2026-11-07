@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NBFC TRACKER - Created by NimnaBro</title>
+  <link rel="icon" type="image/png" href="assets/chest_fnv1.png">
+  <link rel="shortcut icon" type="image/png" href="assets/chest_fnv1.png">
+  <link rel="apple-touch-icon" href="assets/chest_fnv1.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- ==============================================================
+         LEFT COLUMN (1 PART): SIDEBAR, PROFILES & SETTINGS
+    ============================================================== -->
+    <aside class="sidebar">
+      <!-- Brand & Engine Status -->
+      <div class="brand-card">
+        <div class="brand-title">
+          <img src="assets/chest_fnv1.png" alt="NBFC Chest" width="28" height="28" style="object-fit:contain;filter:drop-shadow(0 0 6px rgba(245,166,35,0.45));">
+          <span>NBFC TRACKER</span>
+          <span style="font-size:11px;font-weight:800;color:var(--accent);background:var(--accent-bg);padding:2px 6px;border-radius:4px;border:1px solid rgba(245,166,35,0.3);">v3.0</span>
+        </div>
+        <div class="brand-sub">Fortnite Chest Counter &amp; Live OBS Overlay</div>
+        <div class="badge-live" id="engineStatusBadge" style="margin-top:4px;">
+          <span class="live-dot"></span>
+          <span id="engineStatusText">Active Tracking</span>
+        </div>
+      </div>
+
+      <!-- Account / Profile Switcher -->
+      <div class="side-card">
+        <div class="side-card-title">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            <span>Player Profiles</span>
+          </div>
+          <span id="accountCountBadge" style="font-size:11px;color:var(--muted);font-weight:700;">0 Profiles</span>
+        </div>
+        <div id="accountList" class="account-list">
+          <div style="font-size:12px;color:var(--muted);padding:8px 0;">No profiles loaded yet. Launch companion app or connect replays.</div>
+        </div>
+      </div>
+
+      <!-- Quick Settings & Customization -->
+      <div class="side-card">
+        <div class="side-card-title">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Tracker Settings</span>
+          </div>
+        </div>
+
+        <!-- Base Count Setting -->
+        <form onsubmit="window.app.saveBaseCount(event)" class="form-group">
+          <label class="form-label" for="baseInput">Custom Starting Offset (e.g. 4084):</label>
+          <div class="input-row">
+            <input type="number" id="baseInput" class="text-input" placeholder="Default (replay count)" min="0">
+            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="window.app.clearBaseCount()">Reset</button>
+          </div>
+        </form>
+
+        <!-- Startup Setting -->
+        <div style="padding-top:6px;border-top:1px solid var(--line);">
+          <label style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;color:var(--text);cursor:pointer;">
+            <input type="checkbox" id="chkStartup" onchange="window.app.toggleStartup(this.checked)" style="accent-color:var(--accent);width:16px;height:16px;">
+            <span>Start with Windows (Auto-Startup in Tray)</span>
+          </label>
+          <div style="font-size:11px;color:var(--muted);margin-left:24px;margin-top:2px;">Runs silently in the system tray when PC boots.</div>
+        </div>
+
+        <!-- Replay Folder Auto-Detect & Override -->
+        <div style="padding-top:6px;border-top:1px solid var(--line);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <span class="form-label">Replay Folder:</span>
+            <span style="font-size:10px;font-weight:800;color:var(--good);background:var(--good-bg);padding:2px 6px;border-radius:4px;">AUTO-DETECTED</span>
+          </div>
+          <div id="detectedFolderPath" style="font-size:11px;color:var(--muted);word-break:break-all;background:rgba(0,0,0,0.25);padding:6px 8px;border-radius:6px;border:1px solid var(--line);font-family:monospace;">
+            %LOCALAPPDATA%\FortniteGame\Saved\Demos
+          </div>
+          <div style="margin-top:6px;display:flex;gap:6px;">
+            <input type="text" id="customFolderInput" class="text-input" placeholder="Custom folder path (optional)" style="font-size:11px;padding:6px 8px;">
+            <button type="button" class="btn btn-secondary" onclick="window.app.setCustomDemosFolder()" style="font-size:11px;padding:6px 10px;">Set</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- OBS Studio Browser Source Card -->
+      <div class="side-card">
+        <div class="side-card-title">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            <span>OBS Browser Overlay</span>
+          </div>
+        </div>
+
+        <div class="obs-preview-box">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <img src="assets/chest_fnv1.png" alt="Chest" width="28" height="28" style="object-fit:contain;">
+            <span id="obsPreviewVal" style="font-size:20px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;">0</span>
+          </div>
+          <span style="font-size:10px;font-weight:800;color:var(--good);background:var(--good-bg);padding:2px 6px;border-radius:4px;">100% TRANSPARENT</span>
+        </div>
+
+        <div class="obs-url-display" id="obsUrlCode">overlay.html?room=nimnabro</div>
+
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="btn btn-primary" onclick="window.app.copyObsUrl()" style="flex:1;">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="btnCopyText">Copy URL</span>
+          </button>
+          <a id="obsOpenBtn" href="overlay.html?room=nimnabro" target="_blank" class="btn btn-secondary" style="flex:1;">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+              <polyline points="15 3 21 3 21 9"></polyline>
+              <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+            <span>Preview</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Replay Controls & Connect -->
+      <div class="side-card">
+        <div class="side-card-title">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Replay Sources</span>
+          </div>
+        </div>
+
+        <div id="syncStatusDesc" style="font-size:12px;color:var(--muted);line-height:1.4;">
+          Automatic companion engine active. Select folder or files to scan additional replays.
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button type="button" class="btn btn-secondary btn-block" onclick="window.app.connectFolder()">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Connect Live Folder</span>
+          </button>
+          <button type="button" class="btn btn-secondary btn-block" onclick="document.getElementById('replayFileInput').click()">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="12" y1="18" x2="12" y2="12"></line>
+              <line x1="9" y1="15" x2="15" y2="15"></line>
+            </svg>
+            <span id="btnSelectFilesLabel">Select .replay Files</span>
+          </button>
+          <input type="file" id="replayFileInput" multiple accept=".replay" style="display:none;" onchange="window.app.handleFileInput(this.files)">
+          <button type="button" class="btn btn-secondary btn-block" onclick="window.app.exportCsv()">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Export CSV</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==============================================================
+         RIGHT COLUMN (2 PARTS): STATISTICS, CHARTS & MATCH HISTORY
+    ============================================================== -->
+    <main class="content">
+      <!-- Content Top Header -->
+      <div class="content-header">
+        <div class="profile-headline">
+          <svg class="svg-icon svg-accent" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Profile: <span id="activeAccountName" class="player-tag">—</span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span style="font-size:12px;color:var(--muted);" id="lastUpdatedTime">Auto-refreshing live</span>
+        </div>
+      </div>
+
+      <!-- Stat Grid (High-Performance CSS Grid) -->
+      <section class="stat-grid">
+        <!-- Hero Total Chests Tile -->
+        <div class="stat-tile hero">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon svg-accent" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Total Chests Opened</span>
+          </div>
+          <div class="stat-val" id="statTotal">0</div>
+          <div class="stat-sub" id="statTotalSub">chests counted across all matches</div>
+        </div>
+
+        <!-- Last Match Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            <span>Last Match</span>
+          </div>
+          <div class="stat-val" id="statLastMatch">0</div>
+          <div class="stat-sub">chests in latest game</div>
+        </div>
+
+        <!-- This Session Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span>This Session</span>
+          </div>
+          <div class="stat-val" id="statSession">0</div>
+          <div class="stat-sub">chests opened today</div>
+        </div>
+
+        <!-- Matches Analyzed Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+            <span>Matches Analyzed</span>
+          </div>
+          <div class="stat-val" id="statMatches">0</div>
+          <div class="stat-sub">replays parsed</div>
+        </div>
+
+        <!-- Average Chests Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="20" x2="18" y2="10"></line>
+              <line x1="12" y1="20" x2="12" y2="4"></line>
+              <line x1="6" y1="20" x2="6" y2="14"></line>
+            </svg>
+            <span>Average / Match</span>
+          </div>
+          <div class="stat-val" id="statAvg">0.0</div>
+          <div class="stat-sub">chests per game</div>
+        </div>
+
+        <!-- Victory Royales Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;">
+            <svg class="svg-icon svg-accent" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+              <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+              <path d="M4 22h16"></path>
+              <path d="M10 14.66V17c0 .55-.45 1-1 1H7"></path>
+              <path d="M14 14.66V17c0 .55.45 1 1 1h2"></path>
+              <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"></path>
+            </svg>
+            <span>Victory Royales</span>
+          </div>
+          <div class="stat-val" id="statTreasures">0</div>
+          <div class="stat-sub">#1 placements</div>
+        </div>
+      </section>
+
+      <!-- 30-Day Activity Histogram -->
+      <section class="chart-card">
+        <div class="chart-title" style="display:flex;align-items:center;gap:8px;">
+          <svg class="svg-icon svg-accent" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+          </svg>
+          <span>Chest Activity Histogram (Last 30 Days)</span>
+        </div>
+        <div class="bars-container" id="chartBars">
+          <!-- Injected dynamically by app.js -->
+        </div>
+        <div class="chart-axis">
+          <span>30 days ago</span>
+          <span>Today</span>
+        </div>
+      </section>
+
+      <!-- Match History Table -->
+      <section class="table-card">
+        <div class="table-header-row">
+          <div class="table-title" style="display:flex;align-items:center;gap:8px;">
+            <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            <span>Recent Match History</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);" id="matchCountIndicator">0 matches</div>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Date & Time</th>
+                <th>Game Mode</th>
+                <th>Placement</th>
+                <th style="text-align:right;">Chests</th>
+                <th style="text-align:right;">Eliminations</th>
+                <th>Profile</th>
+              </tr>
+            </thead>
+            <tbody id="matchesTableBody">
+              <!-- Injected dynamically by app.js -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Clean Footer -->
+      <footer style="display:flex;flex-direction:column;gap:12px;margin-top:32px;padding-top:20px;border-top:1px solid var(--line);">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <svg class="svg-icon svg-accent" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+            </svg>
+            <span style="font-weight:800;color:#fff;">NBFC TRACKER</span>
+            <span style="color:var(--muted);">· Created by <a href="https://guns.lol/nimnabro" target="_blank" style="color:var(--accent);text-decoration:none;font-weight:700;">NimnaBro</a> · All Rights Reserved</span>
+          </div>
+          <div style="display:flex;gap:16px;align-items:center;">
+            <a href="https://github.com/nimnabrox/NBFC_TRACKER" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:var(--muted);text-decoration:none;font-weight:600;font-size:12px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+              </svg>
+              <span>GitHub (100% Safe &amp; Open Source)</span>
+            </a>
+            <a href="https://guns.lol/nimnabro" target="_blank" style="color:var(--muted);text-decoration:none;font-weight:600;font-size:12px;">Creator Profile ↗</a>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.5;">
+          100% Safe · Anti-Cheat Verified · Zero Game Memory Injection · Inspect Full Open-Source Code at <a href="https://github.com/nimnabrox/NBFC_TRACKER" target="_blank" style="color:var(--accent);text-decoration:underline;">github.com/nimnabrox/NBFC_TRACKER</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Browser AppData Guidance Modal -->
+  <div id="chromeModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);z-index:9999;align-items:center;justify-content:center;padding:20px;">
+    <div style="background:#1a1f2b;border:1px solid var(--accent);border-radius:14px;max-width:520px;width:100%;padding:24px;box-shadow:0 12px 36px rgba(0,0,0,0.85);">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <svg class="svg-icon svg-accent" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <h3 style="margin:0;font-size:17px;color:#fff;font-weight:800;">Browser Folder Access Notice</h3>
+      </div>
+      <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;">
+        Google Chrome and Microsoft Edge security policies prevent web pages from directly opening folders inside <code style="color:var(--accent);">AppData</code> ("contains system files").
+      </p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+        <div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--line);">
+          <strong style="color:var(--accent);font-size:13px;">Option 1: Select C:\FortniteReplays</strong>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Select <code style="color:#fff;">This PC &gt; Local Disk (C:) &gt; FortniteReplays</code>. Chrome opens this folder with zero warnings and auto-updates live!</div>
+        </div>
+        <div style="padding:12px;background:rgba(255,255,255,0.03);border-radius:8px;border:1px solid var(--line);">
+          <strong style="color:var(--good);font-size:13px;">Option 2: Select .replay Files Directly</strong>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Browsers allow selecting individual replay files directly from AppData with zero warnings.</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button type="button" class="btn btn-secondary" onclick="document.getElementById('chromeModal').style.display='none'">Close</button>
+        <button type="button" class="btn btn-primary" onclick="document.getElementById('chromeModal').style.display='none';document.getElementById('replayFileInput').click();">Select .replay Files</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

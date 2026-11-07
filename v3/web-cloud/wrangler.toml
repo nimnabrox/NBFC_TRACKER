@@ -1,0 +1,15 @@
+name = "nbfct"
+main = "_worker.js"
+compatibility_date = "2024-09-23"
+
+routes = [
+  { pattern = "nbfct.nimnabro.com", custom_domain = true }
+]
+
+kv_namespaces = [
+  { binding = "TRACKER_KV", id = "7ac0f94e8db443d1aa3a23ba7efbb773" }
+]
+
+[assets]
+directory = "."
+binding = "ASSETS"
