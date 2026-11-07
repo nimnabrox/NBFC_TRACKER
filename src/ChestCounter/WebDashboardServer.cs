@@ -35,7 +35,8 @@ public static class WebDashboardServer
         try
         {
             _listener = new HttpListener();
-            _listener.Prefixes.Add(Url);
+            _listener.Prefixes.Add($"http://localhost:{Port}/");
+            _listener.Prefixes.Add($"http://127.0.0.1:{Port}/");
             _listener.Start();
 
             _thread = new Thread(() =>
@@ -69,6 +70,7 @@ public static class WebDashboardServer
         }
         catch (Exception ex)
         {
+            ErrorLog.Write("WebDashboardServer Start", ex);
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"  [Web Dashboard] Notice: Local port {Port} unavailable ({ex.Message}). Will open HTML file directly.");
             Console.ResetColor();

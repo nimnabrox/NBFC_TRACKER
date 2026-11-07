@@ -143,6 +143,7 @@ public class MainGuiForm : Form
 
     private void RestoreWindow()
     {
+        ShowInTaskbar = true;
         Show();
         WindowState = FormWindowState.Normal;
         BringToFront();
@@ -208,7 +209,7 @@ public class MainGuiForm : Form
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
-        if (!_allowExit && e.CloseReason == CloseReason.UserClosing)
+        if (!_allowExit && e.CloseReason != CloseReason.WindowsShutDown)
         {
             e.Cancel = true;
             Hide();
