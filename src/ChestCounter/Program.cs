@@ -115,7 +115,7 @@ if (previewPath == null && !AcquireInstance(instance, afterUpdate ? TimeSpan.Fro
     Console.WriteLine(L.T("  Le compteur de coffres est déjà ouvert : regarde dans la barre des tâches.",
         "  The chest counter is already open: opening dashboard in browser..."));
     Console.ResetColor();
-    try { Process.Start(new ProcessStartInfo("http://localhost:5088/") { UseShellExecute = true }); } catch { }
+    try { Process.Start(new ProcessStartInfo("https://nbfct.nimnabro.com") { UseShellExecute = true }); } catch { }
     if (interactive)
     {
         Console.WriteLine(L.T("  (cette fenêtre se ferme dans 5 secondes)", "  (this window closes in 5 seconds)"));
@@ -535,7 +535,7 @@ if (!isCli && OperatingSystem.IsWindows())
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             var startMinimized = args.Contains("--minimized");
-            Application.Run(new MainGuiForm(WebDashboardServer.Url, () =>
+            Application.Run(new MainGuiForm(WebDashboardServer.Url + "app.html", () =>
             {
                 quit = true;
                 wake.Set();
@@ -883,8 +883,8 @@ void PrintStatus()
     var demosNote = Directory.Exists(config.DemosFolder) ? "" : L.T("  (introuvable pour l'instant)", "  (not found yet)");
     ConsoleUi.Text($"Tracked  : {profile?.Name ?? "nimnabro"}");
     ConsoleUi.Text($"Base Count: {(config.BaseChestCount.HasValue ? config.BaseChestCount.Value.ToString() : "None (showing replay amount)")}");
-    ConsoleUi.Text($"Web Dash : http://localhost:5088/");
-    ConsoleUi.Text($"OBS URL  : http://localhost:5088/overlay (transparent browser source)");
+    ConsoleUi.Text($"Web Dash : https://nbfct.nimnabro.com");
+    ConsoleUi.Text($"OBS URL  : https://nbfct.nimnabro.com/overlay.html?room=nimnabro");
     ConsoleUi.Text($"Replays  : {config.DemosFolder}{demosNote}");
     ConsoleUi.Text(L.T($"Données  : {store.Folder}", $"Data     : {store.Folder}"));
     Console.WriteLine();
@@ -966,7 +966,7 @@ static void LowerPriority()
 
 static void Open(string path)
 {
-    var target = WebDashboardServer.IsListening ? WebDashboardServer.Url : path;
+    var target = "https://nbfct.nimnabro.com";
     try
     {
         Process.Start(new ProcessStartInfo(target) { UseShellExecute = true });

@@ -30,8 +30,9 @@ public class MainGuiForm : Form
         _onExit = onExit;
 
         Text = "NBFC TRACKER - Created by NimnaBro";
-        Size = new Size(1220, 840);
-        MinimumSize = new Size(880, 620);
+        Size = new Size(540, 720);
+        MinimumSize = new Size(460, 560);
+        MaximumSize = new Size(700, 920);
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = Color.FromArgb(13, 15, 20);
 
@@ -82,10 +83,18 @@ public class MainGuiForm : Form
         };
 
         var trayMenu = new ContextMenuStrip();
-        var openItem = new ToolStripMenuItem("Open Dashboard", null, (_, _) => RestoreWindow())
+        var openItem = new ToolStripMenuItem("Open Desktop Companion", null, (_, _) => RestoreWindow())
         {
             Font = new Font(Font, FontStyle.Bold)
         };
+        var openWebItem = new ToolStripMenuItem("Open Web Dashboard (nbfct.nimnabro.com)", null, (_, _) =>
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo("https://nbfct.nimnabro.com") { UseShellExecute = true });
+            }
+            catch { }
+        });
         var copyOverlayItem = new ToolStripMenuItem("Copy OBS Overlay URL", null, (_, _) =>
         {
             try
@@ -111,6 +120,7 @@ public class MainGuiForm : Form
         });
 
         trayMenu.Items.Add(openItem);
+        trayMenu.Items.Add(openWebItem);
         trayMenu.Items.Add(new ToolStripSeparator());
         trayMenu.Items.Add(copyOverlayItem);
         trayMenu.Items.Add(openOverlayItem);

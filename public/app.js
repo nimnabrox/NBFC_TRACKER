@@ -613,12 +613,12 @@ function applyCompanionDaemonState(d) {
 
   const engineStatusText = document.getElementById('engineStatusText');
   if (engineStatusText) {
-    engineStatusText.textContent = "Companion Daemon Connected (0ms)";
+    engineStatusText.textContent = "Live Tracking";
   }
 
   const desc = document.getElementById('syncStatusDesc');
   if (desc) {
-    desc.textContent = "Live auto-tracking active via NBFC TRACKER.exe. New matches sync automatically.";
+    desc.textContent = "Auto-tracking active. Matches and chests update live in real-time.";
   }
 
   if (d.base && !STATE.baseChestCount) {
@@ -670,7 +670,7 @@ function applyEdgeSyncState(d) {
 
   const engineStatusText = document.getElementById('engineStatusText');
   if (engineStatusText) {
-    engineStatusText.textContent = "Cloud Edge Sync Active";
+    engineStatusText.textContent = "Live Tracking";
   }
   const desc = document.getElementById('syncStatusDesc');
   if (desc) {

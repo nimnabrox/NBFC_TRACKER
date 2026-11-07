@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NBFC TRACKER - Created by NimnaBro</title>
+  <link rel="icon" type="image/png" href="assets/chest_fnv1.png">
+  <link rel="shortcut icon" type="image/png" href="assets/chest_fnv1.png">
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* Sleek Mini Companion App Styles */
+    html, body {
+      height: 100%;
+      overflow: hidden;
+      background: #0d0f14;
+      font-family: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+      color: #f0f2f5;
+    }
+    .mini-shell {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      max-width: 100%;
+    }
+    /* Custom Sleek Scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #10131a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #2a3142;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f5a623;
+    }
+    /* Top Header */
+    .mini-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      background: #141820;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+    }
+    .mini-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mini-brand img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 6px rgba(245, 166, 35, 0.4));
+    }
+    .mini-title {
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+    .badge-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      background: rgba(72, 187, 120, 0.12);
+      color: #48bb78;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(72, 187, 120, 0.25);
+    }
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #48bb78;
+      box-shadow: 0 0 8px #48bb78;
+    }
+    /* Tabs Header */
+    .mini-tabs {
+      display: flex;
+      background: #11141b;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 0;
+      padding: 0 10px;
+      gap: 4px;
+    }
+    .mini-tab-btn {
+      flex: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      padding: 12px 10px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: #8c93a4;
+      font-size: 12px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .mini-tab-btn:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .mini-tab-btn.active {
+      color: #f5a623;
+      border-bottom-color: #f5a623;
+      background: rgba(245, 166, 35, 0.06);
+    }
+    /* Content Area */
+    .mini-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .tab-pane {
+      display: none;
+      flex-direction: column;
+      gap: 14px;
+      animation: fadeIn 0.15s ease;
+    }
+    .tab-pane.active {
+      display: flex;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Cards */
+    .mini-card {
+      background: #1a1f2b;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .mini-card-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #8c93a4;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    /* Chest Big Tile */
+    .hero-stat-card {
+      background: linear-gradient(135deg, #1d2332 0%, #151922 100%);
+      border: 1px solid rgba(245, 166, 35, 0.25);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    }
+    .hero-stat-card::after {
+      content: '';
+      position: absolute;
+      top: -40px;
+      right: -40px;
+      width: 120px;
+      height: 120px;
+      background: radial-gradient(circle, rgba(245, 166, 35, 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .hero-number {
+      font-size: 46px;
+      font-weight: 900;
+      color: #f5a623;
+      line-height: 1.1;
+      text-shadow: 0 0 24px rgba(245, 166, 35, 0.45);
+      font-variant-numeric: tabular-nums;
+    }
+    .hero-label {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #a0aec0;
+      margin-top: 4px;
+    }
+    .sub-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .sub-stat-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 8px;
+      padding: 10px;
+    }
+    .sub-stat-val {
+      font-size: 18px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .sub-stat-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: #8c93a4;
+      margin-top: 2px;
+    }
+    /* Buttons */
+    .btn-gold {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 11px 16px;
+      background: #f5a623;
+      color: #0d0f14;
+      font-weight: 800;
+      font-size: 13px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-gold:hover {
+      background: #ffbe40;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(245, 166, 35, 0.35);
+    }
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      width: 100%;
+      padding: 10px 14px;
+      background: #212736;
+      color: #f0f2f5;
+      font-weight: 700;
+      font-size: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s ease;
+    }
+    .btn-secondary:hover {
+      background: #2a3246;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    /* Settings Form Controls */
+    .setting-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .setting-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+    .setting-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .setting-desc {
+      font-size: 11px;
+      color: #8c93a4;
+      margin-top: 2px;
+    }
+    /* Toggle Switch */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 44px;
+      height: 24px;
+      flex-shrink: 0;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #2b3140;
+      transition: .2s;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: #f5a623;
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+      background-color: #0d0f14;
+    }
+    /* Input Box */
+    .mini-input {
+      width: 100%;
+      background: #11141b;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #fff;
+      font-family: inherit;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .mini-input:focus {
+      border-color: #f5a623;
+    }
+    /* Footer */
+    .mini-footer {
+      padding: 12px 18px;
+      background: #141820;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 11px;
+      color: #8c93a4;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .mini-footer a {
+      color: #f5a623;
+      text-decoration: none;
+      font-weight: 700;
+    }
+    .mini-footer a:hover {
+      text-decoration: underline;
+    }
+    /* Toast Notification */
+    #toastNotice {
+      display: none;
+      position: fixed;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f5a623;
+      color: #0d0f14;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+      z-index: 999;
+      animation: popToast 0.2s ease;
+    }
+    @keyframes popToast {
+      from { opacity: 0; transform: translate(-50%, 8px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+  </style>
+</head>
+<body>
+  <div class="mini-shell">
+    <!-- Top Header Bar -->
+    <header class="mini-header">
+      <div class="mini-brand">
+        <img src="assets/chest_fnv1.png" alt="Chest">
+        <div>
+          <div class="mini-title">NBFC TRACKER</div>
+          <div style="font-size:10px;color:#8c93a4;font-weight:700;">Fortnite Replay Counter · v3.0</div>
+        </div>
+      </div>
+      <div class="badge-status" id="headerStatusBadge">
+        <span class="status-dot"></span>
+        <span id="headerStatusText">Live Tracking</span>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="mini-tabs">
+      <button type="button" class="mini-tab-btn active" data-tab="tabStats">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="20" x2="18" y2="10"></line>
+          <line x1="12" y1="20" x2="12" y2="4"></line>
+          <line x1="6" y1="20" x2="6" y2="14"></line>
+        </svg>
+        <span>Live Stats</span>
+      </button>
+      <button type="button" class="mini-tab-btn" data-tab="tabSettings">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+        </svg>
+        <span>Settings</span>
+      </button>
+      <button type="button" class="mini-tab-btn" data-tab="tabObs">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+          <line x1="8" y1="21" x2="16" y2="21"></line>
+          <line x1="12" y1="17" x2="12" y2="21"></line>
+        </svg>
+        <span>OBS Overlay</span>
+      </button>
+    </nav>
+
+    <!-- Scrollable Body Content -->
+    <main class="mini-body">
+      <!-- TAB 1: LIVE STATS -->
+      <div id="tabStats" class="tab-pane active">
+        <!-- Active Gamer Account -->
+        <div class="mini-card" style="display:flex;align-items:center;justify-content:space-between;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;border-radius:8px;background:rgba(245,166,35,0.12);display:flex;align-items:center;justify-content:center;color:#f5a623;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </div>
+            <div>
+              <div style="font-size:10px;font-weight:800;color:#8c93a4;text-transform:uppercase;">Fortnite Profile</div>
+              <div style="font-size:15px;font-weight:900;color:#fff;" id="activePlayerName">nimnabro</div>
+            </div>
+          </div>
+          <select id="profileDropdown" style="background:#11141b;color:#f5a623;border:1px solid rgba(245,166,35,0.3);padding:6px 10px;border-radius:6px;font-size:12px;font-weight:700;font-family:inherit;outline:none;">
+            <option value="all">All Accounts</option>
+          </select>
+        </div>
+
+        <!-- Hero Chest Counter Tile -->
+        <div class="hero-stat-card">
+          <div class="hero-label">Total Chests Opened</div>
+          <div class="hero-number" id="statTotalChests">0</div>
+          <div style="font-size:11px;color:#8c93a4;margin-top:2px;" id="statMatchProgress">Auto-updates after every match</div>
+
+          <div class="sub-stats-grid">
+            <div class="sub-stat-box">
+              <div class="sub-stat-val" id="statLastMatch">0</div>
+              <div class="sub-stat-lbl">Last Match</div>
+            </div>
+            <div class="sub-stat-box">
+              <div class="sub-stat-val" id="statSession">0</div>
+              <div class="sub-stat-lbl">This Session</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick OBS Link Action -->
+        <div class="mini-card" style="padding:14px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:11px;font-weight:800;color:#8c93a4;text-transform:uppercase;">OBS Stream Overlay</span>
+            <span style="font-size:11px;color:#48bb78;font-weight:700;">● Active Ready</span>
+          </div>
+          <div style="background:#11141b;border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:8px 10px;font-size:11px;color:#f5a623;font-weight:700;word-break:break-all;user-select:all;margin-bottom:10px;" id="obsUrlDisplay">
+            https://nbfct.nimnabro.com/overlay.html?room=nimnabro
+          </div>
+          <button type="button" class="btn-secondary" id="btnCopyOverlay" style="gap:6px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span id="btnCopyOverlayText">Copy OBS Overlay URL</span>
+          </button>
+        </div>
+
+        <!-- Launch Web Dashboard Button -->
+        <a href="https://nbfct.nimnabro.com" target="_blank" class="btn-gold" id="btnOpenWeb">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="2" y1="12" x2="22" y2="12"></line>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+          </svg>
+          <span>Open Full Web Dashboard (nbfct.nimnabro.com)</span>
+        </a>
+      </div>
+
+      <!-- TAB 2: SETTINGS -->
+      <div id="tabSettings" class="tab-pane">
+        <!-- Windows Startup Card -->
+        <div class="mini-card">
+          <div class="setting-row">
+            <div>
+              <div class="setting-title">Start with Windows</div>
+              <div class="setting-desc">Launch silently minimized in system tray when your PC boots.</div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="chkStartupMini">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Fortnite Replays Folder Card -->
+        <div class="mini-card">
+          <div class="mini-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <span>Fortnite Replays Folder</span>
+          </div>
+          <div style="font-size:11px;color:#8c93a4;margin-bottom:8px;">Auto-detected replay location:</div>
+          <div style="background:#11141b;border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:8px 10px;font-size:11px;color:#fff;word-break:break-all;font-family:monospace;margin-bottom:12px;" id="detectedFolderText">
+            %LOCALAPPDATA%\FortniteGame\Saved\Demos
+          </div>
+
+          <div style="font-size:11px;font-weight:700;color:#fff;margin-bottom:6px;">Manual Folder Override (Optional):</div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="inputCustomFolder" class="mini-input" placeholder="e.g. C:\FortniteReplays">
+            <button type="button" class="btn-secondary" id="btnSaveCustomFolder" style="width:auto;white-space:nowrap;padding:8px 14px;">Set</button>
+          </div>
+        </div>
+
+        <!-- Starting Chest Count Offset -->
+        <div class="mini-card">
+          <div class="mini-card-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            </svg>
+            <span>Starting Chest Offset</span>
+          </div>
+          <div style="font-size:11px;color:#8c93a4;margin-bottom:10px;">
+            Set a base chest count to match your season goal or in-game milestone:
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:8px;">
+            <input type="number" id="inputBaseChest" class="mini-input" placeholder="e.g. 5000">
+            <button type="button" class="btn-gold" id="btnSaveBaseChest" style="width:auto;white-space:nowrap;padding:8px 16px;">Save</button>
+            <button type="button" class="btn-secondary" id="btnResetBaseChest" style="width:auto;white-space:nowrap;padding:8px 12px;">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: OBS OVERLAY -->
+      <div id="tabObs" class="tab-pane">
+        <!-- Live Pill Preview -->
+        <div class="mini-card" style="text-align:center;padding:24px 16px;">
+          <div style="font-size:11px;font-weight:800;color:#8c93a4;text-transform:uppercase;margin-bottom:14px;">Live Stream Preview</div>
+          <div style="display:inline-flex;align-items:center;gap:12px;padding:8px 20px 8px 12px;background:#1c1f26;border:2px solid #f5a623;border-radius:40px;box-shadow:0 6px 20px rgba(0,0,0,0.6);">
+            <img src="assets/chest_fnv1.png" width="30" height="30" style="object-fit:contain;filter:drop-shadow(0 0 6px rgba(245,166,35,0.5));">
+            <span style="font-size:24px;font-weight:900;color:#f5a623;font-variant-numeric:tabular-nums;" id="previewChestsVal">0</span>
+          </div>
+        </div>
+
+        <!-- Overlay URL & Copy -->
+        <div class="mini-card">
+          <div class="mini-card-title">Browser Source URL</div>
+          <div style="background:#11141b;border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:10px;font-size:11px;color:#f5a623;font-weight:700;word-break:break-all;user-select:all;margin-bottom:12px;" id="obsFullUrl">
+            https://nbfct.nimnabro.com/overlay.html?room=nimnabro
+          </div>
+
+          <div style="display:flex;gap:10px;">
+            <button type="button" class="btn-gold" id="btnCopyObs2" style="flex:1;">Copy URL</button>
+            <a href="https://nbfct.nimnabro.com/overlay.html?room=nimnabro" target="_blank" class="btn-secondary" id="btnTestObs" style="flex:1;">Test in Browser</a>
+          </div>
+        </div>
+
+        <!-- Setup Instructions -->
+        <div class="mini-card">
+          <div class="mini-card-title">OBS Studio Setup Steps</div>
+          <ol style="margin:0;padding-left:18px;font-size:11px;color:#a0aec0;line-height:1.6;">
+            <li>In OBS Studio, click <b>+</b> under Sources and choose <b>Browser</b>.</li>
+            <li>Paste the URL above into the <b>URL</b> field.</li>
+            <li>Set <b>Width</b> to <code style="color:#f5a623;">420</code> and <b>Height</b> to <code style="color:#f5a623;">120</code>.</li>
+            <li>Check <i>Shutdown source when not visible</i> (optional) and click <b>OK</b>.</li>
+          </ol>
+        </div>
+      </div>
+    </main>
+
+    <!-- Clean Bottom Footer -->
+    <footer class="mini-footer">
+      <div>
+        Created by <a href="https://guns.lol/nimnabro" target="_blank">NimnaBro</a> · All Rights Reserved
+      </div>
+      <div>
+        <a href="https://github.com/nimnabrox/NBFC_TRACKER" target="_blank" style="display:inline-flex;align-items:center;gap:4px;color:#8c93a4;">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
+          </svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toastNotice">Copied to Clipboard!</div>
+
+  <script src="mini-app.js"></script>
+</body>
+</html>
