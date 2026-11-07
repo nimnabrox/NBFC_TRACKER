@@ -135,50 +135,72 @@
       }
     });
 
-    // 3. Ultra-efficient Polling (Tries local companion at :5088 first, then Cloudflare /api/sync)
+    // 3. Ultra-efficient Auto-Connecting Poller
     let isPolling = false;
     async function poll() {
       if (isPolling) return;
       isPolling = true;
 
-      // Try local daemon first (0ms latency, 0 bandwidth)
+      let localSucceeded = false;
+
+      // Try local daemon first (0ms latency if running on PC)
       try {
         const ctrl = new AbortController();
-        const tid = setTimeout(() => ctrl.abort(), 800);
+        const tid = setTimeout(() => ctrl.abort(), 600);
         const res = await fetch('http://localhost:5088/api/live', { signal: ctrl.signal });
         clearTimeout(tid);
         if (res.ok) {
           const d = await res.json();
           if (d && d.total !== undefined) {
             updateTotal(d.total);
-            isPolling = false;
-            return;
+            localSucceeded = true;
           }
         }
       } catch {}
 
-      // Fallback to Cloudflare Edge /api/sync
-      try {
-        const ctrl = new AbortController();
-        const tid = setTimeout(() => ctrl.abort(), 1200);
-        const baseApi = (window.location.origin && window.location.origin.startsWith('http'))
-          ? window.location.origin
-          : 'https://nbfct.nimnabro.com';
-        const res = await fetch(`${baseApi}/api/sync?room=${encodeURIComponent(room)}`, {
-          cache: 'no-store',
-          signal: ctrl.signal
-        });
-        clearTimeout(tid);
-        if (res.ok) {
-          const d = await res.json();
-          if (d && d.total !== undefined) updateTotal(d.total);
-        }
-      } catch {}
+      if (!localSucceeded) {
+        try {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 600);
+          const res = await fetch('http://127.0.0.1:5088/api/live', { signal: ctrl.signal });
+          clearTimeout(tid);
+          if (res.ok) {
+            const d = await res.json();
+            if (d && d.total !== undefined) {
+              updateTotal(d.total);
+              localSucceeded = true;
+            }
+          }
+        } catch {}
+      }
+
+      // If local not reached or HTTPS mixed-content restricted, ALWAYS query Cloudflare Edge /api/sync
+      if (!localSucceeded) {
+        try {
+          const ctrl = new AbortController();
+          const tid = setTimeout(() => ctrl.abort(), 1000);
+          const baseApi = (window.location.origin && window.location.origin.startsWith('http') && !window.location.origin.includes(':5088'))
+            ? window.location.origin
+            : 'https://nbfct.nimnabro.com';
+          const res = await fetch(`${baseApi}/api/sync?room=${encodeURIComponent(room)}`, {
+            cache: 'no-store',
+            signal: ctrl.signal
+          });
+          clearTimeout(tid);
+          if (res.ok) {
+            const d = await res.json();
+            if (d && d.total !== undefined) {
+              updateTotal(d.total);
+            }
+          }
+        } catch {}
+      }
 
       isPolling = false;
     }
 
-    setInterval(poll, 1000);
+    // Auto-connect loop: runs every 800ms so when app starts it auto-detects without refresh!
+    setInterval(poll, 800);
     poll();
   </script>
 </body>

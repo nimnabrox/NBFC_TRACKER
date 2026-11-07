@@ -108,7 +108,8 @@
       const key = profileDropdown.value;
       try {
         await fetch(`http://localhost:5088/api/set-profile?key=${encodeURIComponent(key)}`);
-        pollLive();
+        await pollLive();
+        showToast("Profile Updated & Synced to Cloud!");
       } catch (e) {
         console.warn("Could not set profile:", e);
       }
@@ -236,17 +237,26 @@
 
     // Populate profile dropdown if accounts list changed
     if (d.accounts && Array.isArray(d.accounts) && d.accounts.length > 0) {
-      if (JSON.stringify(d.accounts) !== JSON.stringify(STATE.accounts)) {
+      const accountsJson = JSON.stringify(d.accounts);
+      if (accountsJson !== STATE._lastAccountsJson) {
+        STATE._lastAccountsJson = accountsJson;
         STATE.accounts = d.accounts;
         if (profileDropdown) {
           profileDropdown.innerHTML = '<option value="all">All Accounts</option>';
+          let anySelected = false;
           d.accounts.forEach(acc => {
             const opt = document.createElement('option');
-            opt.value = acc.name || acc.key;
+            opt.value = acc.key || acc.name;
             opt.textContent = `${acc.name || acc.key} (${acc.chests || 0} chests)`;
-            if (acc.active) opt.selected = true;
+            if (acc.active) {
+              opt.selected = true;
+              anySelected = true;
+            }
             profileDropdown.appendChild(opt);
           });
+          if (!anySelected && (!d.player || d.player === 'All Accounts')) {
+            profileDropdown.value = 'all';
+          }
         }
       }
     }

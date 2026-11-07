@@ -12,7 +12,7 @@ import { SyncManager } from './sync.js';
 
 // --- Global Application State ---
 const STATE = {
-  room: new URLSearchParams(window.location.search).get('room') || 'nimnabro',
+  room: new URLSearchParams(window.location.search).get('room') || '',
   directoryHandle: null,
   processedFiles: new Map(), // fileName -> lastModified
   matches: [],
@@ -23,6 +23,9 @@ const STATE = {
   isCompanionConnected: false,
   hasLoadedLocalMatches: false
 };
+
+let currentMatchPage = 1;
+const MATCHES_PER_PAGE = 10;
 
 // Initialize Universal Sync Manager
 const sync = new SyncManager(STATE.room, false);
@@ -239,17 +242,20 @@ export function clearBaseCount() {
 }
 
 // --- Fortnite Account / Profile Switcher ---
-export function switchAccount(name) {
+export async function switchAccount(name) {
   STATE.activeAccount = name;
   localStorage.setItem('nb_active_account', name);
 
   // Sync to local daemon
   try {
-    fetch(`http://localhost:5088/api/set-profile?key=${encodeURIComponent(name)}`, { mode: 'cors' });
+    await fetch(`http://localhost:5088/api/set-profile?key=${encodeURIComponent(name)}`, { mode: 'cors' });
   } catch {}
 
   updateObsLinks();
   renderApp();
+  try {
+    await pollLiveEdgeSync();
+  } catch {}
 }
 
 // --- Copy OBS URL ---
@@ -473,19 +479,29 @@ function renderActivityChart(matches) {
 function renderMatchesTable(matches) {
   const tbody = document.getElementById('matchesTableBody');
   const countIndicator = document.getElementById('matchCountIndicator');
+  const paginationContainer = document.getElementById('matchesPagination');
   if (!tbody) return;
 
+  const totalMatches = matches.length;
   if (countIndicator) {
-    countIndicator.textContent = `${matches.length} ${matches.length === 1 ? 'match' : 'matches'}`;
+    countIndicator.textContent = `${totalMatches} ${totalMatches === 1 ? 'match' : 'matches'}`;
   }
 
-  if (matches.length === 0) {
+  if (totalMatches === 0) {
     tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:34px;color:var(--muted);">No replay matches detected. Connect your replays or launch companion app.</td></tr>`;
+    if (paginationContainer) paginationContainer.style.display = 'none';
     return;
   }
 
+  const totalPages = Math.ceil(totalMatches / MATCHES_PER_PAGE) || 1;
+  if (currentMatchPage > totalPages) currentMatchPage = totalPages;
+  if (currentMatchPage < 1) currentMatchPage = 1;
+
+  const startIndex = (currentMatchPage - 1) * MATCHES_PER_PAGE;
+  const pageMatches = matches.slice(startIndex, startIndex + MATCHES_PER_PAGE);
+
   let html = '';
-  for (const m of matches.slice(0, 80)) {
+  for (const m of pageMatches) {
     const date = new Date(m.matchStart).toLocaleDateString(undefined, {
       month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
@@ -515,6 +531,41 @@ function renderMatchesTable(matches) {
   }
 
   tbody.innerHTML = html;
+
+  // Pagination controls (10 matches per page)
+  if (paginationContainer) {
+    if (totalPages <= 1) {
+      paginationContainer.style.display = 'none';
+    } else {
+      paginationContainer.style.display = 'flex';
+      paginationContainer.innerHTML = `
+        <div style="font-size:12px;color:var(--muted);font-weight:600;">
+          Showing ${startIndex + 1}–${Math.min(startIndex + MATCHES_PER_PAGE, totalMatches)} of ${totalMatches} matches
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button type="button" class="btn btn-secondary" style="padding:5px 12px;font-size:11px;" ${currentMatchPage === 1 ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''} onclick="window.app.prevMatchPage()">
+            ← Previous
+          </button>
+          <span style="font-size:12px;font-weight:700;color:var(--text);padding:0 6px;">Page ${currentMatchPage} of ${totalPages}</span>
+          <button type="button" class="btn btn-secondary" style="padding:5px 12px;font-size:11px;" ${currentMatchPage === totalPages ? 'disabled style="opacity:0.4;cursor:not-allowed;"' : ''} onclick="window.app.nextMatchPage()">
+            Next →
+          </button>
+        </div>
+      `;
+    }
+  }
+}
+
+export function prevMatchPage() {
+  if (currentMatchPage > 1) {
+    currentMatchPage--;
+    renderApp();
+  }
+}
+
+export function nextMatchPage() {
+  currentMatchPage++;
+  renderApp();
 }
 
 // --- CSV Export ---
@@ -534,22 +585,50 @@ export function exportCsv() {
   URL.revokeObjectURL(url);
 }
 
+function updateConnectionUI(connected) {
+  STATE.isCompanionConnected = connected;
+  const badge = document.getElementById('desktopAppStatusBadge');
+  const dot = document.getElementById('desktopAppStatusDot');
+  const text = document.getElementById('desktopAppStatusText');
+  if (badge && dot && text) {
+    if (connected) {
+      badge.style.background = 'rgba(72, 187, 120, 0.12)';
+      badge.style.color = '#48bb78';
+      badge.style.borderColor = 'rgba(72, 187, 120, 0.3)';
+      dot.style.background = '#48bb78';
+      dot.style.boxShadow = '0 0 8px #48bb78';
+      text.textContent = 'Desktop App Connected';
+    } else {
+      badge.style.background = 'rgba(255, 255, 255, 0.05)';
+      badge.style.color = '#8c93a4';
+      badge.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+      dot.style.background = '#8c93a4';
+      dot.style.boxShadow = 'none';
+      text.textContent = 'Desktop App Disconnected';
+    }
+  }
+}
+
 // --- Background Synchronization Engine ---
 let isPollingSync = false;
 async function pollExternalSync() {
   if (isPollingSync) return;
   isPollingSync = true;
 
-  // 1. Try local companion daemon at http://localhost:5088
+  let localConnected = false;
+
+  // 1. Try local companion daemon at http://localhost:5088 and http://127.0.0.1:5088
   try {
     const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 1200);
+    const tid = setTimeout(() => ctrl.abort(), 900);
     const res = await fetch('http://localhost:5088/api/live', { signal: ctrl.signal, mode: 'cors' });
     clearTimeout(tid);
 
     if (res.ok) {
       const d = await res.json();
       if (d && (d.total !== undefined || d.player)) {
+        localConnected = true;
+        updateConnectionUI(true);
         applyCompanionDaemonState(d);
 
         if (!STATE.hasLoadedLocalMatches) {
@@ -561,27 +640,55 @@ async function pollExternalSync() {
     }
   } catch {}
 
-  // 2. Fallback to Cloudflare Edge Sync
-  try {
-    const ctrl = new AbortController();
-    const tid = setTimeout(() => ctrl.abort(), 1500);
-    const baseApi = (window.location.origin && window.location.origin.startsWith('http'))
-      ? window.location.origin
-      : 'https://nbfct.nimnabro.com';
-    const room = (STATE.activeAccount || STATE.room || 'nimnabro').toLowerCase();
-    const res = await fetch(`${baseApi}/api/sync?room=${encodeURIComponent(room)}`, {
-      cache: 'no-store',
-      signal: ctrl.signal
-    });
-    clearTimeout(tid);
+  if (!localConnected) {
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 900);
+      const res = await fetch('http://127.0.0.1:5088/api/live', { signal: ctrl.signal, mode: 'cors' });
+      clearTimeout(tid);
 
-    if (res.ok) {
-      const d = await res.json();
-      if (d && (d.total !== undefined || d.accounts?.length > 0 || d.matches?.length > 0)) {
-        applyEdgeSyncState(d);
+      if (res.ok) {
+        const d = await res.json();
+        if (d && (d.total !== undefined || d.player)) {
+          localConnected = true;
+          updateConnectionUI(true);
+          applyCompanionDaemonState(d);
+
+          if (!STATE.hasLoadedLocalMatches) {
+            await fetchLocalMatchesOnce();
+          }
+          isPollingSync = false;
+          return;
+        }
       }
-    }
-  } catch {}
+    } catch {}
+  }
+
+  updateConnectionUI(false);
+
+  // 2. Fallback to Cloudflare Edge Sync ONLY if a room is explicitly configured or requested
+  const targetRoom = STATE.room || new URLSearchParams(window.location.search).get('room');
+  if (targetRoom && targetRoom.trim() && targetRoom.trim() !== 'all') {
+    try {
+      const ctrl = new AbortController();
+      const tid = setTimeout(() => ctrl.abort(), 1200);
+      const baseApi = (window.location.origin && window.location.origin.startsWith('http') && !window.location.origin.includes(':5088'))
+        ? window.location.origin
+        : 'https://nbfct.nimnabro.com';
+      const res = await fetch(`${baseApi}/api/sync?room=${encodeURIComponent(targetRoom.toLowerCase())}`, {
+        cache: 'no-store',
+        signal: ctrl.signal
+      });
+      clearTimeout(tid);
+
+      if (res.ok) {
+        const d = await res.json();
+        if (d && (d.total !== undefined || d.accounts?.length > 0 || d.matches?.length > 0)) {
+          applyEdgeSyncState(d);
+        }
+      }
+    } catch {}
+  }
 
   isPollingSync = false;
 }
@@ -730,7 +837,9 @@ window.app = {
   copyObsUrl,
   exportCsv,
   toggleStartup,
-  setCustomDemosFolder
+  setCustomDemosFolder,
+  prevMatchPage,
+  nextMatchPage
 };
 
 document.addEventListener('DOMContentLoaded', () => {

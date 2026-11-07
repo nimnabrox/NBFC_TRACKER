@@ -113,13 +113,12 @@ if (previewPath == null && !AcquireInstance(instance, afterUpdate ? TimeSpan.Fro
     L.Set(store.LoadConfig()?.Language ?? L.SystemDefault);
     Console.ForegroundColor = ConsoleColor.Yellow;
     Console.WriteLine(L.T("  Le compteur de coffres est déjà ouvert : regarde dans la barre des tâches.",
-        "  The chest counter is already open: opening dashboard in browser..."));
+        "  NBFC TRACKER is already running in your system tray / desktop companion."));
     Console.ResetColor();
-    try { Process.Start(new ProcessStartInfo("https://nbfct.nimnabro.com") { UseShellExecute = true }); } catch { }
     if (interactive)
     {
-        Console.WriteLine(L.T("  (cette fenêtre se ferme dans 5 secondes)", "  (this window closes in 5 seconds)"));
-        Thread.Sleep(5_000);
+        Console.WriteLine(L.T("  (cette fenêtre se ferme dans 3 secondes)", "  (this window closes in 3 seconds)"));
+        Thread.Sleep(3_000);
     }
     return 0;
 }
@@ -280,7 +279,7 @@ if (firstRun && interactive)
         Console.WriteLine();
         ReportWriter.Progress = new ScanProgress(0, existing.Count);
         ReportWriter.WriteAll(store, config, data);
-        if (config.OpenReportOnStart)
+        if (isCli && config.OpenReportOnStart)
         {
             Open(store.ReportPath);
             reportOpened = true;
@@ -433,7 +432,7 @@ if (backlog > 1)
     ReportWriter.Progress = new ScanProgress(0, backlog);
 }
 ReportWriter.WriteAll(store, config, data);
-if (config.OpenReportOnStart && !reportOpened && !auto)
+if (isCli && config.OpenReportOnStart && !reportOpened && !auto)
 {
     Open(store.ReportPath);
 }
@@ -442,6 +441,7 @@ if (backlog > 0)
     tracker.Scan();
     ReportWriter.Progress = null;
     ReportWriter.WriteAll(store, config, data);
+    WebDashboardServer.SyncToCloudAsync();
 }
 if (tracker.NewProfilesFound)
 {
@@ -488,7 +488,14 @@ if (config.UpdateMode != "off")
 DateTime? autoCloseAt = null;
 DateTime? fortniteClosedSince = null;
 var keys = new BlockingCollection<ConsoleKeyInfo>();
-Console.CancelKeyPress += (_, e) => { e.Cancel = true; quit = true; wake.Set(); };
+try
+{
+    if (isCli)
+    {
+        Console.CancelKeyPress += (_, e) => { e.Cancel = true; quit = true; wake.Set(); };
+    }
+}
+catch { }
 
 // Keyboard: one thread blocked on ReadKey (no polling). Menus opened from the main loop read the same queue.
 if (interactive)
@@ -537,9 +544,11 @@ if (!isCli && OperatingSystem.IsWindows())
             var startMinimized = args.Contains("--minimized");
             Application.Run(new MainGuiForm(WebDashboardServer.Url + "app.html", () =>
             {
+                TraceLog("MainGuiForm onExit callback invoked!");
                 quit = true;
                 wake.Set();
             }, startMinimized));
+            TraceLog("Application.Run on guiThread returned!");
         }
         catch (Exception ex)
         {

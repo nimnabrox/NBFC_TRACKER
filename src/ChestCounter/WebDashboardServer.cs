@@ -34,10 +34,15 @@ public static class WebDashboardServer
 
         try
         {
+            var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ChestCounter", "trace.log");
+            File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss.fff}] [WebDashboardServer] Starting on http://localhost:{Port}/ and http://127.0.0.1:{Port}/ ...\r\n");
+
             _listener = new HttpListener();
             _listener.Prefixes.Add($"http://localhost:{Port}/");
             _listener.Prefixes.Add($"http://127.0.0.1:{Port}/");
             _listener.Start();
+
+            File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss.fff}] [WebDashboardServer] Listener started successfully!\r\n");
 
             _thread = new Thread(() =>
             {
@@ -64,12 +69,18 @@ public static class WebDashboardServer
             Console.WriteLine($"  [OBS Overlay]   Live at {OverlayUrl}");
             Console.ResetColor();
 
-            // Broadcast initial state to Cloudflare edge sync and keep cloud live every 10 seconds
+            // Broadcast initial state to Cloudflare edge sync and keep cloud live every 2 seconds
             SyncToCloudAsync();
-            _cloudSyncTimer = new System.Threading.Timer(_ => SyncToCloudAsync(), null, TimeSpan.FromSeconds(5), TimeSpan.FromSeconds(10));
+            _cloudSyncTimer = new System.Threading.Timer(_ => SyncToCloudAsync(), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
         }
         catch (Exception ex)
         {
+            try
+            {
+                var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ChestCounter", "trace.log");
+                File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss.fff}] [WebDashboardServer] ERROR: {ex}\r\n");
+            }
+            catch { }
             ErrorLog.Write("WebDashboardServer Start", ex);
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine($"  [Web Dashboard] Notice: Local port {Port} unavailable ({ex.Message}). Will open HTML file directly.");
@@ -162,10 +173,23 @@ public static class WebDashboardServer
             // 2b. Set Active Account / Profile API
             if (path.Equals("/api/set-profile", StringComparison.OrdinalIgnoreCase))
             {
-                var profileKey = req.QueryString["key"] ?? req.QueryString["profile"];
-                if (_config != null && _store != null && _data != null && !string.IsNullOrWhiteSpace(profileKey))
+                var profileKey = req.QueryString["key"] ?? req.QueryString["profile"] ?? "";
+                if (_config != null && _store != null && _data != null)
                 {
-                    _config.Profile = profileKey;
+                    if (profileKey.Equals("all", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(profileKey))
+                    {
+                        _config.Profile = "all";
+                    }
+                    else
+                    {
+                        lock (_data)
+                        {
+                            var match = Profiles.List(_data).FirstOrDefault(p =>
+                                p.Key.Equals(profileKey, StringComparison.OrdinalIgnoreCase) ||
+                                (!string.IsNullOrEmpty(p.Name) && p.Name.Equals(profileKey, StringComparison.OrdinalIgnoreCase)));
+                            _config.Profile = match != null ? match.Key : profileKey;
+                        }
+                    }
                     _store.SaveConfig(_config);
                     ReportWriter.WriteAll(_store, _config, _data);
                     Console.ForegroundColor = ConsoleColor.Cyan;
@@ -375,6 +399,39 @@ public static class WebDashboardServer
                 return;
             }
 
+            // Embedded Resources Fallback: Enables 100% standalone single-file .exe operation on ANY new PC with zero external folders
+            var asm = typeof(AppInfo).Assembly;
+            var resNames = asm.GetManifestResourceNames();
+            var targetSuffix = cleanPath.Replace('/', '.').Replace('\\', '.');
+            var matchedRes = resNames.FirstOrDefault(r =>
+                r.EndsWith("." + targetSuffix, StringComparison.OrdinalIgnoreCase) ||
+                r.EndsWith("." + Path.GetFileName(cleanPath), StringComparison.OrdinalIgnoreCase));
+
+            if (matchedRes != null)
+            {
+                using var stream = asm.GetManifestResourceStream(matchedRes);
+                if (stream != null)
+                {
+                    var ext = Path.GetExtension(cleanPath).ToLowerInvariant();
+                    res.ContentType = ext switch
+                    {
+                        ".html" => "text/html; charset=utf-8",
+                        ".css" => "text/css; charset=utf-8",
+                        ".js" or ".mjs" => "application/javascript; charset=utf-8",
+                        ".json" => "application/json; charset=utf-8",
+                        ".png" => "image/png",
+                        ".svg" => "image/svg+xml",
+                        ".ico" => "image/x-icon",
+                        _ => "application/octet-stream"
+                    };
+
+                    res.ContentLength64 = stream.Length;
+                    stream.CopyTo(res.OutputStream);
+                    res.Close();
+                    return;
+                }
+            }
+
             // Fallback to legacy report if static index not found
             res.ContentType = "text/html; charset=utf-8";
             if (_store != null && File.Exists(_store.ReportPath))
@@ -428,7 +485,7 @@ public static class WebDashboardServer
                 }
 
                 // 2. If active player name is distinct, also sync to that player's room
-                if (!activePlayer.Equals("nimnabro", StringComparison.OrdinalIgnoreCase))
+                if (!activePlayer.Equals("nimnabro", StringComparison.OrdinalIgnoreCase) && !activePlayer.Equals("All Accounts", StringComparison.OrdinalIgnoreCase))
                 {
                     var playerPayload = GetCloudSyncPayload(activePlayer.ToLowerInvariant());
                     using (var c2 = new StringContent(playerPayload, Encoding.UTF8, "application/json"))
@@ -461,6 +518,10 @@ public static class WebDashboardServer
                 {
                     playerName = cur.Name;
                 }
+                else if (string.Equals(_config.Profile, "all", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(_config.Profile))
+                {
+                    playerName = "All Accounts";
+                }
             }
             var baseCount = _config.BaseChestCount;
             var matches = matchArray.OrderByDescending(ReportWriter.When).ToList();
@@ -474,7 +535,10 @@ public static class WebDashboardServer
 
             // Format accounts list
             var profileItems = Profiles.List(_data).Select(p =>
-                $"{{\"key\":\"{EscapeJson(p.Key)}\",\"name\":\"{EscapeJson(p.Name)}\",\"matches\":{p.Matches},\"chests\":{p.Chests},\"active\":{(p.Key == _config.Profile || p.Name == playerName ? "true" : "false")}}}");
+            {
+                var isActive = (p.Key == _config.Profile || (!string.IsNullOrEmpty(_config.Profile) && p.Name.Equals(_config.Profile, StringComparison.OrdinalIgnoreCase)));
+                return $"{{\"key\":\"{EscapeJson(p.Key)}\",\"name\":\"{EscapeJson(p.Name)}\",\"matches\":{p.Matches},\"chests\":{p.Chests},\"active\":{(isActive ? "true" : "false")}}}";
+            });
             var accountsJson = "[" + string.Join(",", profileItems) + "]";
             var matchesJson = GetMatchesJson();
 

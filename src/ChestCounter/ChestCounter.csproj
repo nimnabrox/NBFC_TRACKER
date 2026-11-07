@@ -30,5 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\lib\FortniteReplayReader\FortniteReplayReader.csproj" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
+    <EmbeddedResource Include="..\..\public\**\*" LinkBase="public" />
   </ItemGroup>
 </Project>

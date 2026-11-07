@@ -26,11 +26,18 @@ public static class Profiles
 
     private static DateTime When(MatchRecord m) => m.MatchStartUtc ?? m.AnalyzedAtUtc;
 
-    /// <summary>The selected profile when it exists, else the most recently played one (null = no match yet).</summary>
+    /// <summary>The selected profile when it exists, else the most recently played one (null = no match yet or all accounts).</summary>
     public static Profile? Current(TrackerData d, Config c)
     {
         var all = List(d);
-        return all.FirstOrDefault(p => p.Key == c.Profile) ?? all.FirstOrDefault();
+        if (string.IsNullOrEmpty(c.Profile) || c.Profile.Equals("all", StringComparison.OrdinalIgnoreCase))
+        {
+            return null;
+        }
+        return all.FirstOrDefault(p =>
+            p.Key.Equals(c.Profile, StringComparison.OrdinalIgnoreCase) ||
+            (!string.IsNullOrEmpty(p.Name) && p.Name.Equals(c.Profile, StringComparison.OrdinalIgnoreCase)))
+            ?? all.FirstOrDefault();
     }
 
     /// <summary>The data of one profile only (same objects, filtered list), as seen by the overlay and the report.</summary>

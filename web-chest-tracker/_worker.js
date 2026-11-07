@@ -62,7 +62,30 @@ export default {
         }
       }
 
-      const room = (url.searchParams.get('room') || 'nimnabro').toLowerCase();
+      const rawRoom = url.searchParams.get('room');
+      // If no room is explicitly requested, return a fresh clean state (User Privacy: never leak nimnabro's data to random visitors)
+      if (!rawRoom || !rawRoom.trim()) {
+        return new Response(JSON.stringify({
+          room: '',
+          total: 0,
+          lastMatch: 0,
+          liveChests: 0,
+          base: null,
+          session: 0,
+          player: '—',
+          accounts: [],
+          matches: [],
+          inProgress: false
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Cache-Control': 'no-cache, no-store, must-revalidate'
+          }
+        });
+      }
+
+      const room = rawRoom.toLowerCase();
       const kvKey = `fct_room_${room}`;
 
       let state = roomStates.get(room);

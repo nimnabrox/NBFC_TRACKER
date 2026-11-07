@@ -209,6 +209,13 @@ public class MainGuiForm : Form
 
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
+        try
+        {
+            var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ChestCounter", "trace.log");
+            File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss.fff}] [MainGuiForm] OnFormClosing with reason: {e.CloseReason}, allowExit={_allowExit}\r\n");
+        }
+        catch { }
+
         if (!_allowExit && e.CloseReason != CloseReason.WindowsShutDown)
         {
             e.Cancel = true;

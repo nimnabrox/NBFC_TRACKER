@@ -62,12 +62,12 @@
         </div>
 
         <!-- Base Count Setting -->
-        <form onsubmit="window.app.saveBaseCount(event)" class="form-group">
+        <form onsubmit="window.app.saveBaseCount(event)" class="form-group" style="margin-bottom:0;">
           <label class="form-label" for="baseInput">Custom Starting Offset (e.g. 4084):</label>
           <div class="input-row">
-            <input type="number" id="baseInput" class="text-input" placeholder="Default (replay count)" min="0">
-            <button type="submit" class="btn btn-primary">Save</button>
-            <button type="button" class="btn btn-secondary" onclick="window.app.clearBaseCount()">Reset</button>
+            <input type="number" id="baseInput" class="text-input" placeholder="e.g. 4084" min="0">
+            <button type="submit" class="btn btn-primary" style="padding:7px 12px;font-size:12px;">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="window.app.clearBaseCount()" style="padding:7px 10px;font-size:12px;">Reset</button>
           </div>
         </form>
 
@@ -195,7 +195,12 @@
           </svg>
           <span>Profile: <span id="activeAccountName" class="player-tag">—</span></span>
         </div>
-        <div style="display:flex;align-items:center;gap:12px;">
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+          <!-- Desktop App Connection Status Badge -->
+          <div id="desktopAppStatusBadge" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,0.06);color:var(--muted);border:1px solid var(--line);transition:all 0.2s ease;">
+            <span id="desktopAppStatusDot" style="width:8px;height:8px;border-radius:50%;background:#8c93a4;"></span>
+            <span id="desktopAppStatusText">Desktop App Disconnected</span>
+          </div>
           <span style="font-size:12px;color:var(--muted);" id="lastUpdatedTime">Auto-refreshing live</span>
         </div>
       </div>
@@ -331,6 +336,9 @@
               <!-- Injected dynamically by app.js -->
             </tbody>
           </table>
+        </div>
+        <!-- Matches Pagination (10 per page) -->
+        <div id="matchesPagination" style="display:none;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(0,0,0,0.22);border-top:1px solid var(--line);border-radius:0 0 var(--radius-md) var(--radius-md);flex-wrap:wrap;gap:10px;">
         </div>
       </section>
 

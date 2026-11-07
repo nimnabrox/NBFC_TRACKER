@@ -87,7 +87,7 @@ public sealed class Config
 
     /// <summary>"prompt" (offer new versions), "auto" (install them) or "off" (never check GitHub).</summary>
     public string UpdateMode { get; set; } = "prompt";
-    public bool OpenReportOnStart { get; set; } = true;
+    public bool OpenReportOnStart { get; set; } = false;
 
     /// <summary>Disabled by default as requested (no overlay for now).</summary>
     public bool ShowOverlay { get; set; } = false;
