@@ -69,9 +69,8 @@ public static class WebDashboardServer
             Console.WriteLine($"  [OBS Overlay]   Live at {OverlayUrl}");
             Console.ResetColor();
 
-            // Broadcast initial state to Cloudflare edge sync and keep cloud live every 2 seconds
+            // Sync initial state once on startup (no periodic spam timer!)
             SyncToCloudAsync();
-            _cloudSyncTimer = new System.Threading.Timer(_ => SyncToCloudAsync(), null, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(2));
         }
         catch (Exception ex)
         {
@@ -459,6 +458,9 @@ public static class WebDashboardServer
     }
 
     private static readonly HttpClient _syncClient = new() { Timeout = TimeSpan.FromSeconds(5) };
+    private static string _lastSyncedPayloadMain = "";
+    private static string _lastSyncedPayloadPlayer = "";
+    private static readonly object _syncLock = new();
 
     public static void SyncToCloudAsync()
     {
@@ -479,8 +481,16 @@ public static class WebDashboardServer
 
                 // 1. Sync to main room "nimnabro" (the global live endpoint for nbfct.nimnabro.com)
                 var mainPayload = GetCloudSyncPayload("nimnabro");
-                using (var c1 = new StringContent(mainPayload, Encoding.UTF8, "application/json"))
+                bool mainChanged;
+                lock (_syncLock)
                 {
+                    mainChanged = (mainPayload != _lastSyncedPayloadMain);
+                    if (mainChanged) _lastSyncedPayloadMain = mainPayload;
+                }
+
+                if (mainChanged)
+                {
+                    using var c1 = new StringContent(mainPayload, Encoding.UTF8, "application/json");
                     await _syncClient.PostAsync("https://nbfct.nimnabro.com/api/sync", c1);
                 }
 
@@ -488,8 +498,16 @@ public static class WebDashboardServer
                 if (!activePlayer.Equals("nimnabro", StringComparison.OrdinalIgnoreCase) && !activePlayer.Equals("All Accounts", StringComparison.OrdinalIgnoreCase))
                 {
                     var playerPayload = GetCloudSyncPayload(activePlayer.ToLowerInvariant());
-                    using (var c2 = new StringContent(playerPayload, Encoding.UTF8, "application/json"))
+                    bool playerChanged;
+                    lock (_syncLock)
                     {
+                        playerChanged = (playerPayload != _lastSyncedPayloadPlayer);
+                        if (playerChanged) _lastSyncedPayloadPlayer = playerPayload;
+                    }
+
+                    if (playerChanged)
+                    {
+                        using var c2 = new StringContent(playerPayload, Encoding.UTF8, "application/json");
                         await _syncClient.PostAsync("https://nbfct.nimnabro.com/api/sync", c2);
                     }
                 }

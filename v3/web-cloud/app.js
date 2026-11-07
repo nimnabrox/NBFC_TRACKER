@@ -207,7 +207,7 @@ export async function handleFileDrop(files) {
 export function saveBaseCount(e) {
   if (e) e.preventDefault();
   const input = document.getElementById('baseInput');
-  const val = input.value.trim();
+  const val = input ? input.value.trim() : '';
 
   if (!val || val === '0') {
     STATE.baseChestCount = null;
@@ -220,7 +220,36 @@ export function saveBaseCount(e) {
     }
   }
 
+  const inTab = document.getElementById('baseInputTab');
+  if (inTab) inTab.value = STATE.baseChestCount || '';
+
   // Also sync to local daemon if running
+  try {
+    fetch(`http://localhost:5088/api/set-base?count=${encodeURIComponent(STATE.baseChestCount || 0)}`, { mode: 'cors' });
+  } catch {}
+
+  renderApp();
+}
+
+export function saveBaseCountFromTab(e) {
+  if (e) e.preventDefault();
+  const input = document.getElementById('baseInputTab');
+  const val = input ? input.value.trim() : '';
+
+  if (!val || val === '0') {
+    STATE.baseChestCount = null;
+    localStorage.removeItem('nb_base_chest_count');
+  } else {
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num > 0) {
+      STATE.baseChestCount = num;
+      localStorage.setItem('nb_base_chest_count', num.toString());
+    }
+  }
+
+  const inSide = document.getElementById('baseInput');
+  if (inSide) inSide.value = STATE.baseChestCount || '';
+
   try {
     fetch(`http://localhost:5088/api/set-base?count=${encodeURIComponent(STATE.baseChestCount || 0)}`, { mode: 'cors' });
   } catch {}
@@ -233,6 +262,8 @@ export function clearBaseCount() {
   localStorage.removeItem('nb_base_chest_count');
   const input = document.getElementById('baseInput');
   if (input) input.value = '';
+  const inputTab = document.getElementById('baseInputTab');
+  if (inputTab) inputTab.value = '';
 
   try {
     fetch('http://localhost:5088/api/set-base?count=clear', { mode: 'cors' });
@@ -241,21 +272,85 @@ export function clearBaseCount() {
   renderApp();
 }
 
+export function clearBaseCountFromTab() {
+  STATE.baseChestCount = null;
+  localStorage.removeItem('nb_base_chest_count');
+  const inputTab = document.getElementById('baseInputTab');
+  if (inputTab) inputTab.value = '';
+  const inputSide = document.getElementById('baseInput');
+  if (inputSide) inputSide.value = '';
+
+  try {
+    fetch('http://localhost:5088/api/set-base?count=clear', { mode: 'cors' });
+  } catch {}
+
+  renderApp();
+}
+
+export function copyObsUrlFromTab() {
+  const codeEl = document.getElementById('obsFullUrlTab');
+  if (codeEl) {
+    navigator.clipboard.writeText(codeEl.textContent.trim());
+    const btnText = document.getElementById('btnCopyTextTab');
+    if (btnText) {
+      btnText.textContent = 'Copied!';
+      setTimeout(() => { btnText.textContent = 'Copy Overlay URL'; }, 1800);
+    }
+  }
+}
+
+export async function setCustomDemosFolderFromTab() {
+  const input = document.getElementById('customFolderInputTab');
+  const folder = input?.value.trim();
+  if (!folder) return;
+  try {
+    const res = await fetch(`http://localhost:5088/api/set-demos-folder?folder=${encodeURIComponent(folder)}`, { mode: 'cors' });
+    if (res.ok) {
+      const pathEl = document.getElementById('detectedFolderPathTab');
+      if (pathEl) pathEl.textContent = folder;
+      const pathElSide = document.getElementById('detectedFolderPath');
+      if (pathElSide) pathElSide.textContent = folder;
+      alert('Replay folder updated successfully!');
+    }
+  } catch (e) {
+    alert('Please enter a valid directory path on this machine.');
+  }
+}
+
+export function switchWebTab(tabId) {
+  document.querySelectorAll('.web-tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-tab-target') === tabId);
+  });
+  document.querySelectorAll('.web-tab-pane').forEach(pane => {
+    pane.classList.toggle('active', pane.id === tabId);
+  });
+}
+
 // --- Fortnite Account / Profile Switcher ---
 export async function switchAccount(name) {
   STATE.activeAccount = name;
   localStorage.setItem('nb_active_account', name);
 
-  // Sync to local daemon
+  // 1. Sync to local daemon
   try {
     await fetch(`http://localhost:5088/api/set-profile?key=${encodeURIComponent(name)}`, { mode: 'cors' });
   } catch {}
 
+  // 2. Fetch updated matches for this profile
+  try {
+    const res = await fetch(`http://localhost:5088/api/matches`, { mode: 'cors' });
+    if (res.ok) {
+      const matches = await res.json();
+      if (Array.isArray(matches)) {
+        STATE.matches = matches;
+        saveLocalMatches();
+      }
+    }
+  } catch {}
+
+  currentMatchPage = 1;
   updateObsLinks();
   renderApp();
-  try {
-    await pollLiveEdgeSync();
-  } catch {}
 }
 
 // --- Copy OBS URL ---
@@ -282,6 +377,11 @@ function updateObsLinks() {
   const obsOpenBtn = document.getElementById('obsOpenBtn');
   if (obsLinkEl) obsLinkEl.textContent = overlayUrl;
   if (obsOpenBtn) obsOpenBtn.href = overlayUrl;
+
+  const obsLinkTab = document.getElementById('obsFullUrlTab');
+  const obsOpenBtnTab = document.getElementById('obsOpenBtnTab');
+  if (obsLinkTab) obsLinkTab.textContent = overlayUrl;
+  if (obsOpenBtnTab) obsOpenBtnTab.href = overlayUrl;
 }
 
 // --- Main App Render ---
@@ -324,9 +424,10 @@ function renderApp() {
   }
 
   // Filter matches for active account
-  const activeMatches = STATE.activeAccount
-    ? STATE.matches.filter(m => (m.playerName || 'nimnabro') === STATE.activeAccount)
-    : STATE.matches;
+  const isAll = !STATE.activeAccount || STATE.activeAccount.toLowerCase() === 'all' || STATE.activeAccount.toLowerCase() === 'all accounts';
+  const activeMatches = isAll
+    ? STATE.matches
+    : STATE.matches.filter(m => (m.playerName || '').toLowerCase() === STATE.activeAccount.toLowerCase());
   activeMatches.sort((a, b) => new Date(b.matchStart) - new Date(a.matchStart));
 
   // Compute metrics
@@ -355,6 +456,8 @@ function renderApp() {
 
   const obsVal = document.getElementById('obsPreviewVal');
   if (obsVal) obsVal.textContent = Number(displayedTotal).toLocaleString('en-US');
+  const obsValTab = document.getElementById('obsPreviewValTab');
+  if (obsValTab) obsValTab.textContent = Number(displayedTotal).toLocaleString('en-US');
 
   const activeNameEl = document.getElementById('activeAccountName');
   if (activeNameEl) {
@@ -364,6 +467,8 @@ function renderApp() {
   if (STATE.baseChestCount) {
     const baseInput = document.getElementById('baseInput');
     if (baseInput && !baseInput.value) baseInput.value = STATE.baseChestCount;
+    const baseInputTab = document.getElementById('baseInputTab');
+    if (baseInputTab && !baseInputTab.value) baseInputTab.value = STATE.baseChestCount;
   }
 
   // Render Account Switcher List
@@ -805,6 +910,8 @@ export async function setCustomDemosFolder() {
     if (res.ok) {
       const pathEl = document.getElementById('detectedFolderPath');
       if (pathEl) pathEl.textContent = folder;
+      const pathElTab = document.getElementById('detectedFolderPathTab');
+      if (pathElTab) pathElTab.textContent = folder;
       if (input) input.value = '';
       await fetchLocalMatchesOnce();
     }
@@ -820,8 +927,13 @@ async function fetchSettings() {
       const s = await res.json();
       const chk = document.getElementById('chkStartup');
       if (chk && s.startWithWindows !== undefined) chk.checked = s.startWithWindows;
+      const chkTab = document.getElementById('chkStartupTab');
+      if (chkTab && s.startWithWindows !== undefined) chkTab.checked = s.startWithWindows;
+
       const pathEl = document.getElementById('detectedFolderPath');
       if (pathEl && s.demosFolder) pathEl.textContent = s.demosFolder;
+      const pathElTab = document.getElementById('detectedFolderPathTab');
+      if (pathElTab && s.demosFolder) pathElTab.textContent = s.demosFolder;
     }
   } catch {}
 }
@@ -832,14 +944,19 @@ window.app = {
   handleFileInput,
   handleFileDrop,
   saveBaseCount,
+  saveBaseCountFromTab,
   clearBaseCount,
+  clearBaseCountFromTab,
   switchAccount,
   copyObsUrl,
+  copyObsUrlFromTab,
   exportCsv,
   toggleStartup,
   setCustomDemosFolder,
+  setCustomDemosFolderFromTab,
   prevMatchPage,
-  nextMatchPage
+  nextMatchPage,
+  switchWebTab
 };
 
 document.addEventListener('DOMContentLoaded', () => {

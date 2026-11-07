@@ -15,7 +15,18 @@
 
 ---
 
-## 🌟 Overview
+> [!IMPORTANT]
+> ### ⚠️ Required Fortnite Setting: Enable Replay Recording!
+> **Fortnite does not save replays by default on some PC setups.** For NBFC TRACKER to count your chests, you **must** ensure Replays are enabled in your Fortnite settings:
+> 1. Launch **Fortnite** and open **Settings** (press `Esc` → click the Gear icon).
+> 2. Select the **Game** tab (the gear icon on top).
+> 3. Scroll all the way down to the **Replays** section.
+> 4. Turn **Record Replays** to **ON** (and **Record High Stakes / Large Team Replays** to **ON** if you play Team Rumble or special modes).
+> 5. Click **Apply** to save.
+> 
+> *Once enabled, Fortnite will automatically save replay files after each match, and NBFC TRACKER will instantly parse and track every single chest!*
+
+---
 
 **NBFC TRACKER** is a high-performance, ultra-low-spec Fortnite chest tracking ecosystem built for streamers, competitive players, and achievement hunters. It reads and parses local Fortnite replay files (`.replay`) in read-only mode after each match, giving you live stats, session counters, lifetime milestones, and an instant OBS Studio Browser Source overlay.
 

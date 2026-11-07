@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>NBFC TRACKER - Created by NimnaBro</title>
+  <title>NBFC TRACKER</title>
   <link rel="icon" type="image/png" href="assets/chest_fnv1.png">
   <link rel="shortcut icon" type="image/png" href="assets/chest_fnv1.png">
   <link rel="apple-touch-icon" href="assets/chest_fnv1.png">
@@ -65,9 +65,9 @@
         <form onsubmit="window.app.saveBaseCount(event)" class="form-group" style="margin-bottom:0;">
           <label class="form-label" for="baseInput">Custom Starting Offset (e.g. 4084):</label>
           <div class="input-row">
-            <input type="number" id="baseInput" class="text-input" placeholder="e.g. 4084" min="0">
-            <button type="submit" class="btn btn-primary" style="padding:7px 12px;font-size:12px;">Save</button>
-            <button type="button" class="btn btn-secondary" onclick="window.app.clearBaseCount()" style="padding:7px 10px;font-size:12px;">Reset</button>
+            <input type="number" id="baseInput" class="text-input" placeholder="e.g. 4084" min="0" style="flex:1 1 0;min-width:0;width:0;">
+            <button type="submit" class="btn btn-primary" style="padding:7px 10px;font-size:12px;flex-shrink:0;">Save</button>
+            <button type="button" class="btn btn-secondary" onclick="window.app.clearBaseCount()" style="padding:7px 10px;font-size:12px;flex-shrink:0;">Reset</button>
           </div>
         </form>
 
@@ -90,8 +90,8 @@
             %LOCALAPPDATA%\FortniteGame\Saved\Demos
           </div>
           <div style="margin-top:6px;display:flex;gap:6px;">
-            <input type="text" id="customFolderInput" class="text-input" placeholder="Custom folder path (optional)" style="font-size:11px;padding:6px 8px;">
-            <button type="button" class="btn btn-secondary" onclick="window.app.setCustomDemosFolder()" style="font-size:11px;padding:6px 10px;">Set</button>
+            <input type="text" id="customFolderInput" class="text-input" placeholder="Custom folder path (optional)" style="font-size:11px;padding:6px 8px;flex:1 1 0;min-width:0;width:0;">
+            <button type="button" class="btn btn-secondary" onclick="window.app.setCustomDemosFolder()" style="font-size:11px;padding:6px 10px;flex-shrink:0;">Set</button>
           </div>
         </div>
       </div>
@@ -201,9 +201,38 @@
             <span id="desktopAppStatusDot" style="width:8px;height:8px;border-radius:50%;background:#8c93a4;"></span>
             <span id="desktopAppStatusText">Desktop App Disconnected</span>
           </div>
-          <span style="font-size:12px;color:var(--muted);" id="lastUpdatedTime">Auto-refreshing live</span>
         </div>
       </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="web-nav-tabs">
+        <button type="button" class="web-tab-btn active" data-tab-target="tabLiveStats" onclick="window.app.switchWebTab('tabLiveStats')">
+          <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="20" x2="18" y2="10"></line>
+            <line x1="12" y1="20" x2="12" y2="4"></line>
+            <line x1="6" y1="20" x2="6" y2="14"></line>
+          </svg>
+          <span>Live Stats</span>
+        </button>
+        <button type="button" class="web-tab-btn" data-tab-target="tabWebSettings" onclick="window.app.switchWebTab('tabWebSettings')">
+          <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Tracker Settings</span>
+        </button>
+        <button type="button" class="web-tab-btn" data-tab-target="tabWebObs" onclick="window.app.switchWebTab('tabWebObs')">
+          <svg class="svg-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+          <span>OBS Overlay</span>
+        </button>
+      </nav>
+
+      <!-- TAB 1: LIVE STATS -->
+      <div id="tabLiveStats" class="web-tab-pane active">
 
       <!-- Stat Grid (High-Performance CSS Grid) -->
       <section class="stat-grid">
@@ -341,6 +370,115 @@
         <div id="matchesPagination" style="display:none;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(0,0,0,0.22);border-top:1px solid var(--line);border-radius:0 0 var(--radius-md) var(--radius-md);flex-wrap:wrap;gap:10px;">
         </div>
       </section>
+      </div><!-- End of tabLiveStats -->
+
+      <!-- TAB 2: TRACKER SETTINGS -->
+      <div id="tabWebSettings" class="web-tab-pane">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <svg class="svg-icon svg-accent" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+              </svg>
+              <h3 style="margin:0;font-size:16px;font-weight:800;color:#fff;">Tracker Settings &amp; Configuration</h3>
+            </div>
+          </div>
+          <div style="padding:20px;display:flex;flex-direction:column;gap:20px;">
+            <!-- Base Offset -->
+            <div>
+              <label class="form-label" for="baseInputTab" style="font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;display:block;">Custom Starting Chest Offset (e.g. 4084):</label>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Set an initial starting chest milestone count. Newly parsed session chests will accumulate on top of this number.</div>
+              <form onsubmit="window.app.saveBaseCountFromTab(event)" style="display:flex;gap:10px;max-width:440px;">
+                <input type="number" id="baseInputTab" class="text-input" placeholder="e.g. 4084" min="0" style="flex:1 1 0;min-width:0;width:0;">
+                <button type="submit" class="btn btn-primary" style="padding:8px 18px;font-size:13px;flex-shrink:0;">Save Offset</button>
+                <button type="button" class="btn btn-secondary" onclick="window.app.clearBaseCountFromTab()" style="padding:8px 14px;font-size:13px;flex-shrink:0;">Reset</button>
+              </form>
+            </div>
+
+            <!-- Windows Startup -->
+            <div style="padding-top:16px;border-top:1px solid var(--line);">
+              <label style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:#fff;cursor:pointer;">
+                <input type="checkbox" id="chkStartupTab" onchange="window.app.toggleStartup(this.checked)" style="accent-color:var(--accent);width:18px;height:18px;">
+                <span>Start with Windows (Auto-Startup in System Tray)</span>
+              </label>
+              <div style="font-size:12px;color:var(--muted);margin-left:28px;margin-top:4px;">When enabled, the tracker starts automatically and silently runs in your system tray upon Windows login.</div>
+            </div>
+
+            <!-- Replay Folder -->
+            <div style="padding-top:16px;border-top:1px solid var(--line);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;max-width:540px;">
+                <span class="form-label" style="font-size:13px;font-weight:700;color:#fff;">Fortnite Replay Folder Location:</span>
+                <span style="font-size:10px;font-weight:800;color:var(--good);background:var(--good-bg);padding:3px 8px;border-radius:4px;">AUTO-DETECTED</span>
+              </div>
+              <div id="detectedFolderPathTab" style="font-size:12px;color:var(--muted);word-break:break-all;background:rgba(0,0,0,0.3);padding:10px 12px;border-radius:6px;border:1px solid var(--line);font-family:monospace;max-width:540px;">
+                %LOCALAPPDATA%\FortniteGame\Saved\Demos
+              </div>
+              <div style="margin-top:10px;display:flex;gap:8px;max-width:540px;">
+                <input type="text" id="customFolderInputTab" class="text-input" placeholder="Custom folder path (optional)" style="font-size:12px;padding:8px 12px;flex:1 1 0;min-width:0;width:0;">
+                <button type="button" class="btn btn-secondary" onclick="window.app.setCustomDemosFolderFromTab()" style="font-size:12px;padding:8px 16px;flex-shrink:0;">Set Folder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 3: OBS STREAM OVERLAY -->
+      <div id="tabWebObs" class="web-tab-pane">
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <svg class="svg-icon svg-accent" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                <line x1="8" y1="21" x2="16" y2="21"></line>
+                <line x1="12" y1="17" x2="12" y2="21"></line>
+              </svg>
+              <h3 style="margin:0;font-size:16px;font-weight:800;color:#fff;">OBS Studio Browser Overlay</h3>
+            </div>
+            <span style="font-size:11px;font-weight:800;color:var(--good);background:var(--good-bg);padding:3px 8px;border-radius:4px;">100% TRANSPARENT PILL</span>
+          </div>
+          <div style="padding:24px;display:flex;flex-direction:column;gap:20px;">
+            <!-- Live Preview -->
+            <div style="text-align:center;padding:28px 16px;background:rgba(0,0,0,0.3);border:1px dashed var(--accent);border-radius:var(--radius-md);">
+              <div style="font-size:12px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;">Live Stream Overlay Preview</div>
+              <div style="display:inline-flex;align-items:center;gap:12px;padding:8px 22px 8px 14px;background:#1c1f26;border:2px solid #f5a623;border-radius:40px;box-shadow:0 8px 24px rgba(0,0,0,0.6);">
+                <img src="assets/chest_fnv1.png" alt="Chest" width="32" height="32" style="object-fit:contain;filter:drop-shadow(0 0 6px rgba(245,166,35,0.5));">
+                <span id="obsPreviewValTab" style="font-size:26px;font-weight:900;color:var(--accent);font-variant-numeric:tabular-nums;">0</span>
+              </div>
+            </div>
+
+            <!-- OBS Browser Source URL -->
+            <div>
+              <label class="form-label" style="font-size:13px;font-weight:700;color:#fff;margin-bottom:6px;display:block;">Your Unique Browser Source URL:</label>
+              <div id="obsFullUrlTab" style="background:#11141b;border:1px solid rgba(255,255,255,0.08);border-radius:6px;padding:12px 14px;font-size:13px;color:var(--accent);font-weight:700;word-break:break-all;user-select:all;margin-bottom:12px;font-family:monospace;">
+                https://nbfct.nimnabro.com/overlay.html?room=nimnabro
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-primary" onclick="window.app.copyObsUrlFromTab()" style="padding:10px 20px;">
+                  <svg class="svg-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                  <span id="btnCopyTextTab">Copy Overlay URL</span>
+                </button>
+                <a id="obsOpenBtnTab" href="overlay.html?room=nimnabro" target="_blank" class="btn btn-secondary" style="padding:10px 20px;">Preview in New Tab ↗</a>
+              </div>
+            </div>
+
+            <!-- Setup Instructions -->
+            <div style="padding:16px;background:rgba(255,255,255,0.02);border:1px solid var(--line);border-radius:var(--radius-md);">
+              <h4 style="margin:0 0 10px 0;font-size:13px;color:#fff;">How to add to OBS Studio / Streamlabs:</h4>
+              <ol style="margin:0;padding-left:20px;font-size:12px;color:var(--muted);line-height:1.8;">
+                <li>In OBS Studio, click <strong>+</strong> under <strong>Sources</strong> and select <strong>Browser</strong>.</li>
+                <li>Name it <code style="color:var(--accent);">Fortnite Chest Tracker</code> and click <strong>OK</strong>.</li>
+                <li>Paste the copied URL into the <strong>URL</strong> field.</li>
+                <li>Set <strong>Width</strong> to <code style="color:#fff;">300</code> and <strong>Height</strong> to <code style="color:#fff;">100</code>.</li>
+                <li>Click <strong>OK</strong>. The transparent counter will automatically display and update live on stream!</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- Clean Footer -->
       <footer style="display:flex;flex-direction:column;gap:12px;margin-top:32px;padding-top:20px;border-top:1px solid var(--line);">

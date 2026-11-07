@@ -252,6 +252,12 @@ html, body {
   width: 100%;
 }
 
+.input-row .text-input {
+  flex: 1 1 0 !important;
+  min-width: 0 !important;
+  width: 0 !important;
+}
+
 .text-input {
   flex: 1;
   min-width: 0;
@@ -270,7 +276,7 @@ html, body {
 
 .input-row .btn {
   flex-shrink: 0;
-  padding: 7px 12px;
+  padding: 7px 10px;
   font-size: 12px;
   white-space: nowrap;
 }
@@ -631,4 +637,50 @@ footer {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+/* Navigation Tabs for Web Dashboard */
+.web-nav-tabs {
+  display: flex;
+  gap: 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  margin-bottom: 20px;
+}
+.web-tab-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.web-tab-btn:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.04);
+}
+.web-tab-btn.active {
+  color: var(--accent);
+  background: rgba(245, 166, 35, 0.12);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+}
+
+.web-tab-pane {
+  display: none;
+  flex-direction: column;
+  gap: 20px;
+}
+.web-tab-pane.active {
+  display: flex;
 }

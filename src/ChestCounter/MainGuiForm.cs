@@ -29,7 +29,7 @@ public class MainGuiForm : Form
         _dashboardUrl = dashboardUrl;
         _onExit = onExit;
 
-        Text = "NBFC TRACKER - Created by NimnaBro";
+        Text = "NBFC TRACKER";
         Size = new Size(540, 720);
         MinimumSize = new Size(460, 560);
         MaximumSize = new Size(700, 920);
@@ -78,7 +78,7 @@ public class MainGuiForm : Form
         _trayIcon = new NotifyIcon
         {
             Icon = this.Icon ?? SystemIcons.Application,
-            Text = "NBFC TRACKER - Created by NimnaBro",
+            Text = "NBFC TRACKER",
             Visible = true
         };
 
@@ -180,7 +180,7 @@ public class MainGuiForm : Form
             var pnl = new Panel { Dock = DockStyle.Fill, BackColor = Color.FromArgb(13, 15, 20) };
             var lbl = new Label
             {
-                Text = "NBFC TRACKER\nCreated by NimnaBro\n\nDashboard is running at:\n" + _dashboardUrl,
+                Text = "NBFC TRACKER\n\nDashboard is running at:\n" + _dashboardUrl,
                 ForeColor = Color.White,
                 Font = new Font("Segoe UI", 13, FontStyle.Bold),
                 TextAlign = ContentAlignment.MiddleCenter,

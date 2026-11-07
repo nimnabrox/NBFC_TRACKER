@@ -279,11 +279,6 @@ if (firstRun && interactive)
         Console.WriteLine();
         ReportWriter.Progress = new ScanProgress(0, existing.Count);
         ReportWriter.WriteAll(store, config, data);
-        if (isCli && config.OpenReportOnStart)
-        {
-            Open(store.ReportPath);
-            reportOpened = true;
-        }
         tracker.Scan();
         tracker.NewProfilesFound = false;
         Console.WriteLine();
@@ -383,11 +378,6 @@ if (OperatingSystem.IsWindows() && config.ShowOverlay)
 }
 
 WebDashboardServer.Start(store, config, data, () => tracker.IsLive, () => tracker.LiveMatch);
-if (isCli && config.OpenReportOnStart && !reportOpened)
-{
-    Open(store.ReportPath);
-    reportOpened = true;
-}
 
 if (OperatingSystem.IsWindows())
 {
@@ -432,10 +422,6 @@ if (backlog > 1)
     ReportWriter.Progress = new ScanProgress(0, backlog);
 }
 ReportWriter.WriteAll(store, config, data);
-if (isCli && config.OpenReportOnStart && !reportOpened && !auto)
-{
-    Open(store.ReportPath);
-}
 if (backlog > 0)
 {
     tracker.Scan();
