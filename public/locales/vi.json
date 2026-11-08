@@ -82,5 +82,11 @@
   "modeDuo": "Đôi",
   "modeTrio": "Bộ ba",
   "modeSquad": "Biệt đội",
-  "setup": "Hướng dẫn thiết lập"
+  "setup": "Hướng dẫn thiết lập",
+  "layout": "Bố cục bảng điều khiển",
+  "classic": "Ban đầu",
+  "modern": "Thiết kế mới",
+  "overlayStyle": "Kiểu lớp phủ",
+  "matchesTotal": "Trận đã ghi",
+  "subscribe": "Đăng ký"
 }

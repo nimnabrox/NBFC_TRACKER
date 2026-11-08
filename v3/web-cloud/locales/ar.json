@@ -82,5 +82,11 @@
   "modeDuo": "ثنائي",
   "modeTrio": "ثلاثي",
   "modeSquad": "فرق",
-  "setup": "دليل الإعداد"
+  "setup": "دليل الإعداد",
+  "layout": "تخطيط لوحة التحكم",
+  "classic": "الأصلي",
+  "modern": "التصميم الجديد",
+  "overlayStyle": "نمط العداد",
+  "matchesTotal": "المباريات المسجلة",
+  "subscribe": "اشتراك"
 }

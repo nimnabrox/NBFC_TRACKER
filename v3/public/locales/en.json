@@ -82,5 +82,11 @@
   "modeDuo": "Duos",
   "modeTrio": "Trios",
   "modeSquad": "Squads",
-  "setup": "Setup guide"
+  "setup": "Setup guide",
+  "layout": "Dashboard layout",
+  "classic": "Original",
+  "modern": "New design",
+  "overlayStyle": "Overlay style",
+  "matchesTotal": "Matches recorded",
+  "subscribe": "Subscribe"
 }

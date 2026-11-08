@@ -27,7 +27,7 @@ test('CSV preserves delimiters and quotes and blocks spreadsheet formulas', () =
 test('all 18 language files cover every UI key and preserve placeholders', async () => {
   const en = JSON.parse(await readFile('v3/public/locales/en.json', 'utf8'));
   assert.equal(languages.length, 18);
-  const html = await readFile('v3/public/index.html', 'utf8');
+  const html = (await Promise.all(['index.html', 'app.html', 'modern.html'].map(name => readFile('v3/public/' + name, 'utf8')))).join('\n');
   const uiKeys = [...html.matchAll(/data-i18n(?:-label)?="([^"]+)"/g)].map(m => m[1]);
   for (const [code] of languages) {
     const dict = JSON.parse(await readFile(`v3/public/locales/${code}.json`, 'utf8'));
@@ -47,11 +47,14 @@ test('all compatibility UIs match v3 source and HTML IDs are unique', async () =
   for (const destination of ['public', 'v3/web-cloud', 'web-chest-tracker']) {
     for (const name of files) assert.equal(await readFile(`${destination}/${name}`, 'utf8'), await readFile(`v3/public/${name}`, 'utf8'), `${destination}/${name}`);
   }
-  const html = await readFile('v3/public/index.html', 'utf8');
-  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
-  assert.equal(ids.length, new Set(ids).size);
   const app = await readFile('v3/public/app.js', 'utf8');
-  for (const [, id] of app.matchAll(/\$\('([^']+)'\)/g)) assert.ok(ids.includes(id), `Missing ${id}`);
+  const optional = new Set(['openWeb', 'obsUrl', 'obsUrlAlt', 'activeAccountName', 'matchesCount', 'accountList']);
+  for (const name of ['index.html', 'app.html', 'modern.html']) {
+    const html = await readFile('v3/public/' + name, 'utf8');
+    const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);
+    assert.equal(ids.length, new Set(ids).size, `Duplicate ID in ${name}`);
+    for (const [, id] of app.matchAll(/\$\('([^']+)'\)/g)) assert.ok(ids.includes(id) || optional.has(id), `Missing ${id} in ${name}`);
+  }
   const server = await readFile('src/ChestCounter/WebDashboardServer.cs', 'utf8');
   for (const [, path] of app.matchAll(/(?:native|companion \+)\(['"]?(\/api\/[a-z-]+)/g)) assert.ok(server.includes('"' + path + '"'), `Missing API ${path}`);
 });

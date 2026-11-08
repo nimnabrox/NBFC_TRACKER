@@ -82,5 +82,11 @@
   "modeDuo": "Duo",
   "modeTrio": "Trio",
   "modeSquad": "Skuad",
-  "setup": "Panduan pengaturan"
+  "setup": "Panduan pengaturan",
+  "layout": "Tata letak dasbor",
+  "classic": "Asli",
+  "modern": "Desain baru",
+  "overlayStyle": "Gaya overlay",
+  "matchesTotal": "Pertandingan tercatat",
+  "subscribe": "Berlangganan"
 }

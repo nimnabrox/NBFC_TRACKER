@@ -82,5 +82,11 @@
   "modeDuo": "雙人",
   "modeTrio": "三人",
   "modeSquad": "小隊",
-  "setup": "設定指南"
+  "setup": "設定指南",
+  "layout": "儀表板版面",
+  "classic": "原始設計",
+  "modern": "新設計",
+  "overlayStyle": "圖層樣式",
+  "matchesTotal": "已記錄對戰",
+  "subscribe": "訂閱"
 }

@@ -82,5 +82,11 @@
   "modeDuo": "듀오",
   "modeTrio": "트리오",
   "modeSquad": "스쿼드",
-  "setup": "설정 가이드"
+  "setup": "설정 가이드",
+  "layout": "대시보드 레이아웃",
+  "classic": "원래 디자인",
+  "modern": "새 디자인",
+  "overlayStyle": "오버레이 스타일",
+  "matchesTotal": "기록한 매치",
+  "subscribe": "구독"
 }

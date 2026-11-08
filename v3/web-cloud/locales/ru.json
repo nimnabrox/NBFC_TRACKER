@@ -82,5 +82,11 @@
   "modeDuo": "Пары",
   "modeTrio": "Тройки",
   "modeSquad": "Отряды",
-  "setup": "Настройка"
+  "setup": "Настройка",
+  "layout": "Макет панели",
+  "classic": "Исходный",
+  "modern": "Новый дизайн",
+  "overlayStyle": "Стиль оверлея",
+  "matchesTotal": "Записано матчей",
+  "subscribe": "Подписаться"
 }

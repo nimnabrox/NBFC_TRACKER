@@ -82,5 +82,11 @@
   "modeDuo": "İkili",
   "modeTrio": "Üçlü",
   "modeSquad": "Ekipler",
-  "setup": "Kurulum kılavuzu"
+  "setup": "Kurulum kılavuzu",
+  "layout": "Panel düzeni",
+  "classic": "Orijinal",
+  "modern": "Yeni tasarım",
+  "overlayStyle": "Katman stili",
+  "matchesTotal": "Kaydedilen maçlar",
+  "subscribe": "Abone ol"
 }

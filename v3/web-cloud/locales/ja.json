@@ -82,5 +82,11 @@
   "modeDuo": "デュオ",
   "modeTrio": "トリオ",
   "modeSquad": "スクワッド",
-  "setup": "セットアップガイド"
+  "setup": "セットアップガイド",
+  "layout": "ダッシュボードのレイアウト",
+  "classic": "オリジナル",
+  "modern": "新しいデザイン",
+  "overlayStyle": "オーバーレイのスタイル",
+  "matchesTotal": "記録したマッチ",
+  "subscribe": "チャンネル登録"
 }

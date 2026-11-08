@@ -131,7 +131,7 @@ public class MainGuiForm : Form
         _onExit = onExit;
 
         Text = "NBFC TRACKER";
-        Size = new Size(1120, 860);
+        Size = new Size(540, 720);
         MinimumSize = new Size(460, 560);
         MaximumSize = Size.Empty;
         StartPosition = FormStartPosition.CenterScreen;

@@ -35,7 +35,10 @@ Check((await http.GetAsync(WebDashboardServer.Url + "api/set-base?count=1.5")).S
 Check((await http.GetAsync(WebDashboardServer.Url + "api/set-demos-folder?folder=Z%3A%5Cmissing-nbfc-folder")).StatusCode == HttpStatusCode.BadRequest, "Missing folder rejected");
 await Get("api/set-language?code=ar");
 Check((await Get("api/settings")).GetProperty("uiLanguage").GetString() == "ar", "Native language persists");
-Check((await http.GetStringAsync(WebDashboardServer.Url)).Contains("counter-card"), "New dashboard serves");
+Check((await http.GetStringAsync(WebDashboardServer.Url)).Contains("app-layout"), "Original website dashboard serves");
+Check((await http.GetStringAsync(WebDashboardServer.Url + "app.html")).Contains("mini-shell"), "Original compact desktop serves");
+Check((await http.GetStringAsync(WebDashboardServer.Url + "modern.html")).Contains("counter-card"), "Optional new dashboard serves");
+Check((await http.GetStringAsync(WebDashboardServer.Url + "overlay")).Contains("chest-halo"), "Local OBS alias serves restored overlay");
 Check((await Get("locales/ja.json")).GetProperty("chests").GetString() == "宝箱", "UTF-8 locale serves");
 Console.WriteLine("All desktop smoke checks passed.");
 using var releaseApi = new HttpListener();

@@ -82,5 +82,11 @@
   "modeDuo": "Duo",
   "modeTrio": "Trio",
   "modeSquad": "Team",
-  "setup": "Einrichtung"
+  "setup": "Einrichtung",
+  "layout": "Dashboard-Layout",
+  "classic": "Original",
+  "modern": "Neues Design",
+  "overlayStyle": "Overlay-Stil",
+  "matchesTotal": "Erfasste Spiele",
+  "subscribe": "Abonnieren"
 }

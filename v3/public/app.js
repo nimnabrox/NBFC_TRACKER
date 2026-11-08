@@ -1,5 +1,6 @@
 import { languages, resolveLanguage, setLanguage, t, number, locale } from './i18n.js';
 import { summarize, activityDays, parseCount, matchesCsv } from './stats.js';
+import { mountLanguagePicker, mountAppearance } from './controls.js';
 
 const $ = id => document.getElementById(id);
 const local = ['localhost', '127.0.0.1'].includes(location.hostname) && location.port === '5088';
@@ -37,18 +38,20 @@ async function copy(text) {
 }
 function overlayUrl() {
   const name = room || snapshot.room || snapshot.player || '';
-  return `${cloud}/overlay.html?${new URLSearchParams({ room: name.toLowerCase(), lang: locale })}`;
+  const file = $('overlayChoice')?.value === 'modern' ? 'overlay-modern.html' : 'overlay.html';
+  return `${cloud}/${file}?${new URLSearchParams({ room: name.toLowerCase(), lang: locale })}`;
 }
 function render() {
   const values = summarize(snapshot);
   for (const [key, value] of Object.entries(values)) $(key).textContent = number(value);
   $('overlayTotal').textContent = number(values.total);
+  document.body.dataset.overlayStyle = $('overlayChoice')?.value || 'classic';
   $('statusText').textContent = t(connection);
   $('status').classList.toggle('online', ['connected', 'cloud'].includes(connection));
   $('totalHint').textContent = snapshot.base > 0 ? `${t('base')}: ${number(snapshot.base)}` : t('fromReplays');
   $('matchStatus').textContent = t(snapshot.inProgress ? 'matchLive' : connection === 'offline' ? 'stale' : 'fromReplays');
   $('profile').disabled = !nativeConnected || !snapshot.accounts?.length;
-  const profileSignature = JSON.stringify([snapshot.player, snapshot.accounts]);
+  const profileSignature = JSON.stringify([locale, snapshot.player, snapshot.accounts]);
   if ($('profile').dataset.signature !== profileSignature) {
     $('profile').replaceChildren();
     const accounts = snapshot.accounts?.length ? snapshot.accounts : [{ key: '', name: snapshot.player || t('noProfile') }];
@@ -59,12 +62,31 @@ function render() {
       $('profile').append(option);
     }
     $('profile').dataset.signature = profileSignature;
+    if ($('accountList')) {
+      $('accountList').replaceChildren();
+      for (const account of accounts) {
+        const button = document.createElement('button'); button.type = 'button';
+        const active = account.active || account.name === snapshot.player || account.key === snapshot.player;
+        button.className = 'account-pill' + (active ? ' active' : ''); button.setAttribute('aria-pressed', String(!!active));
+        const name = document.createElement('span'); name.className = 'account-name'; name.textContent = account.name || account.key;
+        const meta = document.createElement('span'); meta.className = 'account-meta'; meta.textContent = `${number(account.chests || 0)} ${t('chests')}`;
+        button.append(name, meta); button.disabled = !nativeConnected || !account.key;
+        button.onclick = () => { $('profile').value = account.key || account.name; $('profile').dispatchEvent(new window.Event('change', { bubbles: true })); };
+        $('accountList').append(button);
+      }
+      $('profile').hidden = accounts.some(account => account.key);
+    }
   }
   if (!snapshot.player && !snapshot.accounts?.length) $('profile').options[0].textContent = t('noProfile');
   $('previewOverlay').href = overlayUrl();
   $('copyOverlay').disabled = !(room || snapshot.player);
   $('previewOverlay').setAttribute('aria-disabled', String(!(room || snapshot.player)));
   if (!(room || snapshot.player)) $('previewOverlay').removeAttribute('href');
+  if ($('obsUrl')) $('obsUrl').textContent = overlayUrl();
+  if ($('obsUrlAlt')) $('obsUrlAlt').textContent = overlayUrl();
+  if ($('activeAccountName')) $('activeAccountName').textContent = snapshot.player || t('noProfile');
+  if ($('matchesCount')) $('matchesCount').textContent = number(snapshot.matches?.length || 0);
+  if ($('openWeb')) $('openWeb').href = `${cloud}/?${new URLSearchParams({ room: room || snapshot.room || '', lang: locale, layout: 'classic' })}`;
   if (document.activeElement !== $('base')) $('base').value = snapshot.base ?? '';
   ['base', 'resetBase', 'folder', 'startup'].forEach(id => { $(id).disabled = !nativeConnected; });
   $('baseForm').querySelector('button').disabled = !nativeConnected;
@@ -147,7 +169,7 @@ async function loadSettings() {
   try {
     const data = await native('/api/settings');
     $('folder').value = data.demosFolder || ''; $('startup').checked = !!data.startWithWindows;
-    document.querySelectorAll('.version').forEach(el => { el.textContent = data.version || 'v0.2.1'; });
+    document.querySelectorAll('.version').forEach(el => { el.textContent = data.version || 'v0.2.2'; });
     if (!initialLanguage && data.uiLanguage) {
       await setLanguage(data.uiLanguage); $('language').value = locale;
     }
@@ -162,10 +184,13 @@ async function saveBase(value) {
   } catch { toast('error'); }
 }
 for (const [code, label] of languages) { const option = document.createElement('option'); option.value = code; option.textContent = label; $('language').append(option); }
+mountLanguagePicker();
+mountAppearance(render);
 document.addEventListener('languagechange', render);
 $('language').addEventListener('change', async event => {
   try {
     await setLanguage(event.target.value);
+    const url = new URL(location.href); url.searchParams.set('lang', locale); history.replaceState(null, '', url);
     if (nativeConnected) await native('/api/set-language?code=' + encodeURIComponent(locale));
   } catch { toast('error'); }
 });

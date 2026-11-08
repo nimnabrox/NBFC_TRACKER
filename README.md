@@ -1,6 +1,6 @@
 # NBFC TRACKER
 
-An open-source Fortnite replay companion by **NimnaBro**. Track chest milestones, review matches, and add a transparent OBS counter. The desktop app and website share an original charcoal-and-gold interface in 18 languages.
+A Fortnite replay companion by **NimnaBro**. Track chest milestones, review matches, and add a transparent OBS counter. The original website, compact desktop app and original OBS overlay are the defaults, with language support and the newer design available as an option.
 
 [Web dashboard](https://nbfct.nimnabro.com) · [Windows download](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest) · [Report an issue](https://github.com/nimnabrox/NBFC_TRACKER/issues)
 
@@ -13,14 +13,16 @@ An open-source Fortnite replay companion by **NimnaBro**. Track chest milestones
 1. In Fortnite, enable **Settings → Game → Replays → Record Replays**. Enable the other replay options for the modes you play.
 2. Download **NBFC.TRACKER.exe** from Releases and run it on Windows 10/11 x64. Microsoft Edge WebView2 Runtime is required for the embedded dashboard; the app offers a browser fallback when it cannot load.
 3. The companion watches `%LOCALAPPDATA%\FortniteGame\Saved\Demos`. Play a match and let Fortnite finish writing the replay. Live analysis updates periodically; it is not an instantaneous game feed.
-4. In Settings, choose a language or change the replay folder. Accounts are detected from saved replays; each keeps its own totals and starting milestone. Closing the window keeps tracking in the system tray.
+4. Choose a language from the readable dark language menu. In Settings, change the replay folder or choose **Dashboard layout → New design**. Accounts are detected from saved replays; each keeps its own totals and starting milestone. Closing the window keeps tracking in the system tray.
 5. Copy the overlay URL from your dashboard into an OBS **Browser Source**, width **420**, height **120**. Keep the companion running for updates.
 
 Only locally available replays can be analyzed. The tracker cannot recover missing career history. Set a **Starting chest count** for a profile to begin at an existing milestone; new replay and live chests are then added. Reset uses recorded replay totals. Match history, charts, average, and victory count show the latest 150 exported matches; the main total includes the full saved profile history.
 
 ## Web and OBS
 
-The website displays counts from the Windows companion. It does not estimate counts from file size or invent placements. The previous browser-only parser has been removed because it could not accurately decode Fortnite network replay events. Setup instructions are collapsed by default to keep the main dashboard focused on tracking.
+The website displays counts from the Windows companion. It does not estimate counts from file size or invent placements. The previous browser-only parser has been removed because it could not accurately decode Fortnite network replay events. The original layout is restored from the version before the redesign. Setup instructions remain collapsed by default.
+
+**Settings → Dashboard layout** switches between **Original** and **New design** without changing your statistics. **Overlay style** independently selects the original chest-glow/divider overlay or the newer overlay. The choice is remembered on each device; overlay URLs point to the chosen style. Existing `overlay.html` links keep the original appearance. The native app opens in its original compact window with Stats, Settings and OBS tabs.
 
 On another device, open Settings → **Cloud room** and enter the room from the companion's overlay link. Direct URLs work too:
 
@@ -35,7 +37,7 @@ The local dashboard can also be used at `http://localhost:5088/`. Hosted browser
 
 ## Languages
 
-All 18 languages listed above cover the dashboard, settings, setup guide, status messages, pagination, common game modes, and native tray menu. Arabic uses right-to-left layout. Numbers and dates follow the selected locale. Game account names, custom playlist identifiers, filenames, brands and URLs retain their original text. Legacy CLI output and generated legacy reports remain English/French.
+All 18 languages listed above cover the dashboard, settings, layout and overlay choices, setup guide, status messages, pagination, common game modes, and native tray menu. The language picker uses an explicit dark background and readable text, with keyboard navigation and Escape to close. Arabic uses right-to-left layout. Numbers and dates follow the selected locale. Fortnite display headings and buttons use uppercase styling. Player names, language names, custom playlist identifiers, filenames, brands and editable fields retain their original text and capitalization. Legacy CLI output and generated legacy reports remain English/French.
 
 Translations live in `v3/public/locales/`. Automated checks enforce complete keys, matching placeholders, valid UTF-8 and matching compatibility packages. Linguistic review from native speakers is welcome; automated coverage does not establish perfect translation quality.
 
@@ -74,14 +76,14 @@ GitHub Actions can deploy on changes to `main` after repository secrets `CLOUDFL
 Tag a verified commit as `vX.Y.Z` and push the tag. The release workflow runs web checks, desktop smoke checks and a self-contained Windows publish. It uploads `NBFC.TRACKER.exe`, a web ZIP and SHA-256 checksums. The tag sets the executable version. The in-app updater selects the named tracker executable, validates its size and GitHub SHA-256 digest when supplied, and restarts after the previous instance exits. Unauthenticated update checks require a public repository; private releases require access through your signed-in GitHub browser.
 
 ~~~powershell
-git tag v0.2.1
-git push origin main v0.2.1
+git tag v0.2.2
+git push origin main v0.2.2
 ~~~
 
 ## Data and project notes
 
 Your history and configuration remain in `%APPDATA%\ChestCounter`; back them up before moving PCs. The analyzer reads replay files rather than injecting into the game or reading game memory. Compatibility can change when Fortnite changes its replay format. No antivirus result or future game compatibility is guaranteed.
 
-Inspired by the clear presentation of [Fortnite.bot Treasure](https://fortnite.bot/treasure); this project has its own layout and branding. Existing chest artwork and creator logo are retained. The bundled Barlow Condensed heading font uses the [SIL Open Font License](v3/public/assets/fonts/OFL.txt). Not affiliated with Epic Games.
+The optional new design was inspired by the clear presentation of [Fortnite.bot Treasure](https://fortnite.bot/treasure); the default restores NBFC's previous layout and branding. Existing chest artwork and creator logo are retained. Fortnite typography uses the Fort Small and Fort Black assets described in the [font notice](v3/public/assets/fonts/FONT-NOTICE.txt). The separate Barlow font retains its [SIL Open Font License](v3/public/assets/fonts/OFL.txt). Not affiliated with Epic Games.
 
 Source code is available under the [MIT license](LICENSE). Support NimnaBro with creator code **NIMNABRO**.

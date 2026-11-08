@@ -82,5 +82,11 @@
   "modeDuo": "双人",
   "modeTrio": "三人",
   "modeSquad": "小队",
-  "setup": "设置指南"
+  "setup": "设置指南",
+  "layout": "仪表盘布局",
+  "classic": "原始设计",
+  "modern": "新设计",
+  "overlayStyle": "叠加层样式",
+  "matchesTotal": "已记录对局",
+  "subscribe": "订阅"
 }

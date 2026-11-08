@@ -82,5 +82,11 @@
   "modeDuo": "Duplas",
   "modeTrio": "Trios",
   "modeSquad": "Esquadrões",
-  "setup": "Guia de configuração"
+  "setup": "Guia de configuração",
+  "layout": "Layout do painel",
+  "classic": "Original",
+  "modern": "Novo design",
+  "overlayStyle": "Estilo do overlay",
+  "matchesTotal": "Partidas registradas",
+  "subscribe": "Inscrever-se"
 }

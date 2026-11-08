@@ -82,5 +82,11 @@
   "modeDuo": "Duo",
   "modeTrio": "Trio",
   "modeSquad": "Section",
-  "setup": "Guide de configuration"
+  "setup": "Guide de configuration",
+  "layout": "Disposition du tableau de bord",
+  "classic": "Originale",
+  "modern": "Nouveau design",
+  "overlayStyle": "Style de l’overlay",
+  "matchesTotal": "Parties enregistrées",
+  "subscribe": "S’abonner"
 }

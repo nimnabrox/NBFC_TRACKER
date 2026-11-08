@@ -1,0 +1,5 @@
+Fort Small and Fort Black typeface files are used for the requested Fortnite presentation.
+Source: the public font assets referenced by https://fortnite.bot/treasure
+Retrieved: 2026-11-08
+Fortnite and related trademarks belong to Epic Games. This project is not affiliated with Epic Games.
+The separate Barlow font retains its SIL Open Font License in OFL.txt.

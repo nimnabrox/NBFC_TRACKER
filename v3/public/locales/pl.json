@@ -82,5 +82,11 @@
   "modeDuo": "Pary",
   "modeTrio": "Trójki",
   "modeSquad": "Oddziały",
-  "setup": "Instrukcja konfiguracji"
+  "setup": "Instrukcja konfiguracji",
+  "layout": "Układ panelu",
+  "classic": "Oryginalny",
+  "modern": "Nowy wygląd",
+  "overlayStyle": "Styl nakładki",
+  "matchesTotal": "Zapisane mecze",
+  "subscribe": "Subskrybuj"
 }

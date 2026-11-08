@@ -473,10 +473,7 @@ public static class WebDashboardServer
             if (path.Equals("/overlay", StringComparison.OrdinalIgnoreCase) || path.Equals("/obs", StringComparison.OrdinalIgnoreCase))
             {
                 res.ContentType = "text/html; charset=utf-8";
-                var html = GetObsOverlayHtml();
-                var bytes = Encoding.UTF8.GetBytes(html);
-                res.ContentLength64 = bytes.Length;
-                res.OutputStream.Write(bytes, 0, bytes.Length);
+                res.Redirect("/overlay.html" + (req.Url?.Query ?? ""));
                 res.Close();
                 return;
             }
@@ -552,6 +549,8 @@ public static class WebDashboardServer
                     ".png" => "image/png",
                     ".svg" => "image/svg+xml",
                     ".ico" => "image/x-icon",
+                    ".woff2" => "font/woff2",
+                    ".ttf" => "font/ttf",
                     _ => "application/octet-stream"
                 };
 
@@ -585,6 +584,8 @@ public static class WebDashboardServer
                         ".png" => "image/png",
                         ".svg" => "image/svg+xml",
                         ".ico" => "image/x-icon",
+                        ".woff2" => "font/woff2",
+                        ".ttf" => "font/ttf",
                         _ => "application/octet-stream"
                     };
 

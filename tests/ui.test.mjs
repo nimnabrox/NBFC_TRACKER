@@ -2,49 +2,91 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { Window } from 'happy-dom';
-test('dashboard interactions: counts, safe names, profiles, RTL, resets, and settings', async () => {
-  const win = new Window({ url: 'http://localhost:5088/', settings: { disableJavaScriptEvaluation: true, disableJavaScriptFileLoading: true, disableCSSFileLoading: true } });
-  win.document.write(await readFile('v3/public/index.html', 'utf8'));
-  const originals = new Map();
-  function install(name, value) { originals.set(name, Object.getOwnPropertyDescriptor(globalThis, name)); Object.defineProperty(globalThis, name, { value, configurable: true, writable: true }); }
-  for (const name of ['window', 'document', 'navigator', 'location', 'history', 'localStorage', 'CustomEvent']) install(name, name === 'window' ? win : win[name]);
-  const calls = [];
-  let state = { room: 'alice', player: 'Alice', total: 4084, session: 6, lastMatch: 6, base: 4084,
-    accounts: [{ key: 'alice', name: 'Alice', active: true }, { key: 'bob', name: '<img src=x onerror=alert(1)>' }],
-    matches: [{ matchStart: new Date().toISOString(), playlist: 'Playlist_DefaultSolo', chestsOpened: 6, placement: 1, eliminations: 2 }] };
-  install('fetch', async value => {
-    const url = new URL(value); calls.push(url.pathname + url.search);
-    if (url.protocol === 'file:') return new Response(await readFile(url, 'utf8'));
-    if (url.pathname === '/api/live') return Response.json(state);
-    if (url.pathname === '/api/settings') return Response.json({ demosFolder: 'C:\\Demos', startWithWindows: false, uiLanguage: 'en', version: 'v0.2.0' });
-    if (url.pathname === '/api/set-profile') state = { ...state, player: 'Bob', room: 'bob', total: 9, base: null, matches: [] };
-    if (url.pathname === '/api/set-base') state = { ...state, total: 0, base: null };
-    return Response.json({ ok: true });
+async function waitFor(check) {
+  for (let i = 0; i < 100; i++) { if (check()) return; await new Promise(resolve => setTimeout(resolve, 10)); }
+  assert.fail('UI did not update');
+}
+function contrast(a, b) {
+  const luminance = color => {
+    const rgb = color.startsWith('#') ? [1,3,5].map(i => parseInt(color.slice(i,i+2),16)) : color.match(/[\d.]+/g).slice(0,3).map(Number);
+    const components = rgb.map(n => { n /= 255; return n <= .04045 ? n / 12.92 : ((n + .055) / 1.055) ** 2.4; });
+    return components[0] * .2126 + components[1] * .7152 + components[2] * .0722;
+  };
+  const x = luminance(a), y = luminance(b);
+  return (Math.max(x, y) + .05) / (Math.min(x, y) + .05);
+}
+for (const page of ['index.html', 'app.html', 'modern.html']) {
+  test(`${page}: original controls, readable language picker, RTL, overlay styles and resets`, async () => {
+    const win = new Window({ url: 'http://localhost:5088/' + page, settings: { disableJavaScriptEvaluation: true, disableJavaScriptFileLoading: true, disableCSSFileLoading: true } });
+    win.document.write(await readFile('v3/public/' + page, 'utf8'));
+    const style = win.document.createElement('style'); style.textContent = await readFile('v3/public/ui.css', 'utf8'); win.document.head.append(style);
+    const originals = new Map();
+    function install(name, value) { originals.set(name, Object.getOwnPropertyDescriptor(globalThis, name)); Object.defineProperty(globalThis, name, { value, configurable: true, writable: true }); }
+    for (const name of ['window', 'document', 'navigator', 'location', 'history', 'localStorage', 'CustomEvent']) install(name, name === 'window' ? win : win[name]);
+    const calls = [];
+    let state = { room: 'alice', player: 'Alice CamelCase', total: 4084, session: 6, lastMatch: 6, base: 4084,
+      accounts: [{ key: 'alice', name: 'Alice CamelCase', active: true }, { key: 'bob', name: '<img src=x onerror=alert(1)>' }],
+      matches: [{ matchStart: new Date().toISOString(), playlist: 'Playlist_DefaultSolo', chestsOpened: 6, placement: 1, eliminations: 2 }] };
+    install('fetch', async value => {
+      const url = new URL(value); calls.push(url.pathname + url.search);
+      if (url.protocol === 'file:') return new Response(await readFile(url, 'utf8'));
+      if (url.pathname === '/api/live') return Response.json(state);
+      if (url.pathname === '/api/settings') return Response.json({ demosFolder: 'C:\\Demos', startWithWindows: false, uiLanguage: 'en', version: 'v0.2.2' });
+      if (url.pathname === '/api/set-profile') state = { ...state, player: 'Bob', room: 'bob', total: 9, base: null, matches: [] };
+      if (url.pathname === '/api/set-base') state = { ...state, total: 0, base: null };
+      return Response.json({ ok: true });
+    });
+    install('setInterval', () => 1); install('clearInterval', () => {});
+    try {
+      await import('../v3/public/app.js?test=' + page);
+      const $ = id => win.document.getElementById(id);
+      assert.equal($('total').textContent, '4,084');
+      assert.equal($('profile').options.length, 2);
+      assert.equal($('profile').querySelectorAll('img').length, 0);
+      assert.equal($('profile').options[0].textContent, 'Alice CamelCase', 'Player name is unchanged');
+      assert.equal($('matchRows').querySelectorAll('tr').length, 1);
+      assert.equal($('layoutChoice').value, page === 'modern.html' ? 'modern' : 'classic');
+      assert.ok($('previewOverlay').href.includes('/overlay.html?'), 'Original overlay is default');
+      $('overlayChoice').value = 'modern'; $('overlayChoice').dispatchEvent(new win.Event('change'));
+      assert.ok($('previewOverlay').href.includes('/overlay-modern.html?'));
+      $('overlayChoice').value = 'classic'; $('overlayChoice').dispatchEvent(new win.Event('change'));
+      assert.ok($('previewOverlay').href.includes('/overlay.html?'));
+      $('openSettings').click(); assert.ok($('settings').open); $('closeSettings').click(); assert.ok(!$('settings').open);
+      $('languageButton').click(); assert.equal($('languageMenu').hidden, false);
+      const options = [...$('languageMenu').querySelectorAll('[role=option]')];
+      assert.equal(options.length, 18);
+      const normal = win.getComputedStyle(options.find(option => option.dataset.code === 'fr'));
+      const selected = win.getComputedStyle(options.find(option => option.dataset.code === 'en'));
+      assert.ok(contrast(normal.backgroundColor, normal.color) >= 4.5, `Unselected language text is readable: ${normal.backgroundColor} / ${normal.color}`);
+      assert.ok(contrast(selected.backgroundColor, selected.color) >= 4.5, `Selected language text is readable: ${selected.backgroundColor} / ${selected.color}`);
+      assert.ok(parseFloat(normal.fontSize) >= 14, 'Language names are not tiny');
+      options[0].dispatchEvent(new win.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      assert.equal($('languageMenu').hidden, true);
+      $('languageButton').click(); options.find(option => option.dataset.code === 'ar').click();
+      await waitFor(() => win.document.documentElement.dir === 'rtl');
+      assert.equal($('statusText').textContent, 'التطبيق المرافق متصل');
+      assert.equal($('languageName').textContent, 'العربية');
+      assert.equal($('languageMenu').hidden, true);
+      const { setLanguage } = await import('../v3/public/i18n.js');
+      await setLanguage('ja'); assert.equal(win.document.documentElement.dir, 'ltr');
+      assert.equal($('statusText').textContent, '連携アプリに接続済み');
+      await $('profile').onchange({ target: { value: 'bob' } }); assert.equal($('total').textContent, '9');
+      $('base').value = '12'; await $('baseForm').onsubmit({ preventDefault() {} });
+      assert.ok(calls.some(path => path.startsWith('/api/set-base?'))); assert.equal($('total').textContent, '0');
+      $('openGuide').click(); assert.ok($('guide').open);
+      if (page === 'app.html') {
+        win.document.querySelector('[data-tab=tabSettings]').click(); assert.ok($('tabSettings').classList.contains('active'));
+        win.document.querySelector('[data-tab=tabObs]').click(); assert.ok($('tabObs').classList.contains('active'));
+      }
+    } finally {
+      win.dispatchEvent(new win.Event('pagehide')); await win.happyDOM.close();
+      for (const [name, descriptor] of originals) { if (descriptor) Object.defineProperty(globalThis, name, descriptor); else delete globalThis[name]; }
+    }
   });
-  install('setInterval', () => 1); install('clearInterval', () => {});
-  try {
-    await import('../v3/public/app.js');
-    const $ = id => win.document.getElementById(id);
-    assert.equal($('total').textContent, '4,084');
-    assert.equal($('profile').options.length, 2);
-    assert.equal($('profile').querySelectorAll('img').length, 0, 'Profile names cannot inject markup');
-    assert.equal($('matchRows').querySelectorAll('tr').length, 1);
-    $('openSettings').click(); assert.ok($('settings').open); $('closeSettings').click(); assert.ok(!$('settings').open);
-    const { setLanguage } = await import('../v3/public/i18n.js');
-    await setLanguage('ar'); assert.equal(win.document.documentElement.dir, 'rtl');
-    assert.equal($('statusText').textContent, 'التطبيق المرافق متصل');
-    await setLanguage('ja'); assert.equal(win.document.documentElement.dir, 'ltr');
-    assert.equal($('statusText').textContent, '連携アプリに接続済み');
-    await $('profile').onchange({ target: { value: 'bob' } });
-    assert.equal($('total').textContent, '9');
-    $('base').value = '12'; $('base').dispatchEvent(new win.Event('input'));
-    await $('baseForm').onsubmit({ preventDefault() {} });
-    assert.ok(calls.some(path => path.startsWith('/api/set-base?')));
-    assert.equal($('total').textContent, '0', 'True zero is rendered');
-    $('openGuide').click(); assert.ok($('guide').open);
-  } finally {
-    win.dispatchEvent(new win.Event('pagehide'));
-    await win.happyDOM.close();
-    for (const [name, descriptor] of originals) { if (descriptor) Object.defineProperty(globalThis, name, descriptor); else delete globalThis[name]; }
-  }
+}
+test('restored overlay keeps its original chest glow and divider and uses the Fortnite font', async () => {
+  const html = await readFile('v3/public/overlay.html', 'utf8');
+  assert.ok(html.includes('class="chest-halo"')); assert.ok(html.includes('class="divider"'));
+  assert.ok(html.includes('Fort-Black.woff2'));
+  const font = await readFile('v3/public/assets/fonts/Fort-Black.woff2'); assert.equal(font.subarray(0,4).toString(), 'wOF2');
 });
