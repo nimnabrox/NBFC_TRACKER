@@ -6,6 +6,7 @@ permissions:
   contents: write
 jobs:
   build-and-release:
+    if: github.event.deleted != true
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -17,6 +18,8 @@ jobs:
         with:
           dotnet-version: '8.0.x'
       - run: npm ci
+      - name: Verify source and tag version
+        run: node scripts/version.mjs --check --tag "${{ github.ref_name }}"
       - run: npm run check
       - name: Verify desktop behavior
         run: dotnet run --project tests/Smoke/Smoke.csproj -c Release -m:1
@@ -25,7 +28,7 @@ jobs:
         run: |
           $releaseVersion = '${{ github.ref_name }}'.TrimStart('v')
           if ($releaseVersion -notmatch '^\d+\.\d+\.\d+$') { throw 'Tag must be vX.Y.Z' }
-          dotnet publish src/ChestCounter/ChestCounter.csproj -c Release -r win-x64 --self-contained true -m:1 -p:Version=$releaseVersion -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=false -p:DebugType=none -o dist/release
+          dotnet publish src/ChestCounter/ChestCounter.csproj -c Release -r win-x64 --self-contained true -m:1 -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=false -p:DebugType=none -o dist/release
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           npm run package:web
           Copy-Item 'dist/release/NBFC TRACKER.exe' 'dist/release/NBFC.TRACKER.exe'
@@ -35,8 +38,17 @@ jobs:
       - uses: softprops/action-gh-release@v2
         with:
           name: NBFC TRACKER ${{ github.ref_name }}
+          body: |
+            Desktop app, website and release use one shared version.
+
+            - Original dashboard and OBS overlay, with optional caption and last-match details.
+            - 18 languages, readable language controls and Fortnite typography.
+            - Subscribe and NIMNABRO creator-code controls.
+            - Clean OBS URLs, remembered overlay totals and verified GitHub downloads.
+            - Automated UI, version consistency, profile and download-integrity checks.
           generate_release_notes: true
           files: |
             dist/release/NBFC.TRACKER.exe
             dist/release/NBFC-Tracker-Web.zip
             dist/release/SHA256SUMS.txt
+            v3/public/version.json

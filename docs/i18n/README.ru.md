@@ -24,7 +24,7 @@
 Добавь счётчик как источник «Браузер» в OBS. Размер: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=ru
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=ru
 ~~~
 
 Читает локальные повторы. Без доступа к памяти игры. Не связано с Epic Games.

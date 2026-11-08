@@ -1,6 +1,8 @@
 import { languages, resolveLanguage, setLanguage, t, number, locale } from './i18n.js';
 import { summarize, activityDays, parseCount, matchesCsv } from './stats.js';
-import { mountLanguagePicker, mountAppearance } from './controls.js';
+import { mountLanguagePicker, mountMiniTabs } from './controls.js';
+import { getOverlayOptions, setOverlayOptions, mountOverlayEditor } from './overlay-options.js';
+import { version, displayVersion, releaseUrl, compareVersions } from './version.js';
 
 const $ = id => document.getElementById(id);
 const local = ['localhost', '127.0.0.1'].includes(location.hostname) && location.port === '5088';
@@ -10,6 +12,11 @@ let room = new URLSearchParams(location.search).get('room')?.trim().toLowerCase(
 let snapshot = { total: 0, matches: [], accounts: [] };
 let connection = 'waiting', nativeConnected = false, polling = false, page = 1, timer, toastTimer, update;
 let settingsLoaded = false;
+let companionVersion = '', installing = false, installStartVersion = '';
+let updateNotice = null;
+let overlaySaveTimer, overlaySaveQueue = Promise.resolve();
+function notice(key, values = {}) { updateNotice = { key, values }; $('updateMessage').textContent = t(key, values); }
+const updateErrorKey = code => ({ private_access: 'updateAccess', rate_limited: 'updateRateLimited', release_missing: 'updateMissing' }[code] || 'updateOffline');
 
 function toast(key) {
   $('toast').textContent = t(key); $('toast').hidden = false;
@@ -38,15 +45,23 @@ async function copy(text) {
 }
 function overlayUrl() {
   const name = room || snapshot.room || snapshot.player || '';
-  const file = $('overlayChoice')?.value === 'modern' ? 'overlay-modern.html' : 'overlay.html';
-  return `${cloud}/${file}?${new URLSearchParams({ room: name.toLowerCase(), lang: locale })}`;
+  const options = getOverlayOptions();
+  const query = new URLSearchParams({ room: name.toLowerCase(), lang: locale });
+  if (options.showLabel) query.set('label', options.label.trim() || t('overlayDefaultLabel'));
+  if (options.showLastMatch) query.set('last', '1');
+  return `${cloud}/overlay?${query}`;
 }
 function render() {
   const values = summarize(snapshot);
   for (const [key, value] of Object.entries(values)) $(key).textContent = number(value);
   $('overlayTotal').textContent = number(values.total);
-  document.body.dataset.overlayStyle = $('overlayChoice')?.value || 'classic';
+  $('overlayEditorTotal').textContent = number(values.total);
+  const options = getOverlayOptions();
+  document.querySelectorAll('[data-overlay-label]').forEach(el => { el.hidden = !options.showLabel; el.textContent = options.label.trim() || t('overlayDefaultLabel'); });
+  document.querySelectorAll('[data-overlay-last]').forEach(el => { el.hidden = !options.showLastMatch; el.textContent = '+' + number(snapshot.lastMatch || 0); });
   $('statusText').textContent = t(connection);
+  if (updateNotice) $('updateMessage').textContent = t(updateNotice.key, updateNotice.values);
+  document.querySelectorAll('.version').forEach(el => { el.textContent = displayVersion; });
   $('status').classList.toggle('online', ['connected', 'cloud'].includes(connection));
   $('totalHint').textContent = snapshot.base > 0 ? `${t('base')}: ${number(snapshot.base)}` : t('fromReplays');
   $('matchStatus').textContent = t(snapshot.inProgress ? 'matchLive' : connection === 'offline' ? 'stale' : 'fromReplays');
@@ -79,6 +94,8 @@ function render() {
   }
   if (!snapshot.player && !snapshot.accounts?.length) $('profile').options[0].textContent = t('noProfile');
   $('previewOverlay').href = overlayUrl();
+  $('previewEditedOverlay').href = overlayUrl();
+  $('copyEditedOverlay').disabled = !(room || snapshot.player);
   $('copyOverlay').disabled = !(room || snapshot.player);
   $('previewOverlay').setAttribute('aria-disabled', String(!(room || snapshot.player)));
   if (!(room || snapshot.player)) $('previewOverlay').removeAttribute('href');
@@ -154,6 +171,15 @@ async function poll() {
     if (room && room !== (data.room || '').toLowerCase()) throw new Error('Different room');
     snapshot = data; nativeConnected = true; connection = 'connected';
     if (!settingsLoaded) { settingsLoaded = true; await loadSettings(); }
+    if (installing) {
+      const state = await native('/api/update-status');
+      if (state.status === 'failed') {
+        installing = false; $('installUpdate').disabled = false; notice('installFailed');
+      } else if (state.status === 'idle') {
+        const current = await native('/api/settings');
+        if (current.version !== installStartVersion) { installing = false; location.reload(); }
+      }
+    }
   } catch {
     nativeConnected = false; settingsLoaded = false;
     if (room) {
@@ -169,7 +195,12 @@ async function loadSettings() {
   try {
     const data = await native('/api/settings');
     $('folder').value = data.demosFolder || ''; $('startup').checked = !!data.startWithWindows;
-    document.querySelectorAll('.version').forEach(el => { el.textContent = data.version || 'v0.2.3'; });
+    if (data.overlayOptions) setOverlayOptions(data.overlayOptions);
+    companionVersion = data.version || '';
+    if (companionVersion && companionVersion !== displayVersion) {
+      notice('versionMismatch', { app: companionVersion, web: displayVersion });
+      $('updateRelease').hidden = false;
+    }
     if (!initialLanguage && data.uiLanguage) {
       await setLanguage(data.uiLanguage); $('language').value = locale;
     }
@@ -185,7 +216,14 @@ async function saveBase(value) {
 }
 for (const [code, label] of languages) { const option = document.createElement('option'); option.value = code; option.textContent = label; $('language').append(option); }
 mountLanguagePicker();
-mountAppearance(render);
+mountMiniTabs();
+mountOverlayEditor(options => {
+  render(); clearTimeout(overlaySaveTimer);
+  overlaySaveTimer = setTimeout(() => {
+    if (!nativeConnected) return;
+    overlaySaveQueue = overlaySaveQueue.catch(() => {}).then(() => native('/api/set-overlay-options', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(options) })).catch(() => toast('error'));
+  }, 250);
+});
 document.addEventListener('languagechange', render);
 $('language').addEventListener('change', async event => {
   try {
@@ -198,7 +236,9 @@ $('openSettings').onclick = () => { $('room').value = room || snapshot.room || '
 $('closeSettings').onclick = () => $('settings').close();
 $('settings').addEventListener('click', event => { if (event.target === $('settings')) { const r = event.target.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) event.target.close(); } });
 $('copyOverlay').onclick = () => copy(overlayUrl());
+$('copyEditedOverlay').onclick = () => copy(overlayUrl());
 $('creatorCode').onclick = () => copy('NIMNABRO');
+document.querySelectorAll('[data-copy-creator]').forEach(button => { button.onclick = () => copy('NIMNABRO'); });
 $('openGuide').onclick = () => { $('guide').open = true; };
 $('previous').onclick = () => { page--; renderMatches(); }; $('next').onclick = () => { page++; renderMatches(); };
 $('export').onclick = () => {
@@ -230,23 +270,39 @@ $('startup').onchange = async event => {
   catch { event.target.checked = !event.target.checked; toast('error'); }
 };
 $('checkUpdate').onclick = async () => {
-  if (!nativeConnected) { window.open('https://github.com/nimnabrox/NBFC_TRACKER/releases/latest', '_blank', 'noopener'); return; }
-  $('checkUpdate').disabled = true; $('updateMessage').textContent = t('loading');
-  try { update = await native('/api/check-update', { signal: AbortSignal.timeout(15000) });
-    $('updateMessage').textContent = update.available === false ? t('error') : update.hasUpdate ? t('newVersion', { version: update.latestVersion }) : t('upToDate');
-    $('installUpdate').hidden = !update.hasUpdate;
-  } catch { $('updateMessage').textContent = t('error'); }
+  $('checkUpdate').disabled = true; notice('loading');
+  $('updateRelease').href = releaseUrl;
+  try {
+    if (nativeConnected) {
+      update = await native('/api/check-update', { signal: AbortSignal.timeout(25000) });
+      if (update.available === false) notice(updateErrorKey(update.errorCode));
+      else if (update.hasUpdate) notice('newVersion', { version: update.latestVersion });
+      else notice('upToDate');
+      $('installUpdate').hidden = !update.hasUpdate;
+      $('updateRelease').hidden = update.available !== false && !update.hasUpdate;
+    } else {
+      const latest = await request(`${cloud}/version.json`);
+      const newer = compareVersions(latest.version, version) > 0;
+      if (newer) notice('newVersion', { version: latest.displayVersion }); else notice('upToDate');
+      $('installUpdate').hidden = true;
+      $('updateRelease').hidden = false;
+    }
+  } catch { notice('updateOffline'); $('updateRelease').hidden = false; }
   finally { $('checkUpdate').disabled = false; }
 };
 $('installUpdate').onclick = async () => {
   $('installUpdate').disabled = true;
-  try { const result = await native('/api/apply-update', { signal: AbortSignal.timeout(15000) }); if (!result.success) throw new Error('Update failed'); }
-  catch { toast('error'); }
-  finally { $('installUpdate').disabled = false; }
+  installStartVersion = companionVersion || displayVersion;
+  try {
+    const result = await native('/api/apply-update', { signal: AbortSignal.timeout(25000) });
+    if (!result.success) throw new Error('Update failed');
+    installing = true; notice('installing');
+  } catch { notice('installFailed'); $('installUpdate').disabled = false; }
 };
+$('updateRelease').href = releaseUrl;
 let initialLanguage;
 try { initialLanguage = localStorage.getItem('nbfc_language'); } catch {}
 await setLanguage(resolveLanguage(new URLSearchParams(location.search).get('lang') || initialLanguage || navigator.language));
 $('language').value = locale;
 await poll(); timer = setInterval(poll, 2500);
-window.addEventListener('pagehide', () => { clearInterval(timer); clearTimeout(toastTimer); });
+window.addEventListener('pagehide', () => { clearInterval(timer); clearTimeout(toastTimer); clearTimeout(overlaySaveTimer); });

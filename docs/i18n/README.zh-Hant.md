@@ -24,7 +24,7 @@
 將計數器新增為 OBS 瀏覽器來源。尺寸：420 × 120。
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=zh-Hant
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=zh-Hant
 ~~~
 
 讀取本機重播檔案。不存取遊戲記憶體。與 Epic Games 無關聯。

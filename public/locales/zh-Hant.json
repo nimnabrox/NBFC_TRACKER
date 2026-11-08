@@ -88,5 +88,21 @@
   "modern": "新設計",
   "overlayStyle": "圖層樣式",
   "matchesTotal": "已記錄對戰",
-  "subscribe": "訂閱"
+  "subscribe": "訂閱",
+  "useCode": "使用代碼",
+  "updateAccess": "此私人版本需要 GitHub 存取權限。請開啟發行頁面下載。",
+  "updateOffline": "無法連線至更新伺服器，請再試一次。",
+  "updateRateLimited": "GitHub 正在限制請求，請稍後再試。",
+  "updateMissing": "下載尚未就緒，請稍後再試。",
+  "installFailed": "無法安裝更新。目前的應用程式已保留，請再試一次。",
+  "installing": "正在下載更新…",
+  "versionMismatch": "桌面版 {app} · 網頁版 {web}。請下載對應版本。",
+  "importantNote": "重要",
+  "historyNotice": "初始計數來自此電腦儲存的重播，通常約100場對戰，並非整個賽季或生涯總數。請輸入已知總數或最佳估計值，之後的新寶箱會繼續累加。清空起始數量可使用已記錄重播的總數。",
+  "overlayEdit": "編輯圖層",
+  "overlayShowLabel": "顯示標籤",
+  "overlayLabelText": "標籤文字",
+  "overlayShowLast": "顯示 + 上一場",
+  "overlayDefaultLabel": "已開啟寶箱",
+  "overlayEditHint": "修改會更新預覽及複製的連結。預設僅顯示總數。"
 }

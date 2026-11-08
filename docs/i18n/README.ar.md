@@ -24,7 +24,7 @@
 أضف العداد كمصدر متصفح في OBS. الأبعاد: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=ar
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=ar
 ~~~
 
 يقرأ الإعادات المحلية. لا يصل إلى ذاكرة اللعبة. غير تابع لـ Epic Games.

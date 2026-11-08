@@ -88,5 +88,21 @@
   "modern": "Nuovo design",
   "overlayStyle": "Stile overlay",
   "matchesTotal": "Partite registrate",
-  "subscribe": "Iscriviti"
+  "subscribe": "Iscriviti",
+  "useCode": "Usa il codice",
+  "updateAccess": "Questa versione privata richiede l’accesso a GitHub. Apri la pagina della versione per scaricarla.",
+  "updateOffline": "Impossibile raggiungere il server degli aggiornamenti. Riprova.",
+  "updateRateLimited": "GitHub sta limitando le richieste. Riprova più tardi.",
+  "updateMissing": "Il download non è ancora pronto. Riprova tra poco.",
+  "installFailed": "Impossibile installare l’aggiornamento. L’app attuale è stata conservata. Riprova.",
+  "installing": "Download dell’aggiornamento…",
+  "versionMismatch": "Desktop {app} · Web {web}. Scarica la versione corrispondente.",
+  "importantNote": "Importante",
+  "historyNotice": "Il conteggio iniziale usa i replay salvati su questo PC, spesso circa 100 partite. Non è il totale della stagione o della carriera. Inserisci il totale noto o una stima; i nuovi forzieri si aggiungeranno. Svuota il valore iniziale per usare i totali dei replay.",
+  "overlayEdit": "Modifica overlay",
+  "overlayShowLabel": "Mostra etichetta",
+  "overlayLabelText": "Testo etichetta",
+  "overlayShowLast": "Mostra + ultima partita",
+  "overlayDefaultLabel": "Forzieri aperti",
+  "overlayEditHint": "Le modifiche aggiornano l’anteprima e l’URL copiato. Per impostazione predefinita appare solo il totale."
 }

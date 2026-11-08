@@ -24,7 +24,7 @@
 เพิ่มตัวนับเป็นแหล่งเบราว์เซอร์ใน OBS ขนาด: 420 × 120
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=th
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=th
 ~~~
 
 อ่านรีเพลย์ในเครื่อง ไม่เข้าถึงหน่วยความจำเกม ไม่มีส่วนเกี่ยวข้องกับ Epic Games

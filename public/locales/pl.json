@@ -88,5 +88,21 @@
   "modern": "Nowy wygląd",
   "overlayStyle": "Styl nakładki",
   "matchesTotal": "Zapisane mecze",
-  "subscribe": "Subskrybuj"
+  "subscribe": "Subskrybuj",
+  "useCode": "Użyj kodu",
+  "updateAccess": "Ta prywatna wersja wymaga dostępu do GitHub. Otwórz stronę wydania, aby ją pobrać.",
+  "updateOffline": "Nie można połączyć się z serwerem aktualizacji. Spróbuj ponownie.",
+  "updateRateLimited": "GitHub ogranicza liczbę żądań. Spróbuj później.",
+  "updateMissing": "Plik do pobrania nie jest jeszcze gotowy. Spróbuj za chwilę.",
+  "installFailed": "Nie udało się zainstalować aktualizacji. Obecna aplikacja została zachowana. Spróbuj ponownie.",
+  "installing": "Pobieranie aktualizacji…",
+  "versionMismatch": "Aplikacja {app} · Web {web}. Pobierz zgodną wersję.",
+  "importantNote": "Ważne",
+  "historyNotice": "Początkowy wynik pochodzi z powtórek zapisanych na tym komputerze, często około 100 meczów. Nie jest to suma z całego sezonu ani kariery. Wpisz znany lub szacowany wynik; nowe skrzynie będą dodawane. Wyczyść wartość początkową, aby używać sum z powtórek.",
+  "overlayEdit": "Edytuj nakładkę",
+  "overlayShowLabel": "Pokaż etykietę",
+  "overlayLabelText": "Tekst etykiety",
+  "overlayShowLast": "Pokaż + ostatni mecz",
+  "overlayDefaultLabel": "Otwarte skrzynie",
+  "overlayEditHint": "Zmiany aktualizują podgląd i kopiowany URL. Domyślnie wyświetlana jest tylko suma."
 }

@@ -88,5 +88,21 @@
   "modern": "Nouveau design",
   "overlayStyle": "Style de l’overlay",
   "matchesTotal": "Parties enregistrées",
-  "subscribe": "S’abonner"
+  "subscribe": "S’abonner",
+  "useCode": "Utilisez le code",
+  "updateAccess": "Cette version privée nécessite un accès à GitHub. Ouvrez sa page pour la télécharger.",
+  "updateOffline": "Le serveur de mise à jour est inaccessible. Réessayez.",
+  "updateRateLimited": "GitHub limite les requêtes. Réessayez plus tard.",
+  "updateMissing": "Le téléchargement n’est pas encore prêt. Réessayez dans un instant.",
+  "installFailed": "La mise à jour n’a pas pu être installée. Votre application actuelle est conservée. Réessayez.",
+  "installing": "Téléchargement de la mise à jour…",
+  "versionMismatch": "Application {app} · Web {web}. Téléchargez la version correspondante.",
+  "importantNote": "Important",
+  "historyNotice": "Le premier total vient des replays enregistrés sur ce PC, souvent environ 100 parties. Ce n’est pas le total de toute votre saison ou carrière. Saisissez votre total connu ou estimé ; les nouveaux coffres s’ajouteront. Effacez la valeur de départ pour utiliser les replays.",
+  "overlayEdit": "Modifier l’overlay",
+  "overlayShowLabel": "Afficher un libellé",
+  "overlayLabelText": "Texte du libellé",
+  "overlayShowLast": "Afficher + dernière partie",
+  "overlayDefaultLabel": "Coffres ouverts",
+  "overlayEditHint": "Les modifications actualisent l’aperçu et l’URL copiée. Par défaut, seul le total est affiché."
 }

@@ -88,5 +88,21 @@
   "modern": "Novo design",
   "overlayStyle": "Estilo do overlay",
   "matchesTotal": "Partidas registradas",
-  "subscribe": "Inscrever-se"
+  "subscribe": "Inscrever-se",
+  "useCode": "Use o código",
+  "updateAccess": "Esta versão privada requer acesso ao GitHub. Abra a página da versão para baixar.",
+  "updateOffline": "Não foi possível acessar o servidor de atualizações. Tente novamente.",
+  "updateRateLimited": "O GitHub está limitando as solicitações. Tente mais tarde.",
+  "updateMissing": "O download ainda não está pronto. Tente novamente em instantes.",
+  "installFailed": "Não foi possível instalar a atualização. Seu aplicativo atual foi preservado. Tente novamente.",
+  "installing": "Baixando atualização…",
+  "versionMismatch": "Desktop {app} · Web {web}. Baixe a versão correspondente.",
+  "importantNote": "Importante",
+  "historyNotice": "A contagem inicial usa as replays salvas neste PC, geralmente cerca de 100 partidas. Não é o total da temporada ou carreira. Digite o total conhecido ou sua melhor estimativa; os novos baús serão somados. Limpe o valor inicial para usar os totais das replays.",
+  "overlayEdit": "Editar overlay",
+  "overlayShowLabel": "Mostrar rótulo",
+  "overlayLabelText": "Texto do rótulo",
+  "overlayShowLast": "Mostrar + última partida",
+  "overlayDefaultLabel": "Baús abertos",
+  "overlayEditHint": "As mudanças atualizam a prévia e a URL copiada. Por padrão, apenas o total é exibido."
 }

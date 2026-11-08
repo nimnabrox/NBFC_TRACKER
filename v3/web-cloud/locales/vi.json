@@ -88,5 +88,21 @@
   "modern": "Thiết kế mới",
   "overlayStyle": "Kiểu lớp phủ",
   "matchesTotal": "Trận đã ghi",
-  "subscribe": "Đăng ký"
+  "subscribe": "Đăng ký",
+  "useCode": "Dùng mã",
+  "updateAccess": "Bản phát hành riêng tư này cần quyền truy cập GitHub. Mở trang phát hành để tải xuống.",
+  "updateOffline": "Không thể kết nối máy chủ cập nhật. Vui lòng thử lại.",
+  "updateRateLimited": "GitHub đang giới hạn yêu cầu. Vui lòng thử lại sau.",
+  "updateMissing": "Bản tải xuống chưa sẵn sàng. Vui lòng thử lại sau ít phút.",
+  "installFailed": "Không thể cài bản cập nhật. Ứng dụng hiện tại được giữ nguyên. Vui lòng thử lại.",
+  "installing": "Đang tải bản cập nhật…",
+  "versionMismatch": "Ứng dụng {app} · Web {web}. Tải bản phát hành tương ứng.",
+  "importantNote": "Quan trọng",
+  "historyNotice": "Số đếm ban đầu dùng bản phát lại đã lưu trên PC này, thường khoảng 100 trận. Đây không phải tổng cả mùa hoặc sự nghiệp. Nhập tổng đã biết hoặc ước tính; rương mới sẽ được cộng thêm. Xóa số ban đầu để dùng tổng từ bản phát lại.",
+  "overlayEdit": "Chỉnh sửa lớp phủ",
+  "overlayShowLabel": "Hiện nhãn",
+  "overlayLabelText": "Nội dung nhãn",
+  "overlayShowLast": "Hiện + trận gần nhất",
+  "overlayDefaultLabel": "Rương đã mở",
+  "overlayEditHint": "Thay đổi cập nhật bản xem trước và URL được sao chép. Mặc định chỉ hiện tổng số."
 }

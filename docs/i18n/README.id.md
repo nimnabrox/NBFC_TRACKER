@@ -24,7 +24,7 @@ Pertandingan, pencapaian, dan harta karun berikutnya. Semua di satu tempat.
 Tambahkan penghitung sebagai Sumber Browser OBS. Ukuran: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=id
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=id
 ~~~
 
 Membaca replay lokal. Tidak mengakses memori game. Tidak berafiliasi dengan Epic Games.

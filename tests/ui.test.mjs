@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { Window } from 'happy-dom';
+import { version, displayVersion, releaseUrl } from '../v3/public/version.js';
 async function waitFor(check) {
   for (let i = 0; i < 100; i++) { if (check()) return; await new Promise(resolve => setTimeout(resolve, 10)); }
   assert.fail('UI did not update');
@@ -24,33 +25,55 @@ for (const page of ['index.html', 'app.html', 'modern.html']) {
     function install(name, value) { originals.set(name, Object.getOwnPropertyDescriptor(globalThis, name)); Object.defineProperty(globalThis, name, { value, configurable: true, writable: true }); }
     for (const name of ['window', 'document', 'navigator', 'location', 'history', 'localStorage', 'CustomEvent']) install(name, name === 'window' ? win : win[name]);
     const calls = [];
+    let pollTick, nativeAvailable = true;
+    let checkResult = { available: true, hasUpdate: false, currentVersion: displayVersion, latestVersion: displayVersion };
     let state = { room: 'alice', player: 'Alice CamelCase', total: 4084, session: 6, lastMatch: 6, base: 4084,
       accounts: [{ key: 'alice', name: 'Alice CamelCase', active: true }, { key: 'bob', name: '<img src=x onerror=alert(1)>' }],
       matches: [{ matchStart: new Date().toISOString(), playlist: 'Playlist_DefaultSolo', chestsOpened: 6, placement: 1, eliminations: 2 }] };
     install('fetch', async value => {
       const url = new URL(value); calls.push(url.pathname + url.search);
       if (url.protocol === 'file:') return new Response(await readFile(url, 'utf8'));
+      if (url.hostname === 'localhost' && url.pathname.startsWith('/api/') && !nativeAvailable) throw new Error('Companion offline');
       if (url.pathname === '/api/live') return Response.json(state);
+      if (url.pathname === '/api/check-update') return Response.json(checkResult);
+      if (url.pathname === '/api/apply-update') return Response.json({ success: true });
+      if (url.pathname === '/api/update-status') return Response.json({ installing: false, status: 'failed' });
+      if (url.pathname === '/version.json') return Response.json({ version, displayVersion, releaseUrl });
       if (url.pathname === '/api/settings') return Response.json({ demosFolder: 'C:\\Demos', startWithWindows: false, uiLanguage: 'en', version: 'v0.2.2' });
       if (url.pathname === '/api/set-profile') state = { ...state, player: 'Bob', room: 'bob', total: 9, base: null, matches: [] };
       if (url.pathname === '/api/set-base') state = { ...state, total: 0, base: null };
       return Response.json({ ok: true });
     });
-    install('setInterval', () => 1); install('clearInterval', () => {});
+    install('setInterval', callback => { pollTick = callback; return 1; }); install('clearInterval', () => {});
     try {
       await import('../v3/public/app.js?test=' + page);
       const $ = id => win.document.getElementById(id);
       assert.equal($('total').textContent, '4,084');
+      assert.equal($('statusText').textContent, 'Companion connected');
+      for (const element of win.document.querySelectorAll('.version')) assert.equal(element.textContent, displayVersion);
+      await $('checkUpdate').onclick(); assert.equal($('updateMessage').textContent, 'You are up to date.');
+      checkResult = { available: false, errorCode: 'private_access', hasUpdate: false };
+      await $('checkUpdate').onclick(); assert.ok($('updateMessage').textContent.includes('GitHub access')); assert.equal($('updateRelease').hidden, false);
+      checkResult = { available: true, hasUpdate: true, latestVersion: 'v99.0.0' };
+      await $('checkUpdate').onclick(); assert.equal($('installUpdate').hidden, false);
+      await $('installUpdate').onclick(); assert.equal($('installUpdate').disabled, true);
+      await pollTick(); assert.equal($('installUpdate').disabled, false); assert.ok($('updateMessage').textContent.includes('current app is preserved'));
       assert.equal($('profile').options.length, 2);
       assert.equal($('profile').querySelectorAll('img').length, 0);
       assert.equal($('profile').options[0].textContent, 'Alice CamelCase', 'Player name is unchanged');
       assert.equal($('matchRows').querySelectorAll('tr').length, 1);
-      assert.equal($('layoutChoice').value, page === 'modern.html' ? 'modern' : 'classic');
-      assert.ok($('previewOverlay').href.includes('/overlay.html?'), 'Original overlay is default');
-      $('overlayChoice').value = 'modern'; $('overlayChoice').dispatchEvent(new win.Event('change'));
-      assert.ok($('previewOverlay').href.includes('/overlay-modern.html?'));
-      $('overlayChoice').value = 'classic'; $('overlayChoice').dispatchEvent(new win.Event('change'));
-      assert.ok($('previewOverlay').href.includes('/overlay.html?'));
+      assert.equal($('layoutChoice'), null); assert.equal($('overlayChoice'), null);
+      assert.ok(win.document.querySelector('.history-note').textContent.includes('100'));
+      assert.ok($('previewOverlay').href.includes('/overlay?'), 'Original overlay URL is clean');
+      assert.equal(new URL($('previewOverlay').href).searchParams.has('label'), false, 'Default is count only');
+      $('showOverlayLabel').checked = true; $('showOverlayLabel').dispatchEvent(new win.Event('change'));
+      $('overlayLabel').value = 'Chests <opened>'; $('overlayLabel').dispatchEvent(new win.Event('input'));
+      $('showOverlayLast').checked = true; $('showOverlayLast').dispatchEvent(new win.Event('change'));
+      const edited = new URL($('previewOverlay').href);
+      assert.equal(edited.searchParams.get('label'), 'Chests <opened>'); assert.equal(edited.searchParams.get('last'), '1');
+      assert.equal(win.document.querySelector('[data-overlay-label]').textContent, 'Chests <opened>');
+      assert.equal(win.document.querySelector('[data-overlay-label]').children.length, 0, 'Edited text cannot inject markup');
+      assert.equal(win.document.querySelector('[data-overlay-last]').textContent, '+6');
       $('openSettings').click(); assert.ok($('settings').open); $('closeSettings').click(); assert.ok(!$('settings').open);
       $('languageButton').click(); assert.equal($('languageMenu').hidden, false);
       const options = [...$('languageMenu').querySelectorAll('[role=option]')];
@@ -78,6 +101,9 @@ for (const page of ['index.html', 'app.html', 'modern.html']) {
         win.document.querySelector('[data-tab=tabSettings]').click(); assert.ok($('tabSettings').classList.contains('active'));
         win.document.querySelector('[data-tab=tabObs]').click(); assert.ok($('tabObs').classList.contains('active'));
       }
+      await setLanguage('en'); nativeAvailable = false; await pollTick();
+      await $('checkUpdate').onclick(); assert.equal($('updateMessage').textContent, 'You are up to date.');
+      assert.equal($('installUpdate').hidden, true, 'Website without companion offers a download, not an install command');
     } finally {
       win.dispatchEvent(new win.Event('pagehide')); await win.happyDOM.close();
       for (const [name, descriptor] of originals) { if (descriptor) Object.defineProperty(globalThis, name, descriptor); else delete globalThis[name]; }

@@ -88,5 +88,21 @@
   "modern": "Neues Design",
   "overlayStyle": "Overlay-Stil",
   "matchesTotal": "Erfasste Spiele",
-  "subscribe": "Abonnieren"
+  "subscribe": "Abonnieren",
+  "useCode": "Code verwenden",
+  "updateAccess": "Für diese private Version ist GitHub-Zugriff erforderlich. Öffne die Release-Seite zum Herunterladen.",
+  "updateOffline": "Der Update-Server ist nicht erreichbar. Bitte versuche es erneut.",
+  "updateRateLimited": "GitHub begrenzt Anfragen. Bitte versuche es später erneut.",
+  "updateMissing": "Der Download ist noch nicht bereit. Bitte versuche es in Kürze erneut.",
+  "installFailed": "Das Update konnte nicht installiert werden. Deine bisherige App bleibt erhalten. Bitte versuche es erneut.",
+  "installing": "Update wird heruntergeladen…",
+  "versionMismatch": "Desktop {app} · Web {web}. Lade die passende Version herunter.",
+  "importantNote": "Wichtig",
+  "historyNotice": "Der erste Zählerstand stammt aus den Replays auf diesem PC, oft etwa 100 Spielen. Er entspricht nicht deiner gesamten Saison oder Karriere. Gib deinen bekannten Gesamtwert oder eine Schätzung ein; neue Truhen werden addiert. Leeren nutzt die Replay-Summen.",
+  "overlayEdit": "Overlay bearbeiten",
+  "overlayShowLabel": "Beschriftung anzeigen",
+  "overlayLabelText": "Beschriftung",
+  "overlayShowLast": "+ letztes Spiel anzeigen",
+  "overlayDefaultLabel": "Geöffnete Truhen",
+  "overlayEditHint": "Änderungen aktualisieren Vorschau und kopierte URL. Standardmäßig wird nur die Gesamtzahl angezeigt."
 }

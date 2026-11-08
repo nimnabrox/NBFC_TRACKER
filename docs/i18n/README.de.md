@@ -24,7 +24,7 @@ Deine Spiele, deine Meilensteine, dein nächster Schatz. Alles an einem Ort.
 Füge den Zähler als OBS-Browserquelle hinzu. Größe: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=de
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=de
 ~~~
 
 Liest lokale Replays. Kein Zugriff auf den Spielspeicher. Nicht mit Epic Games verbunden.

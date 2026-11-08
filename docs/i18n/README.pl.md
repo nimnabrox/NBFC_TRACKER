@@ -24,7 +24,7 @@ Twoje mecze, osiągnięcia i następny skarb. Wszystko w jednym miejscu.
 Dodaj licznik jako źródło przeglądarki w OBS. Rozmiar: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=pl
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=pl
 ~~~
 
 Odczytuje lokalne powtórki. Bez dostępu do pamięci gry. Brak powiązań z Epic Games.

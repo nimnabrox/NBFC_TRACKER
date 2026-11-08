@@ -1,3 +1,99 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>NBFC Tracker · OBS</title><link rel="icon" href="assets/chest_fnv1.png"><style>
-*{box-sizing:border-box;margin:0}html,body{background:transparent!important;overflow:hidden;font-family:'Segoe UI',Tahoma,Arial,sans-serif}.pill{display:inline-flex;align-items:center;gap:18px;margin:5px;padding:12px 24px 12px 13px;border:2px solid #edc36c;border-radius:16px;background:#191d24;color:#edc36c;min-height:90px;max-width:410px}.pill img{width:58px;height:58px;object-fit:contain}.counter{font-size:42px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.2;white-space:nowrap}.label{font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:#b6b1a3}html[dir=rtl] .pill{flex-direction:row-reverse}
-</style></head><body><div class="pill"><img src="assets/chest_fnv1.png" alt=""><div><div id="total" class="counter">—</div><div id="label" class="label">NBFC TRACKER</div></div></div><script type="module" src="overlay.js"></script></body></html>
+<!doctype html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <title>NBFC TRACKER Overlay - Created by NimnaBro</title>
+  <link rel="icon" type="image/png" href="assets/chest_fnv1.png">
+  <link rel="shortcut icon" type="image/png" href="assets/chest_fnv1.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      background: transparent !important;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      padding: 4px;
+      font-family: 'Montserrat', 'Segoe UI Black', 'Impact', system-ui, sans-serif;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 24px 10px 14px;
+      background: #1c1f26;
+      border: 2px solid #f5a623;
+      border-radius: 20px;
+      box-shadow: inset 0 0 16px rgba(245, 166, 35, 0.28);
+      overflow: hidden;
+      user-select: none;
+    }
+    .chest-box {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 64px;
+      height: 64px;
+      flex-shrink: 0;
+    }
+    .chest-halo {
+      position: absolute;
+      width: 74px;
+      height: 74px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(245, 166, 35, 0.65) 0%, rgba(245, 166, 35, 0.25) 45%, rgba(245, 166, 35, 0) 72%);
+      filter: blur(4px);
+      pointer-events: none;
+    }
+    .chest-img {
+      position: relative;
+      width: 60px;
+      height: 60px;
+      object-fit: contain;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.6));
+    }
+    .divider {
+      width: 2px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.16);
+      margin: 0 18px 0 14px;
+      flex-shrink: 0;
+    }
+    .stat-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .counter {
+      font-size: 52px;
+      font-weight: 900;
+      line-height: 1;
+      color: #f7a81b;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+      text-shadow: 0 0 18px rgba(247, 168, 27, 0.65), 0 2px 4px rgba(0, 0, 0, 0.9);
+      transition: transform 0.18s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+  </style>
+<style>@font-face{font-family:Fort Display;src:url(assets/fonts/Fort-Black.woff2) format("woff2");font-weight:900;font-display:swap}.counter{font-family:Fort Display,Impact,"Segoe UI",Tahoma,sans-serif}.pill{max-width:410px;min-height:90px}.counter{font-size:52px}html[dir=rtl] .pill{direction:rtl}.counter{direction:ltr}</style><style>@font-face{font-family:"Fort UI";src:url(assets/fonts/Fort-Small.woff2) format("woff2");font-display:swap}.stat-values{display:flex;flex-direction:column;align-items:flex-start;gap:2px}.overlay-label{font-family:"Fort UI","Segoe UI",Tahoma,sans-serif;font-size:12px;line-height:1;color:#d5d9e1;white-space:nowrap;max-width:210px;overflow:hidden;text-overflow:ellipsis}.overlay-last{font-family:"Fort Display","Segoe UI",Tahoma,sans-serif;font-size:20px;line-height:1;color:#48bb78}.detailed .counter{font-size:42px}[hidden]{display:none!important}</style></head>
+<body>
+  <div class="pill">
+    <div class="chest-box">
+      <div class="chest-halo"></div>
+      <img src="assets/chest_fnv1.png" alt="Chest" class="chest-img">
+    </div>
+    <div class="divider"></div>
+    <div class="stat-box"><div class="stat-values"><span id="overlayCaption" class="overlay-label" hidden=""></span><div id="total" class="counter">—</div><span id="overlayLast" class="overlay-last" hidden=""></span></div></div>
+  </div>
+
+
+
+
+<script type="module" src="overlay.js"></script></body></html>

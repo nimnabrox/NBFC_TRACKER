@@ -44,29 +44,7 @@ export function mountLanguagePicker() {
   document.addEventListener('languagechange', refresh); refresh();
 }
 
-export function mountAppearance(onOverlayChange) {
-  const layout = document.getElementById('layoutChoice');
-  const overlay = document.getElementById('overlayChoice');
-  if (layout) {
-    layout.value = document.body.dataset.layout || 'classic';
-    layout.addEventListener('change', () => {
-      try { localStorage.setItem('nbfc_layout', layout.value); } catch {}
-      const url = new URL(location.href);
-      url.searchParams.set('layout', layout.value);
-      url.searchParams.set('lang', locale);
-      const local = location.port === '5088' && ['localhost', '127.0.0.1'].includes(location.hostname);
-      const base = url.pathname.replace(/(?:index|app|modern)(?:\.html)?\/?$/, '').replace(/[^/]*$/, '');
-      url.pathname = base + (layout.value === 'modern' ? 'modern.html' : local ? 'app.html' : 'index.html');
-      location.assign(url.href);
-    });
-  }
-  if (overlay) {
-    try { overlay.value = localStorage.getItem('nbfc_overlay') === 'modern' ? 'modern' : 'classic'; } catch {}
-    overlay.addEventListener('change', () => {
-      try { localStorage.setItem('nbfc_overlay', overlay.value); } catch {}
-      onOverlayChange();
-    });
-  }
+export function mountMiniTabs() {
   document.querySelectorAll('.mini-tab-btn[data-tab]').forEach(button => {
     button.addEventListener('click', () => {
       document.querySelectorAll('.mini-tab-btn').forEach(tab => tab.classList.toggle('active', tab === button));

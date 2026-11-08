@@ -24,7 +24,7 @@ Tus partidas, tus metas y tu próximo tesoro. Todo en un mismo lugar.
 Añade el contador como fuente de navegador en OBS. Tamaño: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=es
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=es
 ~~~
 
 Lee repeticiones locales. No accede a la memoria del juego. Sin afiliación con Epic Games.

@@ -88,5 +88,21 @@
   "modern": "Yeni tasarım",
   "overlayStyle": "Katman stili",
   "matchesTotal": "Kaydedilen maçlar",
-  "subscribe": "Abone ol"
+  "subscribe": "Abone ol",
+  "useCode": "Kodu kullan",
+  "updateAccess": "Bu özel sürüm için GitHub erişimi gerekir. İndirmek için sürüm sayfasını aç.",
+  "updateOffline": "Güncelleme sunucusuna ulaşılamadı. Lütfen tekrar dene.",
+  "updateRateLimited": "GitHub istekleri sınırlıyor. Lütfen daha sonra tekrar dene.",
+  "updateMissing": "İndirme henüz hazır değil. Biraz sonra tekrar dene.",
+  "installFailed": "Güncelleme yüklenemedi. Mevcut uygulaman korundu. Lütfen tekrar dene.",
+  "installing": "Güncelleme indiriliyor…",
+  "versionMismatch": "Masaüstü {app} · Web {web}. Eşleşen sürümü indir.",
+  "importantNote": "Önemli",
+  "historyNotice": "İlk sayı, bu bilgisayarda kayıtlı tekrarlardan gelir; genellikle yaklaşık 100 maçtır. Tüm sezon veya kariyer toplamın değildir. Bildiğin toplamı ya da tahminini gir; yeni sandıklar üzerine eklenecektir. Tekrar toplamları için başlangıç değerini temizle.",
+  "overlayEdit": "Katmanı düzenle",
+  "overlayShowLabel": "Etiket göster",
+  "overlayLabelText": "Etiket metni",
+  "overlayShowLast": "+ son maçı göster",
+  "overlayDefaultLabel": "Açılan sandıklar",
+  "overlayEditHint": "Değişiklikler önizlemeyi ve kopyalanan URL’yi günceller. Varsayılan görünüm yalnızca toplamı gösterir."
 }

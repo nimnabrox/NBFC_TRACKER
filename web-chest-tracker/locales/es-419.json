@@ -88,5 +88,21 @@
   "modern": "Nuevo diseño",
   "overlayStyle": "Estilo del overlay",
   "matchesTotal": "Partidas registradas",
-  "subscribe": "Suscribirse"
+  "subscribe": "Suscribirse",
+  "useCode": "Usa el código",
+  "updateAccess": "Esta versión privada requiere acceso a GitHub. Abre la página de la versión para descargarla.",
+  "updateOffline": "No se pudo conectar con el servidor de actualizaciones. Inténtalo de nuevo.",
+  "updateRateLimited": "GitHub está limitando las solicitudes. Inténtalo más tarde.",
+  "updateMissing": "La descarga aún no está lista. Vuelve a intentarlo en unos momentos.",
+  "installFailed": "No se pudo instalar la actualización. Tu aplicación actual se conserva. Inténtalo de nuevo.",
+  "installing": "Descargando actualización…",
+  "versionMismatch": "Escritorio {app} · Web {web}. Descarga la versión correspondiente.",
+  "importantNote": "Importante",
+  "historyNotice": "El conteo inicial usa las repeticiones guardadas en esta PC, a menudo unas 100 partidas. No es el total de tu temporada o carrera. Ingresa tu total conocido o una estimación; los cofres nuevos se sumarán. Borra el valor inicial para usar las repeticiones.",
+  "overlayEdit": "Editar overlay",
+  "overlayShowLabel": "Mostrar etiqueta",
+  "overlayLabelText": "Texto de la etiqueta",
+  "overlayShowLast": "Mostrar + última partida",
+  "overlayDefaultLabel": "Cofres abiertos",
+  "overlayEditHint": "Los cambios actualizan la vista previa y la URL copiada. Por defecto solo se muestra el total."
 }

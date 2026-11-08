@@ -88,5 +88,21 @@
   "modern": "새 디자인",
   "overlayStyle": "오버레이 스타일",
   "matchesTotal": "기록한 매치",
-  "subscribe": "구독"
+  "subscribe": "구독",
+  "useCode": "코드 사용",
+  "updateAccess": "이 비공개 릴리스에는 GitHub 접근 권한이 필요합니다. 릴리스 페이지를 열어 다운로드하세요.",
+  "updateOffline": "업데이트 서버에 연결할 수 없습니다. 다시 시도하세요.",
+  "updateRateLimited": "GitHub에서 요청을 제한하고 있습니다. 나중에 다시 시도하세요.",
+  "updateMissing": "다운로드가 아직 준비되지 않았습니다. 잠시 후 다시 시도하세요.",
+  "installFailed": "업데이트를 설치할 수 없습니다. 현재 앱은 유지됩니다. 다시 시도하세요.",
+  "installing": "업데이트 다운로드 중…",
+  "versionMismatch": "데스크톱 {app} · 웹 {web}. 일치하는 버전을 다운로드하세요.",
+  "importantNote": "중요",
+  "historyNotice": "첫 집계는 이 PC에 저장된 리플레이를 사용하며, 보통 약 100매치입니다. 시즌 전체나 통산 합계가 아닙니다. 알고 있는 총합 또는 추정치를 입력하면 새 상자가 그 수에 더해집니다. 시작 수를 비우면 기록된 리플레이 합계를 사용합니다.",
+  "overlayEdit": "오버레이 편집",
+  "overlayShowLabel": "라벨 표시",
+  "overlayLabelText": "라벨 텍스트",
+  "overlayShowLast": "+ 최근 매치 표시",
+  "overlayDefaultLabel": "연 상자",
+  "overlayEditHint": "변경 사항은 미리 보기와 복사할 URL에 반영됩니다. 기본값은 합계만 표시합니다."
 }

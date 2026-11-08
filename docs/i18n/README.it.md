@@ -24,7 +24,7 @@ Le tue partite, i tuoi traguardi, il tuo prossimo tesoro. Tutto in un unico post
 Aggiungi il contatore come sorgente browser di OBS. Dimensioni: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=it
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=it
 ~~~
 
 Legge replay locali. Nessun accesso alla memoria del gioco. Non affiliato a Epic Games.

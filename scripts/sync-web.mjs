@@ -1,4 +1,4 @@
-import { cp, rm, readdir, readFile } from 'node:fs/promises';
+import { cp, rm, readdir } from 'node:fs/promises';
 // v3 owns the shared UI; other paths are compatibility packages, never separate implementations.
 const source = 'v3/public';
 for (const destination of ['public', 'v3/web-cloud', 'web-chest-tracker']) {

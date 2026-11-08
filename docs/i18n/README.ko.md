@@ -24,7 +24,7 @@
 OBS 브라우저 소스로 카운터를 추가하세요. 크기: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=ko
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=ko
 ~~~
 
 로컬 리플레이를 읽습니다. 게임 메모리에 접근하지 않습니다. Epic Games와 무관합니다.

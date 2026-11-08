@@ -24,7 +24,7 @@ Trận đấu, cột mốc và kho báu tiếp theo. Tất cả ở một nơi.
 Thêm bộ đếm làm Nguồn trình duyệt trong OBS. Kích thước: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=vi
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=vi
 ~~~
 
 Đọc bản phát lại cục bộ. Không truy cập bộ nhớ trò chơi. Không liên kết với Epic Games.

@@ -88,5 +88,21 @@
   "modern": "新设计",
   "overlayStyle": "叠加层样式",
   "matchesTotal": "已记录对局",
-  "subscribe": "订阅"
+  "subscribe": "订阅",
+  "useCode": "使用代码",
+  "updateAccess": "此私有版本需要 GitHub 访问权限。请打开发布页面下载。",
+  "updateOffline": "无法连接更新服务器，请重试。",
+  "updateRateLimited": "GitHub 正在限制请求，请稍后重试。",
+  "updateMissing": "下载尚未就绪，请稍后重试。",
+  "installFailed": "无法安装更新。当前应用已保留，请重试。",
+  "installing": "正在下载更新…",
+  "versionMismatch": "桌面版 {app} · 网页版 {web}。请下载对应版本。",
+  "importantNote": "重要",
+  "historyNotice": "初始计数来自此电脑保存的回放，通常约100场对局，并非整个赛季或生涯总数。请输入已知总数或最佳估计值，之后的新宝箱会继续累加。清空起始数量可使用已记录回放的总数。",
+  "overlayEdit": "编辑叠加层",
+  "overlayShowLabel": "显示标签",
+  "overlayLabelText": "标签文字",
+  "overlayShowLast": "显示 + 上一局",
+  "overlayDefaultLabel": "已开启宝箱",
+  "overlayEditHint": "修改会更新预览及复制的链接。默认仅显示总数。"
 }

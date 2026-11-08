@@ -24,7 +24,7 @@
 OBSのブラウザソースにカウンターを追加。サイズ：420 × 120。
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=ja
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=ja
 ~~~
 
 ローカルのリプレイを読み取ります。ゲームメモリへのアクセスはありません。Epic Gamesとは無関係です。

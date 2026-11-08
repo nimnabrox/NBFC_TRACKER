@@ -88,5 +88,21 @@
   "modern": "Desain baru",
   "overlayStyle": "Gaya overlay",
   "matchesTotal": "Pertandingan tercatat",
-  "subscribe": "Berlangganan"
+  "subscribe": "Berlangganan",
+  "useCode": "Gunakan kode",
+  "updateAccess": "Akses GitHub diperlukan untuk rilis privat ini. Buka halaman rilis untuk mengunduh.",
+  "updateOffline": "Server pembaruan tidak dapat dijangkau. Coba lagi.",
+  "updateRateLimited": "GitHub membatasi permintaan. Coba lagi nanti.",
+  "updateMissing": "Unduhan rilis belum siap. Coba lagi sebentar lagi.",
+  "installFailed": "Pembaruan tidak dapat dipasang. Aplikasi saat ini tetap tersimpan. Coba lagi.",
+  "installing": "Mengunduh pembaruan…",
+  "versionMismatch": "Desktop {app} · Web {web}. Unduh rilis yang sesuai.",
+  "importantNote": "Penting",
+  "historyNotice": "Hitungan awal memakai replay yang tersimpan di PC ini, sering kali sekitar 100 pertandingan. Ini bukan total satu musim atau karier. Masukkan total yang diketahui atau perkiraan terbaik; peti baru akan ditambahkan. Kosongkan hitungan awal untuk memakai total replay.",
+  "overlayEdit": "Edit overlay",
+  "overlayShowLabel": "Tampilkan label",
+  "overlayLabelText": "Teks label",
+  "overlayShowLast": "Tampilkan + pertandingan terakhir",
+  "overlayDefaultLabel": "Peti dibuka",
+  "overlayEditHint": "Perubahan memperbarui pratinjau dan URL yang disalin. Tampilan bawaan hanya menunjukkan total."
 }

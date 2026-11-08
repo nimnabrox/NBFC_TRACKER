@@ -880,7 +880,7 @@ void PrintStatus()
     ConsoleUi.Text($"Tracked  : {profile?.Name ?? "nimnabro"}");
     ConsoleUi.Text($"Base Count: {(config.BaseChestCount.HasValue ? config.BaseChestCount.Value.ToString() : "None (showing replay amount)")}");
     ConsoleUi.Text($"Web Dash : https://nbfct.nimnabro.com");
-    ConsoleUi.Text($"OBS URL  : https://nbfct.nimnabro.com/overlay.html?room=nimnabro");
+    ConsoleUi.Text($"OBS URL  : {WebDashboardServer.CurrentCloudOverlayUrl}");
     ConsoleUi.Text($"Replays  : {config.DemosFolder}{demosNote}");
     ConsoleUi.Text(L.T($"Données  : {store.Folder}", $"Data     : {store.Folder}"));
     Console.WriteLine();

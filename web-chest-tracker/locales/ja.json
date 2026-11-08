@@ -88,5 +88,21 @@
   "modern": "新しいデザイン",
   "overlayStyle": "オーバーレイのスタイル",
   "matchesTotal": "記録したマッチ",
-  "subscribe": "チャンネル登録"
+  "subscribe": "チャンネル登録",
+  "useCode": "コードを使用",
+  "updateAccess": "この非公開リリースにはGitHubのアクセス権が必要です。リリースページからダウンロードしてください。",
+  "updateOffline": "更新サーバーに接続できませんでした。もう一度お試しください。",
+  "updateRateLimited": "GitHubのリクエスト制限に達しました。しばらくしてからお試しください。",
+  "updateMissing": "ダウンロードの準備ができていません。少し待ってからお試しください。",
+  "installFailed": "更新をインストールできませんでした。現在のアプリは保持されています。もう一度お試しください。",
+  "installing": "更新をダウンロード中…",
+  "versionMismatch": "デスクトップ {app} · Web {web}。対応するリリースをダウンロードしてください。",
+  "importantNote": "重要",
+  "historyNotice": "最初のカウントは、このPCに保存されたリプレイ（多くの場合約100マッチ）が対象です。シーズン全体や通算の合計ではありません。把握している合計または推定値を入力すると、新しい宝箱が加算されます。開始値を空にするとリプレイの合計を使用します。",
+  "overlayEdit": "オーバーレイを編集",
+  "overlayShowLabel": "ラベルを表示",
+  "overlayLabelText": "ラベルのテキスト",
+  "overlayShowLast": "＋直近マッチを表示",
+  "overlayDefaultLabel": "開けた宝箱",
+  "overlayEditHint": "変更はプレビューとコピーするURLに反映されます。初期設定では合計のみ表示します。"
 }

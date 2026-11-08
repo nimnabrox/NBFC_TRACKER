@@ -24,6 +24,8 @@ public static class WebDashboardServer
     private static Func<MatchRecord?>? _getLiveMatch;
     private static System.Threading.Timer? _cloudSyncTimer;
     private static UpdateInfo? _cachedUpdate;
+    private static int _installingUpdate;
+    private static volatile string _updateStatus = "idle";
 
     public static void Start(Store store, Config config, TrackerData data, Func<bool>? isLiveInProgress = null, Func<MatchRecord?>? getLiveMatch = null)
     {
@@ -191,6 +193,11 @@ public static class WebDashboardServer
                             var replayTotal = _data.Matches.Where(m => Profiles.Key(m).Equals(pKey, StringComparison.OrdinalIgnoreCase)).Sum(m => m.ChestsOpened);
                             if (!string.IsNullOrWhiteSpace(pKey)) _config.ProfileBaseReplayTotals[pKey] = replayTotal;
                             if (!string.IsNullOrWhiteSpace(pName)) _config.ProfileBaseReplayTotals[pName] = replayTotal;
+                            var liveAtSave = (_isLiveInProgress?.Invoke() ?? false) ? _getLiveMatch?.Invoke() : null;
+                            var liveBaseline = liveAtSave != null && (Profiles.Key(liveAtSave).Equals(pKey, StringComparison.OrdinalIgnoreCase)
+                                || string.Equals(liveAtSave.PlayerName, pName, StringComparison.OrdinalIgnoreCase)) ? liveAtSave.ChestsOpened : 0;
+                            if (!string.IsNullOrWhiteSpace(pKey)) _config.ProfileBaseLiveTotals[pKey] = liveBaseline;
+                            if (!string.IsNullOrWhiteSpace(pName)) _config.ProfileBaseLiveTotals[pName] = liveBaseline;
                             _store.SaveConfig(_config);
                             ReportWriter.WriteAll(_store, _config, _data);
                             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -274,7 +281,8 @@ public static class WebDashboardServer
                 var baseStr = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value.ToString() : "null";
                 var startWithFn = _config?.StartWithFortnite ?? false;
 
-                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"uiLanguage\":\"{EscapeJson(_config?.UiLanguage ?? _config?.Language ?? "en")}\",\"version\":\"{AppInfo.DisplayVersion}\"}}";
+                var overlayOptions = System.Text.Json.JsonSerializer.Serialize(_config?.OverlayOptions ?? new(), new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web));
+                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"uiLanguage\":\"{EscapeJson(_config?.UiLanguage ?? _config?.Language ?? "en")}\",\"version\":\"{AppInfo.DisplayVersion}\",\"overlayOptions\":{overlayOptions}}}";
                 var bytes = Encoding.UTF8.GetBytes(json);
                 res.ContentLength64 = bytes.Length;
                 res.OutputStream.Write(bytes, 0, bytes.Length);
@@ -282,75 +290,67 @@ public static class WebDashboardServer
                 return;
             }
 
-            // 2c-2. Check for Updates API
-            if (path.Equals("/api/check-update", StringComparison.OrdinalIgnoreCase))
+            if (path.Equals("/api/set-overlay-options", StringComparison.OrdinalIgnoreCase))
             {
-                res.ContentType = "application/json; charset=utf-8";
+                if (req.HttpMethod != "POST") { res.StatusCode = 405; res.Close(); return; }
+                if (_config == null || _store == null) { res.StatusCode = 503; res.Close(); return; }
                 try
                 {
-                    var update = Updater.CheckAsync().GetAwaiter().GetResult();
-                    if (update != null)
-                    {
-                        _cachedUpdate = update;
-                        var json = $"{{\"hasUpdate\":true,\"currentVersion\":\"{AppInfo.DisplayVersion}\",\"latestVersion\":\"{EscapeJson(update.Tag)}\",\"tag\":\"{EscapeJson(update.Tag)}\",\"url\":\"{EscapeJson(update.PageUrl)}\",\"downloadUrl\":\"{EscapeJson(update.AssetUrl)}\",\"size\":{update.Size},\"changelog\":\"{EscapeJson(update.Changelog ?? "")}\"}}";
-                        var bytes = Encoding.UTF8.GetBytes(json);
-                        res.ContentLength64 = bytes.Length;
-                        res.OutputStream.Write(bytes, 0, bytes.Length);
-                    }
-                    else
-                    {
-                        var json = $"{{\"hasUpdate\":false,\"available\":{(Updater.LastCheckError == null ? "true" : "false")},\"currentVersion\":\"{AppInfo.DisplayVersion}\"}}";
-                        var bytes = Encoding.UTF8.GetBytes(json);
-                        res.ContentLength64 = bytes.Length;
-                        res.OutputStream.Write(bytes, 0, bytes.Length);
-                    }
+                    if (req.ContentLength64 > 4096) { res.StatusCode = 413; res.Close(); return; }
+                    var options = System.Text.Json.JsonSerializer.Deserialize<OverlayPreferences>(req.InputStream, new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web));
+                    if (options == null || (options.Label?.Length ?? 0) > 64 || (options.Label?.Any(char.IsControl) ?? false))
+                    { res.StatusCode = 400; res.Close(); return; }
+                    options.Label ??= "";
+                    _config.OverlayOptions = options; _store.SaveConfig(_config);
+                    WriteJson(res, new { ok = true });
                 }
-                catch (Exception ex)
-                {
-                    var json = $"{{\"hasUpdate\":false,\"currentVersion\":\"{AppInfo.DisplayVersion}\",\"error\":\"{EscapeJson(ex.Message)}\"}}";
-                    var bytes = Encoding.UTF8.GetBytes(json);
-                    res.ContentLength64 = bytes.Length;
-                    res.OutputStream.Write(bytes, 0, bytes.Length);
-                }
-                res.Close();
+                catch { res.StatusCode = 400; res.Close(); }
                 return;
             }
-
-            // 2c-3. Apply Update API
+            if (path.Equals("/api/check-update", StringComparison.OrdinalIgnoreCase))
+            {
+                var check = Updater.CheckDetailedAsync().GetAwaiter().GetResult();
+                _cachedUpdate = check.HasUpdate ? check.Release : null;
+                WriteJson(res, new {
+                    hasUpdate = check.HasUpdate, available = check.ErrorCode == null, errorCode = check.ErrorCode,
+                    currentVersion = AppInfo.DisplayVersion, latestVersion = check.Release?.Tag,
+                    url = check.Release?.PageUrl ?? AppInfo.RepoUrl + "/releases/latest",
+                    size = check.Release?.Size, changelog = check.Release?.Changelog
+                });
+                return;
+            }
+            if (path.Equals("/api/update-status", StringComparison.OrdinalIgnoreCase))
+            {
+                WriteJson(res, new { installing = Volatile.Read(ref _installingUpdate) == 1, status = _updateStatus });
+                return;
+            }
             if (path.Equals("/api/apply-update", StringComparison.OrdinalIgnoreCase))
             {
-                res.ContentType = "application/json; charset=utf-8";
+                if (Interlocked.CompareExchange(ref _installingUpdate, 1, 0) != 0)
+                { WriteJson(res, new { success = false, errorCode = "busy" }); return; }
                 try
                 {
                     var update = _cachedUpdate ?? Updater.CheckAsync().GetAwaiter().GetResult();
-                    if (update != null)
+                    if (update == null)
                     {
-                        Task.Run(() =>
-                        {
-                            Thread.Sleep(500);
-                            Updater.Install(update);
-                        });
-                        var json = $"{{\"success\":true,\"message\":\"Installing update {EscapeJson(update.Tag)} and restarting...\"}}";
-                        var bytes = Encoding.UTF8.GetBytes(json);
-                        res.ContentLength64 = bytes.Length;
-                        res.OutputStream.Write(bytes, 0, bytes.Length);
+                        Interlocked.Exchange(ref _installingUpdate, 0);
+                        WriteJson(res, new { success = false, errorCode = "no_update" }); return;
                     }
-                    else
-                    {
-                        var json = "{\"success\":false,\"message\":\"No new update available.\"}";
-                        var bytes = Encoding.UTF8.GetBytes(json);
-                        res.ContentLength64 = bytes.Length;
-                        res.OutputStream.Write(bytes, 0, bytes.Length);
-                    }
+                    _updateStatus = "downloading";
+                    Task.Run(async () => {
+                        await Task.Delay(350);
+                        var error = Updater.Install(update);
+                        _updateStatus = error == null ? "restarting" : "failed";
+                        Interlocked.Exchange(ref _installingUpdate, 0);
+                    });
+                    WriteJson(res, new { success = true, status = "downloading" });
                 }
-                catch (Exception ex)
+                catch
                 {
-                    var json = $"{{\"success\":false,\"message\":\"{EscapeJson(ex.Message)}\"}}";
-                    var bytes = Encoding.UTF8.GetBytes(json);
-                    res.ContentLength64 = bytes.Length;
-                    res.OutputStream.Write(bytes, 0, bytes.Length);
+                    _updateStatus = "failed";
+                    Interlocked.Exchange(ref _installingUpdate, 0);
+                    WriteJson(res, new { success = false, errorCode = "unavailable" });
                 }
-                res.Close();
                 return;
             }
 
@@ -469,15 +469,6 @@ public static class WebDashboardServer
                 }
             }
 
-            // 4. OBS Studio Overlay (transparent, ultra-lightweight, zero-flicker)
-            if (path.Equals("/overlay", StringComparison.OrdinalIgnoreCase) || path.Equals("/obs", StringComparison.OrdinalIgnoreCase))
-            {
-                res.ContentType = "text/html; charset=utf-8";
-                res.Redirect("/overlay.html" + (req.Url?.Query ?? ""));
-                res.Close();
-                return;
-            }
-
             // 5. Raw JSON Data API
             if (path.Equals("/api/data", StringComparison.OrdinalIgnoreCase))
             {
@@ -524,6 +515,10 @@ public static class WebDashboardServer
             else if (cleanPath.Equals("overlay", StringComparison.OrdinalIgnoreCase) || cleanPath.Equals("obs", StringComparison.OrdinalIgnoreCase))
             {
                 cleanPath = "overlay.html";
+            }
+            else if (cleanPath.Equals("overlay-modern", StringComparison.OrdinalIgnoreCase))
+            {
+                cleanPath = "overlay-modern.html";
             }
 
             var staticCandidates = new[]
@@ -686,7 +681,7 @@ public static class WebDashboardServer
             var baseCount = _config.GetBaseChestForProfile(profileKey) ?? _config.GetBaseChestForProfile(playerName);
             var matches = matchArray.OrderByDescending(ReportWriter.When).ToList();
             var inProgress = _isLiveInProgress?.Invoke() ?? false;
-            var liveMatch = _getLiveMatch?.Invoke();
+            var liveMatch = inProgress ? _getLiveMatch?.Invoke() : null;
             var liveChests = liveMatch != null && (Profiles.Key(liveMatch).Equals(profileKey, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(liveMatch.PlayerName, playerName, StringComparison.OrdinalIgnoreCase)) ? liveMatch.ChestsOpened : 0;
             var sessionChests = matches.Where(ReportWriter.IsThisSession).Sum(m => m.ChestsOpened) + liveChests;
@@ -767,6 +762,16 @@ public static class WebDashboardServer
         catch { return "[]"; }
     }
 
+    private static void WriteJson(HttpListenerResponse response, object value)
+    {
+        response.ContentType = "application/json; charset=utf-8";
+        response.Headers["Cache-Control"] = "no-store";
+        var bytes = System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(value);
+        response.ContentLength64 = bytes.Length;
+        response.OutputStream.Write(bytes);
+        response.Close();
+    }
+
     private static string EscapeJson(string s) => System.Text.Json.JsonSerializer.Serialize(s ?? "")[1..^1];
 
     public static string CurrentCloudRoom
@@ -777,7 +782,17 @@ public static class WebDashboardServer
             lock (_data) return Profiles.Current(_data, _config)?.Name.ToLowerInvariant() ?? "";
         }
     }
-    public static string CurrentCloudOverlayUrl => "https://nbfct.nimnabro.com/overlay.html?room=" + Uri.EscapeDataString(CurrentCloudRoom) + "&lang=" + DashboardLanguage.Code;
+    public static string CurrentCloudOverlayUrl
+    {
+        get
+        {
+            var url = "https://nbfct.nimnabro.com/overlay?room=" + Uri.EscapeDataString(CurrentCloudRoom) + "&lang=" + DashboardLanguage.Code;
+            var options = _config?.OverlayOptions;
+            if (options?.ShowLabel == true) url += "&label=" + Uri.EscapeDataString(string.IsNullOrWhiteSpace(options.Label) ? DashboardLanguage.Text("overlayDefaultLabel") : options.Label.Trim());
+            if (options?.ShowLastMatch == true) url += "&last=1";
+            return url;
+        }
+    }
 
     private static string GetObsOverlayHtml()
     {

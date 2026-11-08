@@ -24,7 +24,7 @@ Your matches, your milestones, your next treasure. All in one place.
 Add your counter as an OBS Browser Source. Size: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=en
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=en
 ~~~
 
 Reads local replay files. No game memory access. Not affiliated with Epic Games.

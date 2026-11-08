@@ -1,30 +1,100 @@
 <!doctype html>
-<html lang="en" dir="ltr"><head>
+<html lang="en"><head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#111419">
   <meta name="description" content="Your Fortnite matches, chest milestones and stream overlay. An open-source companion by NimnaBro.">
   <title>NBFC Tracker · Every chest counts</title>
-  <link rel="icon" href="assets/chest_fnv1.png"><link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="ui.css"><script src="appearance.js"></script></head>
-<body data-layout="modern">
-  <header class="topbar"><a class="brand" href="./"><span class="brand-icon"><img src="assets/chest_fnv1.png" width="32" height="32" alt=""></span><span>NBFC<span class="brand-light"> TRACKER</span><small data-i18n="tagline">FORTNITE CHEST TRACKER</small></span></a>
-    <nav data-i18n-label="dashboard" aria-label="Dashboard"><a class="nav-link selected" href="#dashboard" data-i18n="dashboard">Dashboard</a><a class="nav-link" href="#history" data-i18n="history">Match history</a></nav>
-    <div class="header-actions"><div class="language-picker"><button type="button" id="languageButton" class="language-button" aria-haspopup="listbox" aria-expanded="false" aria-controls="languageMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2v3m5 17 5-10 5 10m-8-4h6"></path></svg><span id="languageName">English</span><span aria-hidden="true">⌄</span></button><div id="languageMenu" class="language-menu" role="listbox" hidden=""></div><select id="language" hidden="" aria-hidden="true" tabindex="-1"></select></div><button class="icon-button" id="openSettings" data-i18n-label="settings" aria-label="Settings"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 3-1 3-3 1-2 5 2 5 3 1 1 3h6l1-3 3-1 2-5-2-5-3-1-1-3Z"></path><circle cx="12" cy="12" r="3"></circle></svg></button><a class="button small download" href="https://github.com/nimnabrox/NBFC_TRACKER/releases/latest" target="_blank" rel="noopener" data-i18n="download">Download for Windows</a></div>
-  </header>
-  <main id="dashboard">
-    <section class="intro"><div><p class="eyebrow" data-i18n="tagline">FORTNITE CHEST TRACKER</p><h1 data-i18n="dashboard">Dashboard</h1></div><a href="#guide" class="text-link" id="openGuide"><span data-i18n="setup">Setup guide</span><span aria-hidden="true">↗</span></a></section>
-    <div class="dashboard-grid">
-      <section class="counter-card"><div class="counter-top"><span class="label" data-i18n="total">Chests tracked</span><span class="status" id="status" role="status"><i></i><span id="statusText" data-i18n="waiting">Waiting for companion</span></span></div><div class="counter-body"><div class="counter-data"><strong id="total">0</strong><p id="totalHint" data-i18n="fromReplays">From your replay history</p><div class="player-control"><span class="player-avatar" aria-hidden="true">◈</span><div><label for="profile" data-i18n="profile">Player profile</label><select id="profile"><option data-i18n="noProfile">No profile yet</option></select></div></div></div><div class="chest-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><span class="spark s1">+</span><span class="spark s2">+</span><img src="assets/chest_fnv1.png" alt="" width="210" height="210"><span class="art-tag">NB / 01</span></div></div><div class="counter-bottom"><span><i class="live-dot"></i><span id="matchStatus" data-i18n="fromReplays">From your replay history</span></span><span>NBFC <span class="version">v0.2.3</span></span></div></section>
-      <section class="stats-grid" data-i18n-label="activity" aria-label="Statistics"><article class="stat"><span class="stat-symbol">↗</span><strong id="session">0</strong><span data-i18n="session">This session</span></article><article class="stat"><span class="stat-symbol">◷</span><strong id="lastMatch">0</strong><span data-i18n="lastMatch">Last match</span></article><article class="stat"><span class="stat-symbol">▥</span><strong id="average">0</strong><span data-i18n="average">Chests / match</span></article><article class="stat"><span class="stat-symbol">♜</span><strong id="victories">0</strong><span data-i18n="victories">Victories</span></article></section>
-      <section class="panel activity"><div class="panel-heading"><h2 data-i18n="activity">Your activity</h2><span class="muted" data-i18n="last30">Last 30 days</span></div><div id="chart" class="chart" role="img" aria-label="Chest activity"></div><div class="chart-axis"><span id="chartStart"></span><span id="chartEmpty" data-i18n="noActivity">Your next match starts the story.</span><span id="chartEnd"></span></div></section>
-      <section class="panel overlay-card"><div class="panel-heading"><h2 data-i18n="overlay">Stream overlay</h2><span class="obs-label">OBS</span></div><div class="overlay-preview"><div class="preview-pill"><img src="assets/chest_fnv1.png" alt="" width="36" height="36"><strong id="overlayTotal">0</strong></div><span class="preview-grid" aria-hidden="true"></span></div><p class="muted" data-i18n="overlayHint">Add your counter as an OBS Browser Source. Size: 420 × 120.</p><div class="overlay-actions"><button id="copyOverlay" class="button primary" data-i18n="copy">Copy URL</button><a id="previewOverlay" class="button secondary" target="_blank" rel="noopener" data-i18n="preview">Preview</a></div></section>
-    </div>
-    <section class="panel history" id="history"><div class="panel-heading"><div><h2 data-i18n="history">Match history</h2></div><button class="button secondary small" id="export" data-i18n="export">Export CSV</button></div><div class="table-scroll"><table><thead><tr><th data-i18n="date">Date</th><th data-i18n="mode">Mode</th><th data-i18n="placement">Placement</th><th data-i18n="chests">Chests</th><th data-i18n="eliminations">Eliminations</th></tr></thead><tbody id="matchRows"></tbody></table></div><div class="pagination" id="pagination"><span id="pageLabel"></span><div><button class="button secondary small" id="previous" data-i18n="previous">Previous</button><button class="button secondary small" id="next" data-i18n="next">Next</button></div></div></section>
-    <details class="guide" id="guide"><summary data-i18n="setup">Setup guide</summary><div class="steps"><article><span class="step-number">01</span><h3 data-i18n="step1">Enable replays</h3><p data-i18n="step1Body"></p></article><article><span class="step-number">02</span><h3 data-i18n="step2">Open the companion</h3><p data-i18n="step2Body"></p></article><article><span class="step-number">03</span><h3 data-i18n="step3">Bring it to your stream</h3><p data-i18n="step3Body"></p></article></div></details>
-  </main>
-  <footer><a class="footer-brand" href="./">NBFC TRACKER<span> / BY NIMNABRO</span></a><div class="footer-links"><button id="creatorCode" class="footer-code" data-i18n-label="creator">NIMNABRO</button><a href="https://github.com/nimnabrox/NBFC_TRACKER" target="_blank" rel="noopener">GitHub ↗</a></div><span class="version">v0.2.3</span></footer>
-  <dialog id="settings"><section class="appearance-settings"><label for="layoutChoice" data-i18n="layout">Dashboard layout</label><select id="layoutChoice"><option value="classic" data-i18n="classic">Classic</option><option value="modern" data-i18n="modern">Modern</option></select><label for="overlayChoice" data-i18n="overlayStyle">Overlay style</label><select id="overlayChoice"><option value="classic" data-i18n="classic">Classic</option><option value="modern" data-i18n="modern">Modern</option></select></section><div class="dialog-heading"><h2 data-i18n="settings">Settings</h2><button id="closeSettings" class="icon-button" data-i18n-label="close" aria-label="Close">×</button></div><form id="roomForm"><label for="room" data-i18n="room">Cloud room</label><p data-i18n="roomHint"></p><div class="form-row"><input id="room" maxlength="128" autocomplete="off" dir="auto"><button class="button secondary" data-i18n="connect">Connect</button></div></form><form id="baseForm"><label for="base" data-i18n="base">Starting chest count</label><p data-i18n="baseHint"></p><div class="form-row"><input id="base" type="number" min="0" max="2147483647" step="1" inputmode="numeric"><button class="button primary" data-i18n="save">Save</button><button type="button" class="button secondary" id="resetBase" data-i18n="reset">Reset</button></div></form><form id="folderForm"><label for="folder" data-i18n="folder">Replay folder</label><p data-i18n="folderHint"></p><div class="form-row"><input id="folder" dir="ltr" autocomplete="off"><button class="button secondary" data-i18n="save">Save</button></div></form><label class="checkbox-row"><input type="checkbox" id="startup"><span data-i18n="startup">Start with Windows</span></label><div class="update-row"><span><span data-i18n="version">Version</span> <b class="version">v0.2.3</b></span><button id="checkUpdate" class="button secondary small" data-i18n="checkUpdate">Check for updates</button></div><p id="updateMessage" role="status"></p><button id="installUpdate" class="button primary" data-i18n="installUpdate" hidden="">Install update</button></dialog>
-  <div class="toast" id="toast" role="status" aria-live="polite" hidden=""></div>
-  <script type="module" src="app.js"></script>
+  <link rel="icon" href="assets/chest_fnv1.png"><link rel="stylesheet" href="classic.css">
+<link rel="stylesheet" href="ui.css"></head>
+<body data-layout="classic">
+  <div class="app-layout">
+    <!-- ==============================================================
+         LEFT COLUMN (1 PART): SIDEBAR, PROFILES & SETTINGS
+    ============================================================== -->
+    <aside class="sidebar"><div class="brand-card"><div class="brand-title"><img src="assets/chest_fnv1.png" alt="" width="32" height="32"><span>NBFC TRACKER</span><small class="version">v0.1.0</small></div><div class="brand-sub" data-i18n="tagline"></div><div class="status" id="status"><i></i><span id="statusText" data-i18n="waiting"></span></div></div><div class="side-card language-card"><label class="side-card-title" data-i18n="language"></label><div class="language-picker"><button type="button" id="languageButton" class="language-button" aria-haspopup="listbox" aria-expanded="false" aria-controls="languageMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2v3m5 17 5-10 5 10m-8-4h6"></path></svg><span id="languageName">English</span><span aria-hidden="true">⌄</span></button><div id="languageMenu" class="language-menu" role="listbox" hidden=""></div><select id="language" hidden="" aria-hidden="true" tabindex="-1"></select></div></div><section class="side-card"><label for="profile" class="side-card-title" data-i18n="profile"></label><select id="profile" class="text-input"></select><div id="accountList" class="account-list"></div></section><section class="side-card quick-settings"><h2 class="side-card-title" data-i18n="settings"></h2><form id="baseForm"><label for="base" data-i18n="base">Starting chest count</label><div class="history-note" role="note"><strong data-i18n="importantNote">Important</strong><p data-i18n="historyNotice"></p></div><div class="form-row"><input id="base" type="number" min="0" max="2147483647" step="1" inputmode="numeric"><button class="button primary" data-i18n="save">Save</button><button type="button" class="button secondary" id="resetBase" data-i18n="reset">Reset</button></div></form><form id="folderForm"><label for="folder" data-i18n="folder">Replay folder</label><p data-i18n="folderHint"></p><div class="form-row"><input id="folder" dir="ltr" autocomplete="off"><button class="button secondary" data-i18n="save">Save</button></div></form><label class="checkbox-row"><input type="checkbox" id="startup"><span data-i18n="startup">Start with Windows</span></label></section><section class="side-card classic-obs" id="overlayCard"><h2 class="side-card-title" data-i18n="overlay"></h2><div class="obs-preview-box"><div class="classic-overlay-preview"><span class="chest-halo"></span><img src="assets/chest_fnv1.png" alt="" width="42" height="42"><span class="overlay-divider"></span><span class="overlay-values"><span data-overlay-label="" hidden=""></span><strong id="overlayTotal">0</strong><small data-overlay-last="" hidden="">+0</small></span></div></div><div id="obsUrl" class="obs-url-display"></div><p class="muted" data-i18n="overlayHint">Add your counter as an OBS Browser Source. Size: 420 × 120.</p><div class="overlay-actions"><button id="copyOverlay" class="button primary" data-i18n="copy">Copy URL</button><a id="previewOverlay" class="button secondary" target="_blank" rel="noopener" data-i18n="preview">Preview</a></div></section><div class="side-card"><span class="side-card-title" data-i18n="creator"></span><button class="button secondary" id="creatorCode"><span data-i18n="useCode">Use code</span> <strong>NIMNABRO</strong></button></div></aside>
 
-</body></html>
+    <!-- ==============================================================
+         RIGHT COLUMN (2 PARTS): STATISTICS, CHARTS & MATCH HISTORY
+    ============================================================== -->
+    <main class="content" id="dashboard"><div class="content-header"><div class="profile-headline"><span data-i18n="profile"></span><span id="activeAccountName" class="player-tag">—</span></div><div class="content-actions"><button id="openSettings" class="button secondary" data-i18n="settings"></button><a class="button primary" href="https://github.com/nimnabrox/NBFC_TRACKER/releases/latest" target="_blank" rel="noopener" data-i18n="download"></a></div></div><nav class="web-nav-tabs"><a class="web-tab-btn active" href="#dashboard" data-i18n="dashboard"></a><a class="web-tab-btn" href="#history" data-i18n="history"></a><a class="web-tab-btn" href="#overlayCard" data-i18n="overlay"></a><a class="web-tab-btn" id="openGuide" href="#guide" data-i18n="setup"></a></nav><section class="stat-grid">
+        <!-- Hero Total Chests Tile -->
+        <div class="stat-tile hero">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="total"></div>
+          <div class="stat-val" id="total">0</div>
+          <div class="stat-sub" id="totalHint" data-i18n="fromReplays"></div>
+        </div>
+
+        <!-- Last Match Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="lastMatch"></div>
+          <div class="stat-val" id="lastMatch">0</div>
+
+        </div>
+
+        <!-- This Session Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="session"></div>
+          <div class="stat-val" id="session">0</div>
+
+        </div>
+
+        <!-- Matches Analyzed Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="matchesTotal"></div>
+          <div class="stat-val" id="matchesCount">0</div>
+
+        </div>
+
+        <!-- Average Chests Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="average"></div>
+          <div class="stat-val" id="average">0.0</div>
+
+        </div>
+
+        <!-- Victory Royales Tile -->
+        <div class="stat-tile">
+          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="victories"></div>
+          <div class="stat-val" id="victories">0</div>
+
+        </div>
+      </section><div class="classic-match-status"><span class="live-dot"></span><span id="matchStatus"></span></div><section class="creator-support" aria-label="NimnaBro"><div class="creator-identity"><img src="assets/nimnabrologo.png" alt="" width="46" height="46"><div><strong>Nimna Bro</strong><span>@nimna_bro_</span></div></div><div class="creator-actions"><button type="button" class="button secondary creator-use-code" data-copy-creator=""><span data-i18n="useCode">Use code</span><strong>NIMNABRO</strong></button><a class="button subscribe-button" href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" rel="noopener" data-i18n="subscribe">Subscribe</a></div></section><section class="chart-card">
+        <div class="chart-title" style="display:flex;align-items:center;gap:8px;"><span data-i18n="activity"></span><span class="muted" data-i18n="last30"></span></div>
+        <div class="bars-container" id="chart">
+          <!-- Injected dynamically by app.js -->
+        </div>
+        <div class="chart-axis"><span id="chartStart"></span><span id="chartEmpty" data-i18n="noActivity"></span><span id="chartEnd"></span></div>
+      </section><section class="table-card" id="history">
+        <div class="table-header-row">
+          <div class="table-title" style="display:flex;align-items:center;gap:8px;"><span data-i18n="history"></span></div>
+          <button class="button secondary small" id="export" data-i18n="export">Export CSV</button>
+        </div>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th data-i18n="date"></th>
+                <th data-i18n="mode"></th>
+                <th data-i18n="placement"></th>
+                <th style="text-align:right;" data-i18n="chests"></th>
+                <th style="text-align:right;" data-i18n="eliminations"></th>
+
+              </tr>
+            </thead>
+            <tbody id="matchRows">
+              <!-- Injected dynamically by app.js -->
+            </tbody>
+          </table>
+        </div>
+        <!-- Matches Pagination (10 per page) -->
+        <div class="pagination" id="pagination"><span id="pageLabel"></span><div><button class="button secondary small" id="previous" data-i18n="previous">Previous</button><button class="button secondary small" id="next" data-i18n="next">Next</button></div></div>
+      </section><details class="guide" id="guide"><summary data-i18n="setup">Setup guide</summary><div class="steps"><article><span class="step-number">01</span><h3 data-i18n="step1">Enable replays</h3><p data-i18n="step1Body"></p></article><article><span class="step-number">02</span><h3 data-i18n="step2">Open the companion</h3><p data-i18n="step2Body"></p></article><article><span class="step-number">03</span><h3 data-i18n="step3">Bring it to your stream</h3><p data-i18n="step3Body"></p></article></div></details></main>
+  </div>
+
+  <!-- Browser AppData Guidance Modal -->
+
+
+
+
+
+<dialog id="settings"><section class="overlay-editor"><h3 data-i18n="overlayEdit">Edit overlay</h3><label class="checkbox-row"><input type="checkbox" id="showOverlayLabel"><span data-i18n="overlayShowLabel">Show a label</span></label><label for="overlayLabel" class="overlay-input-label" data-i18n="overlayLabelText">Label text</label><input id="overlayLabel" type="text" maxlength="64" autocomplete="off" dir="auto"><label class="checkbox-row"><input type="checkbox" id="showOverlayLast"><span data-i18n="overlayShowLast">Show + last match</span></label><div class="overlay-editor-preview"><div class="classic-overlay-preview"><img src="assets/chest_fnv1.png" width="42" height="42" alt=""><span class="overlay-divider"></span><span class="overlay-values"><span data-overlay-label="" hidden=""></span><strong id="overlayEditorTotal">0</strong><small data-overlay-last="" hidden="">+0</small></span></div></div><p class="muted" data-i18n="overlayEditHint">Changes update the preview and copied URL.</p><div class="overlay-actions"><button type="button" id="copyEditedOverlay" class="button primary" data-i18n="copy">Copy URL</button><a id="previewEditedOverlay" class="button secondary" target="_blank" rel="noopener" data-i18n="preview">Preview</a></div></section><div class="dialog-heading"><h2 data-i18n="settings">Settings</h2><button id="closeSettings" class="icon-button" data-i18n-label="close" aria-label="Close">×</button></div><form id="roomForm"><label for="room" data-i18n="room">Cloud room</label><p data-i18n="roomHint"></p><div class="form-row"><input id="room" maxlength="128" autocomplete="off" dir="auto"><button class="button secondary" data-i18n="connect">Connect</button></div></form><div class="update-row"><span><span data-i18n="version">Version</span> <b class="version">v0.1.0</b></span><button id="checkUpdate" class="button secondary small" data-i18n="checkUpdate">Check for updates</button></div><p id="updateMessage" role="status"></p><button id="installUpdate" class="button primary" data-i18n="installUpdate" hidden="">Install update</button><a id="updateRelease" class="button secondary" hidden="" target="_blank" rel="noopener" href="https://github.com/nimnabrox/NBFC_TRACKER/releases/latest" data-i18n="download"></a></dialog><div class="toast" id="toast" role="status" aria-live="polite" hidden=""></div><script type="module" src="app.js"></script></body></html>

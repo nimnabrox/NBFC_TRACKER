@@ -1,13 +1,15 @@
 {
   "name": "nbfc-tracker",
-  "version": "0.2.3",
+  "version": "0.1.0",
   "private": true,
   "type": "module",
   "scripts": {
+    "version:sync": "node scripts/version.mjs && node scripts/sync-web.mjs",
+    "version:check": "node scripts/version.mjs --check",
     "dev": "wrangler dev --config v3/web-cloud/wrangler.toml",
-    "deploy": "wrangler deploy --config v3/web-cloud/wrangler.toml",
+    "deploy": "npm run version:check && wrangler deploy --config v3/web-cloud/wrangler.toml",
     "sync:web": "node scripts/sync-web.mjs",
-    "check": "node --test tests/*.test.mjs",
+    "check": "node scripts/version.mjs --check && node --test tests/*.test.mjs",
     "package:web": "node scripts/package-web.mjs"
   },
   "devDependencies": {

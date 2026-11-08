@@ -88,5 +88,21 @@
   "modern": "New design",
   "overlayStyle": "Overlay style",
   "matchesTotal": "Matches recorded",
-  "subscribe": "Subscribe"
+  "subscribe": "Subscribe",
+  "useCode": "Use code",
+  "updateAccess": "GitHub access is required for this private release. Open the release page to download.",
+  "updateOffline": "Could not reach the update server. Please try again.",
+  "updateRateLimited": "GitHub is limiting requests. Please try again later.",
+  "updateMissing": "The release download is not ready yet. Please try again shortly.",
+  "installFailed": "The update could not be installed. Your current app is preserved. Please try again.",
+  "installing": "Downloading update…",
+  "versionMismatch": "Desktop {app} · Web {web}. Download the matching release.",
+  "importantNote": "Important",
+  "historyNotice": "The first count uses replays saved on this PC, often around 100 matches. It is not your full season or career total. Enter your known total or best estimate; new chests will count upward from it. Clear the starting count to use recorded replay totals.",
+  "overlayEdit": "Edit overlay",
+  "overlayShowLabel": "Show a label",
+  "overlayLabelText": "Label text",
+  "overlayShowLast": "Show + last match",
+  "overlayDefaultLabel": "Chests opened",
+  "overlayEditHint": "Changes update the preview and copied URL. The default shows only the total."
 }

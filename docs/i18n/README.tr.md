@@ -24,7 +24,7 @@ Maçların, hedeflerin ve sıradaki hazinen. Hepsi bir arada.
 Sayacı OBS Tarayıcı Kaynağı olarak ekle. Boyut: 420 × 120.
 
 ~~~text
-https://nbfct.nimnabro.com/overlay.html?room=YOUR_ROOM&lang=tr
+https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=tr
 ~~~
 
 Yerel tekrar dosyalarını okur. Oyun belleğine erişmez. Epic Games ile bağlantılı değildir.
