@@ -69,6 +69,9 @@
             <button type="submit" class="btn btn-primary" style="padding:7px 10px;font-size:12px;flex-shrink:0;">Save</button>
             <button type="button" class="btn btn-secondary" onclick="window.app.clearBaseCount()" style="padding:7px 10px;font-size:12px;flex-shrink:0;">Reset</button>
           </div>
+          <div style="margin-top:6px;padding:6px 8px;background:rgba(245,166,35,0.08);border-left:3px solid var(--accent);border-radius:4px;font-size:10px;color:var(--muted);line-height:1.4;">
+            <strong style="color:var(--accent);">⚠️ Important Note:</strong> The counter initially shows only chests from saved local replay files (Fortnite only stores ~100 recent replays). If you opened more chests previously across your Fortnite account history, enter your total career count and click <strong>Save</strong> — NBFC TRACKER will then keep counting upward from your milestone!
+          </div>
         </form>
 
         <!-- Startup Setting -->
@@ -327,71 +330,37 @@
         </div>
       </section>
 
-      <!-- Nimna Bro Official YouTube Channel & Live Stream Hub -->
-      <section class="card" style="margin-bottom:24px;border:1px solid rgba(255, 0, 0, 0.3);background:linear-gradient(135deg, rgba(255, 0, 0, 0.06) 0%, rgba(20, 24, 33, 0.95) 100%);">
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid rgba(255,255,255,0.06);flex-wrap:wrap;gap:12px;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <img src="assets/nimnabrologo.png" onerror="this.onerror=null;this.src='assets/chest_fnv1.png'" alt="Nimna Bro" style="width:48px;height:48px;border-radius:50%;border:2px solid #f5a623;object-fit:cover;box-shadow:0 0 12px rgba(245,166,35,0.4);">
+      <!-- Nimna Bro Official YouTube Channel & Support Banner -->
+      <section class="card" style="margin-bottom:24px;border:1px solid rgba(245, 166, 35, 0.3);background:linear-gradient(135deg, rgba(245, 166, 35, 0.08) 0%, rgba(20, 24, 33, 0.95) 100%);">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:18px 24px;flex-wrap:wrap;gap:16px;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            <img src="assets/nimnabrologo.png" onerror="this.onerror=null;this.src='assets/chest_fnv1.png'" alt="Nimna Bro" style="width:52px;height:52px;border-radius:50%;border:2px solid #f5a623;object-fit:cover;box-shadow:0 0 14px rgba(245,166,35,0.4);">
             <div>
               <div style="display:flex;align-items:center;gap:8px;">
-                <h3 style="margin:0;font-size:16px;font-weight:900;color:#fff;">Nimna Bro</h3>
-                <span style="font-size:11px;font-weight:700;color:#f5a623;">@nimna_bro_</span>
+                <h3 style="margin:0;font-size:18px;font-weight:900;color:#fff;">Nimna Bro</h3>
+                <span style="font-size:12px;font-weight:700;color:#f5a623;">@nimna_bro_</span>
+                <span style="font-size:10px;font-weight:800;color:#a0aec0;background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);">YOUTUBE CREATOR</span>
               </div>
-              <div style="font-size:12px;color:var(--muted);margin-top:2px;">
-                Official Fortnite Live Streamer &amp; Creator · Support In Item Shop: <strong style="color:var(--accent);">USE CODE: NIMNABRO</strong>
+              <div style="font-size:12px;color:var(--muted);margin-top:4px;">
+                Support Nimna Bro! Watch daily Fortnite content &amp; streams. In the Item Shop: <strong style="color:var(--accent);">USE CODE: NIMNABRO</strong>
               </div>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:10px;">
-            <div id="ytLiveStatusBadge" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:5px 12px;border-radius:20px;background:rgba(255,255,255,0.06);color:#a0aec0;border:1px solid rgba(255,255,255,0.12);">
-              <span id="ytLiveDot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8c93a4;"></span>
-              <span id="ytLiveStatusText">YOUTUBE STREAM</span>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <!-- Creator Code Pill -->
+            <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.35);border-radius:8px;">
+              <span style="font-size:13px;font-weight:900;color:var(--accent);letter-spacing:0.8px;">USE CODE: NIMNABRO</span>
+              <button type="button" class="btn btn-secondary" onclick="window.app.copyCreatorCode()" style="padding:4px 10px;font-size:11px;font-weight:800;">
+                <span id="creatorCodePillText">Copy</span>
+              </button>
             </div>
-            <a href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" class="btn btn-primary" style="background:#cc0000;border-color:#ff1a1a;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:6px;padding:7px 16px;font-size:12px;font-weight:800;">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
+            <!-- Subscribe Button -->
+            <a href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" class="btn btn-primary" style="background:#cc0000;border-color:#ff1a1a;color:#fff;text-decoration:none;display:inline-flex;align-items:center;gap:8px;padding:10px 20px;font-size:13px;font-weight:800;border-radius:8px;box-shadow:0 4px 14px rgba(204,0,0,0.4);">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
               </svg>
               <span>Subscribe Guys! 🔔</span>
             </a>
-          </div>
-        </div>
-
-        <div style="padding:20px;display:grid;grid-template-columns:minmax(0, 1.4fr) minmax(0, 1fr);gap:20px;align-items:center;">
-          <!-- Left: Video Embed / Stream Player -->
-          <div style="position:relative;width:100%;padding-top:56.25%;background:#0a0c10;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.08);box-shadow:0 8px 24px rgba(0,0,0,0.5);">
-            <iframe id="ytLiveIframe" src="https://www.youtube-nocookie.com/embed/live_stream?channel=UC2wBrvuTFkusdcdX_TSscLg&autoplay=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"></iframe>
-          </div>
-
-          <!-- Right: Details, Live Chat Notice & Creator Code -->
-          <div style="display:flex;flex-direction:column;gap:14px;">
-            <div>
-              <div id="ytVideoTitle" style="font-size:15px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:6px;">
-                🔴 Fortnite Live Stream &amp; Highlights - Nimna Bro
-              </div>
-              <div style="font-size:12px;color:var(--muted);line-height:1.5;">
-                Join the live chat, participate in chest hunts, community custom matches, and giveaways! Streaming daily Fortnite content.
-              </div>
-            </div>
-
-            <!-- Creator Code Pill -->
-            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.25);border-radius:8px;">
-              <div>
-                <div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;">Fortnite Item Shop Creator Code</div>
-                <div style="font-size:15px;font-weight:900;color:var(--accent);letter-spacing:1px;">USE CODE: NIMNABRO</div>
-              </div>
-              <button type="button" class="btn btn-secondary" onclick="window.app.copyCreatorCode()" style="padding:6px 14px;font-size:11px;font-weight:800;" id="btnCopyCreatorCode">
-                <span id="creatorCodePillText">Copy Code</span>
-              </button>
-            </div>
-
-            <div style="display:flex;gap:10px;flex-wrap:wrap;">
-              <a href="https://www.youtube.com/@nimna_bro_/live" target="_blank" class="btn btn-primary" id="ytWatchBtn" style="flex:1;text-align:center;text-decoration:none;padding:10px;font-size:13px;font-weight:800;">
-                ▶ Watch Stream on YouTube
-              </a>
-              <a href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" class="btn btn-secondary" style="text-decoration:none;padding:10px 16px;font-size:13px;font-weight:700;">
-                Channel Page ↗
-              </a>
-            </div>
           </div>
         </div>
       </section>
@@ -472,6 +441,9 @@
                 <button type="submit" class="btn btn-primary" style="padding:8px 18px;font-size:13px;flex-shrink:0;">Save Offset</button>
                 <button type="button" class="btn btn-secondary" onclick="window.app.clearBaseCountFromTab()" style="padding:8px 14px;font-size:13px;flex-shrink:0;">Reset</button>
               </form>
+              <div style="margin-top:8px;padding:8px 12px;background:rgba(245,166,35,0.08);border-left:3px solid var(--accent);border-radius:4px;font-size:11px;color:var(--muted);line-height:1.4;max-width:440px;">
+                <strong style="color:var(--accent);">⚠️ Important Note:</strong> The counter initially shows only chests from saved local replay files (Fortnite only stores ~100 recent replays). If you opened more chests previously across your Fortnite account history, enter your total career count above and click <strong>Save Offset</strong> — NBFC TRACKER will then keep counting upward from your milestone!
+              </div>
             </div>
 
             <!-- Windows Startup -->

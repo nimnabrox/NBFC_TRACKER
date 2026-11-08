@@ -103,6 +103,18 @@ public class MainGuiForm : Form
         ApplyDarkTitleBar(this.Handle);
     }
 
+    private const int WM_NCACTIVATE = 0x0086;
+    private const int WM_ACTIVATEAPP = 0x001C;
+
+    protected override void WndProc(ref Message m)
+    {
+        base.WndProc(ref m);
+        if (m.Msg == WM_NCACTIVATE || m.Msg == WM_ACTIVATEAPP)
+        {
+            ApplyDarkTitleBar(this.Handle);
+        }
+    }
+
     private readonly WebView2 _webView;
     private readonly string _dashboardUrl;
     private readonly Action? _onExit;

@@ -146,10 +146,8 @@ public static class Updater
             {
                 foreach (var f in Directory.EnumerateFiles(dir, pattern))
                 {
-                    if (f.EndsWith(".old", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".download", StringComparison.OrdinalIgnoreCase))
-                    {
-                        try { File.Delete(f); } catch { /* still in use: next time */ }
-                    }
+                    if (string.Equals(f, exe, StringComparison.OrdinalIgnoreCase)) continue;
+                    try { File.Delete(f); } catch { /* still in use: next time */ }
                 }
             }
             catch { }

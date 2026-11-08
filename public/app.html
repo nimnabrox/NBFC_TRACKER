@@ -396,7 +396,7 @@
         <img src="assets/chest_fnv1.png" alt="Chest">
         <div>
           <div class="mini-title">NBFC TRACKER</div>
-          <div style="font-size:10px;color:#8c93a4;font-weight:700;">Fortnite Replay Counter · v3.0</div>
+          <div style="font-size:10px;color:#8c93a4;font-weight:700;">Fortnite Chest Counter · v0.1.0</div>
         </div>
       </div>
       <div class="badge-status" id="headerStatusBadge">
@@ -482,39 +482,31 @@
               <button type="button" class="btn-gold" id="btnSaveBaseHero" style="width:auto;white-space:nowrap;padding:6px 14px;font-size:11px;font-weight:800;flex-shrink:0;">Save</button>
               <button type="button" class="btn-secondary" id="btnResetBaseHero" style="width:auto;white-space:nowrap;padding:6px 10px;font-size:11px;font-weight:700;flex-shrink:0;">Reset</button>
             </div>
+            <div style="margin-top:8px;padding:8px 10px;background:rgba(245,166,35,0.08);border-left:3px solid #f5a623;border-radius:4px;font-size:10px;color:#a0aec0;line-height:1.4;">
+              <strong style="color:#f5a623;">⚠️ Important Note:</strong> The counter initially shows only chests from saved local replay files (Fortnite only stores ~100 recent replays). If you opened more chests previously across your Fortnite account history, enter your total count above and click <strong>Save</strong> — NBFC TRACKER will then keep counting upward from your milestone!
+            </div>
           </div>
         </div>
 
-        <!-- Nimna Bro Official YouTube Channel & Stream -->
+        <!-- Nimna Bro Official YouTube Channel & Support Card -->
         <div class="mini-card" style="padding:14px;background:linear-gradient(180deg, #181b22 0%, #11141b 100%);border:1px solid rgba(245, 166, 35, 0.25);">
           <!-- Channel Header -->
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <div style="display:flex;align-items:center;gap:10px;">
-              <img src="assets/nimnabrologo.png" onerror="this.onerror=null;this.src='assets/chest_fnv1.png'" alt="Nimna Bro" style="width:34px;height:34px;border-radius:50%;border:2px solid #f5a623;object-fit:cover;box-shadow:0 0 10px rgba(245,166,35,0.3);">
+              <img src="assets/nimnabrologo.png" onerror="this.onerror=null;this.src='assets/chest_fnv1.png'" alt="Nimna Bro" style="width:36px;height:36px;border-radius:50%;border:2px solid #f5a623;object-fit:cover;box-shadow:0 0 10px rgba(245,166,35,0.3);">
               <div>
-                <div style="font-size:13px;font-weight:900;color:#fff;">Nimna Bro</div>
-                <div style="font-size:10px;color:#f5a623;font-weight:700;">@nimna_bro_</div>
+                <div style="font-size:14px;font-weight:900;color:#fff;">Nimna Bro</div>
+                <div style="font-size:11px;color:#f5a623;font-weight:700;">@nimna_bro_</div>
               </div>
             </div>
             <div id="ytLiveBadgeMini" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;background:rgba(255,255,255,0.06);color:#a0aec0;border:1px solid rgba(255,255,255,0.12);">
               <span id="ytLiveDotMini" style="width:6px;height:6px;border-radius:50%;background:#8c93a4;"></span>
-              <span id="ytLiveTextMini">YOUTUBE STREAM</span>
+              <span id="ytLiveTextMini">OFFICIAL CHANNEL</span>
             </div>
           </div>
 
-          <!-- Video / Live Stream Thumbnail Preview -->
-          <a id="ytThumbLinkMini" href="https://www.youtube.com/@nimna_bro_/live" target="_blank" style="display:block;position:relative;width:100%;height:130px;border-radius:8px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(255,255,255,0.1);background:#0a0c10;text-decoration:none;">
-            <img id="ytThumbImgMini" src="https://i.ytimg.com/vi/WNAE8-0VOLE/hqdefault.jpg" onerror="this.onerror=null;this.src='assets/nimnabrologo.png'" alt="Stream Thumbnail" style="width:100%;height:100%;object-fit:cover;">
-            <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);display:flex;align-items:flex-end;padding:8px 10px;">
-              <div id="ytVideoTitleMini" style="font-size:11px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Fortnite Live Stream &amp; Highlights</div>
-            </div>
-            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;background:rgba(204,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(255,0,0,0.5);">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
-            </div>
-          </a>
-
           <!-- Prominent Fortnite Item Shop Creator Code Card -->
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.35);border-radius:8px;margin-bottom:10px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.35);border-radius:8px;margin-bottom:12px;">
             <div>
               <div style="font-size:9px;font-weight:800;color:#8c93a4;text-transform:uppercase;letter-spacing:0.5px;">Support In Fortnite Item Shop</div>
               <div style="font-size:13px;font-weight:900;color:#f5a623;letter-spacing:0.8px;">USE CODE: NIMNABRO</div>
@@ -524,18 +516,13 @@
             </button>
           </div>
 
-          <!-- Action Buttons -->
-          <div style="display:flex;gap:6px;">
-            <a href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" class="btn-gold" style="background:#cc0000;border-color:#ff1a1a;color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;flex:1;padding:8px 12px;font-size:11px;font-weight:800;border-radius:6px;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-              </svg>
-              <span>Subscribe Guys! 🔔</span>
-            </a>
-            <a href="https://www.youtube.com/@nimna_bro_/live" target="_blank" class="btn-secondary" style="text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 12px;font-size:11px;font-weight:700;border-radius:6px;white-space:nowrap;">
-              <span>Watch Live ▶</span>
-            </a>
-          </div>
+          <!-- Subscribe Button -->
+          <a href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" class="btn-gold" style="background:#cc0000;border-color:#ff1a1a;color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 16px;font-size:12px;font-weight:800;border-radius:8px;box-shadow:0 4px 14px rgba(204,0,0,0.4);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+            </svg>
+            <span>Subscribe Guys! 🔔</span>
+          </a>
         </div>
 
         <!-- Quick OBS Link Action -->
@@ -618,6 +605,9 @@
             <input type="number" id="inputBaseChest" class="mini-input" placeholder="e.g. 5000" style="flex:1 1 0;min-width:0;width:0;">
             <button type="button" class="btn-gold" id="btnSaveBaseChest" style="width:auto;white-space:nowrap;padding:8px 16px;flex-shrink:0;">Save</button>
             <button type="button" class="btn-secondary" id="btnResetBaseChest" style="width:auto;white-space:nowrap;padding:8px 12px;flex-shrink:0;">Reset</button>
+          </div>
+          <div style="margin-top:10px;padding:8px 10px;background:rgba(245,166,35,0.08);border-left:3px solid #f5a623;border-radius:4px;font-size:10px;color:#a0aec0;line-height:1.4;">
+            <strong style="color:#f5a623;">⚠️ Important Note:</strong> The counter initially shows only chests from saved local replay files (Fortnite only stores ~100 recent replays). If you opened more chests previously across your Fortnite account history, enter your total career count above and click <strong>Save</strong> — NBFC TRACKER will then keep counting upward from your milestone!
           </div>
         </div>
       </div>

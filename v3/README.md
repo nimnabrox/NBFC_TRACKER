@@ -26,6 +26,18 @@
 > 
 > *Once enabled, Fortnite will automatically save replay files after each match, and NBFC TRACKER will instantly parse and track every single chest!*
 
+> [!NOTE]
+> ### 🏆 Career Chest Milestones & Local Replays Explanation
+> **Why does my chest count start lower than my total career chests?**
+> Fortnite only stores recent replays locally on PC (typically up to ~100 replays). When you first launch NBFC TRACKER, it automatically counts all chests inside those saved local replay files.
+> 
+> **How to match your full career or season count:**
+> 1. In NBFC TRACKER (Desktop App or Web Dashboard), go to **Tracker Settings** → **Custom Starting Offset**.
+> 2. Enter your total milestone or career chests (e.g. `4084`).
+> 3. Click **Save**!
+> 
+> NBFC TRACKER immediately locks in your milestone and continues counting each new chest you open on top of your career base!
+
 ---
 
 **NBFC TRACKER** is a high-performance, ultra-low-spec Fortnite chest tracking ecosystem built for streamers, competitive players, and achievement hunters. It reads and parses local Fortnite replay files (`.replay`) in read-only mode after each match, giving you live stats, session counters, lifetime milestones, and an instant OBS Studio Browser Source overlay.
@@ -90,6 +102,13 @@ Or via the .NET CLI:
 ```cmd
 dotnet publish src\ChestCounter\ChestCounter.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=false -p:DebugType=none -o .
 ```
+
+---
+
+## 💛 Support the Creator
+* **Fortnite Item Shop Creator Code:** `USE CODE: NIMNABRO`
+* **Official YouTube Channel:** [youtube.com/@nimna_bro_](https://www.youtube.com/@nimna_bro_?sub_confirmation=1) (Subscribe guys! 🔔)
+* **Creator Profile:** [guns.lol/nimnabro](https://guns.lol/nimnabro)
 
 ---
 

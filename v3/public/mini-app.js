@@ -269,7 +269,7 @@
           badge.style.borderColor = '#ff0000';
           badge.style.color = '#ff4d4d';
         } else {
-          badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#8c93a4;"></span><span>YOUTUBE STREAM</span>';
+          badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#8c93a4;"></span><span>OFFICIAL CHANNEL</span>';
           badge.style.background = 'rgba(255, 255, 255, 0.06)';
           badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
           badge.style.color = '#a0aec0';
