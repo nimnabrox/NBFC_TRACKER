@@ -1,14 +1,14 @@
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text.Json;
 
 namespace ChestCounter;
 
-public sealed record UpdateInfo(Version Version, string Tag, string AssetUrl, long Size, string? Sha256, string PageUrl);
+public sealed record UpdateInfo(Version Version, string Tag, string AssetUrl, long Size, string? Sha256, string PageUrl, string? Changelog = null);
 
 /// <summary>
-/// Checks the latest GitHub release and replaces ChestCounter.exe with it. The running exe is renamed (Windows allows
+/// Checks the latest GitHub release and replaces NBFC TRACKER.exe with it. The running exe is renamed (Windows allows
 /// that), the new one takes its place and is started; the old file is deleted at the next launch.
-/// This is the only network access of the tool, and it can be turned off in the settings.
 /// </summary>
 public static class Updater
 {
@@ -18,7 +18,7 @@ public static class Updater
     private static HttpClient NewClient(TimeSpan timeout)
     {
         var http = new HttpClient { Timeout = timeout };
-        http.DefaultRequestHeaders.UserAgent.ParseAdd($"ChestCounter/{AppInfo.VersionText}");
+        http.DefaultRequestHeaders.UserAgent.ParseAdd($"NBFCTracker/{AppInfo.VersionText}");
         http.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
         return http;
     }
@@ -42,13 +42,17 @@ public static class Updater
                 return null;
             }
             var tag = root.GetProperty("tag_name").GetString() ?? "";
+            var releaseBody = root.TryGetProperty("body", out var b) ? b.GetString() ?? "" : "";
             if (!Version.TryParse(tag.TrimStart('v', 'V'), out var version) || Normalize(version) <= Normalize(AppInfo.Version))
             {
                 return null;
             }
             foreach (var asset in root.GetProperty("assets").EnumerateArray())
             {
-                if (!string.Equals(asset.GetProperty("name").GetString(), "ChestCounter.exe", StringComparison.OrdinalIgnoreCase))
+                var assetName = asset.GetProperty("name").GetString() ?? "";
+                if (!assetName.Equals("NBFC TRACKER.exe", StringComparison.OrdinalIgnoreCase) &&
+                    !assetName.Equals("ChestCounter.exe", StringComparison.OrdinalIgnoreCase) &&
+                    !assetName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -58,7 +62,7 @@ public static class Updater
                     sha = d[7..];
                 }
                 return new UpdateInfo(version, tag, asset.GetProperty("browser_download_url").GetString()!, asset.GetProperty("size").GetInt64(), sha,
-                    root.TryGetProperty("html_url", out var page) ? page.GetString() ?? AppInfo.RepoUrl : AppInfo.RepoUrl);
+                    root.TryGetProperty("html_url", out var page) ? page.GetString() ?? AppInfo.RepoUrl : AppInfo.RepoUrl, releaseBody);
             }
             return null;
         }
@@ -73,11 +77,7 @@ public static class Updater
     /// <summary>Downloads and puts the new exe in place. Returns null when done, else the reason it failed.</summary>
     public static string? Install(UpdateInfo update)
     {
-        var exe = AppInfo.ExePath;
-        if (exe == null)
-        {
-            return L.T("mise à jour possible seulement depuis ChestCounter.exe", "update only possible from ChestCounter.exe");
-        }
+        var exe = AppInfo.ExePath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NBFC TRACKER.exe");
         var download = exe + ".download";
         var old = exe + ".old";
         try
@@ -98,35 +98,33 @@ public static class Updater
             {
                 if (fs.ReadByte() != 'M' || fs.ReadByte() != 'Z')
                 {
-                    throw new IOException(L.T("le fichier téléchargé n'est pas un exe", "the downloaded file is not an exe"));
-                }
-                if (update.Sha256 != null)
-                {
-                    fs.Position = 0;
-                    var hash = Convert.ToHexString(SHA256.HashData(fs));
-                    if (!hash.Equals(update.Sha256, StringComparison.OrdinalIgnoreCase))
-                    {
-                        throw new IOException(L.T("empreinte SHA-256 incorrecte", "wrong SHA-256 checksum"));
-                    }
+                    throw new IOException(L.T("le fichier téléchargé n'est pas un exécutable Windows valide", "downloaded file is not a valid Windows executable"));
                 }
             }
 
-            // The standby process may run the current exe: stop it (it is restarted from the new exe).
-            if (OperatingSystem.IsWindows())
-            {
-                FortniteWatch.StopStandby();
-            }
             if (File.Exists(old))
             {
-                try { File.Delete(old); } catch { old = exe + $".{DateTime.Now:yyyyMMddHHmmss}.old"; }
+                try { File.Delete(old); } catch { }
             }
             File.Move(exe, old);
             File.Move(download, exe);
+
+            try
+            {
+                Process.Start(new ProcessStartInfo(exe) { UseShellExecute = true });
+                Environment.Exit(0);
+            }
+            catch { }
+
             return null;
         }
         catch (Exception ex)
         {
             try { File.Delete(download); } catch { }
+            if (!File.Exists(exe) && File.Exists(old))
+            {
+                try { File.Move(old, exe); } catch { }
+            }
             return ex.Message;
         }
     }

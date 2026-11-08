@@ -26,18 +26,22 @@ public static class Profiles
 
     private static DateTime When(MatchRecord m) => m.MatchStartUtc ?? m.AnalyzedAtUtc;
 
-    /// <summary>The selected profile when it exists, else the most recently played one (null = no match yet or all accounts).</summary>
+    /// <summary>The selected profile when it exists, else the account of the most recent match (null = no match yet on this PC).</summary>
     public static Profile? Current(TrackerData d, Config c)
     {
         var all = List(d);
-        if (string.IsNullOrEmpty(c.Profile) || c.Profile.Equals("all", StringComparison.OrdinalIgnoreCase))
+        if (all.Count == 0) return null;
+
+        if (!string.IsNullOrWhiteSpace(c.Profile) && !c.Profile.Equals("all", StringComparison.OrdinalIgnoreCase))
         {
-            return null;
+            var match = all.FirstOrDefault(p =>
+                p.Key.Equals(c.Profile, StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrEmpty(p.Name) && p.Name.Equals(c.Profile, StringComparison.OrdinalIgnoreCase)));
+            if (match != null) return match;
         }
-        return all.FirstOrDefault(p =>
-            p.Key.Equals(c.Profile, StringComparison.OrdinalIgnoreCase) ||
-            (!string.IsNullOrEmpty(p.Name) && p.Name.Equals(c.Profile, StringComparison.OrdinalIgnoreCase)))
-            ?? all.FirstOrDefault();
+
+        // Default to the account that played the most recent match (List is ordered by LastPlayed descending)
+        return all.FirstOrDefault();
     }
 
     /// <summary>The data of one profile only (same objects, filtered list), as seen by the overlay and the report.</summary>
@@ -46,7 +50,14 @@ public static class Profiles
         var current = Current(d, c);
         if (current == null)
         {
-            return d;
+            return new TrackerData
+            {
+                Version = d.Version,
+                AnalyzerVersion = d.AnalyzerVersion,
+                CreatedUtc = d.CreatedUtc,
+                Matches = new List<MatchRecord>(),
+                ProcessedFiles = d.ProcessedFiles,
+            };
         }
         return new TrackerData
         {

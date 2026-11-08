@@ -1,0 +1,47 @@
+name: Release NBFC TRACKER
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8.0 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Publish Single-File Executable
+        run: |
+          dotnet publish src/ChestCounter/ChestCounter.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=false -o dist
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/NBFC TRACKER.exe
+          name: NBFC TRACKER ${{ github.ref_name }}
+          body: |
+            ### ⚡ NBFC TRACKER ${{ github.ref_name }} Release
+
+            **What's New in this Release:**
+            - **Per-Account Starting Chest Milestone Isolation**: Fixed chest offset leakage across accounts. Each Fortnite account now maintains its own independent starting offset or raw replay count.
+            - **Default to Active Match Account**: The app and web dashboard automatically select the player account from the most recent match by default.
+            - **Native Windows Dark Mode Title Bar**: Styled the native desktop companion title bar in dark mode to seamlessly match the UI.
+            - **Built-in 1-Click Update System**: Automatic update detection directly via GitHub Releases.
+            - **100% KV-Free Unlimited Cloud Edge Relay & Local OBS Overlay**: High performance with zero quotas.
+
+            **Installation:**
+            - Download `NBFC TRACKER.exe` below.
+            - Run directly on Windows 10 / 11 (zero installation required).
+          draft: false
+          prerelease: false

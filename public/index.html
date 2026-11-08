@@ -23,7 +23,7 @@
         <div class="brand-title">
           <img src="assets/chest_fnv1.png" alt="NBFC Chest" width="28" height="28" style="object-fit:contain;filter:drop-shadow(0 0 6px rgba(245,166,35,0.45));">
           <span>NBFC TRACKER</span>
-          <span style="font-size:11px;font-weight:800;color:var(--accent);background:var(--accent-bg);padding:2px 6px;border-radius:4px;border:1px solid rgba(245,166,35,0.3);">v3.0</span>
+          <span id="appVersionBadge" style="font-size:11px;font-weight:800;color:var(--accent);background:var(--accent-bg);padding:2px 6px;border-radius:4px;border:1px solid rgba(245,166,35,0.3);">v0.1.0</span>
         </div>
         <div class="brand-sub">Fortnite Chest Counter &amp; Live OBS Overlay</div>
         <div class="badge-live" id="engineStatusBadge" style="margin-top:4px;">
@@ -417,6 +417,46 @@
               <div style="margin-top:10px;display:flex;gap:8px;max-width:540px;">
                 <input type="text" id="customFolderInputTab" class="text-input" placeholder="Custom folder path (optional)" style="font-size:12px;padding:8px 12px;flex:1 1 0;min-width:0;width:0;">
                 <button type="button" class="btn btn-secondary" onclick="window.app.setCustomDemosFolderFromTab()" style="font-size:12px;padding:8px 16px;flex-shrink:0;">Set Folder</button>
+              </div>
+            </div>
+
+            <!-- Version Control & Software Updates -->
+            <div style="padding-top:16px;border-top:1px solid var(--line);">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;max-width:540px;">
+                <span class="form-label" style="font-size:13px;font-weight:700;color:#fff;">Software Version &amp; Updates:</span>
+                <span id="settingsVersionBadge" style="font-size:11px;font-weight:800;color:var(--accent);background:var(--accent-bg);padding:3px 8px;border-radius:4px;border:1px solid rgba(245,166,35,0.3);">v0.1.0</span>
+              </div>
+              <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Keep your chest counter up-to-date with new Fortnite updates, bug fixes, and features.</div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <button type="button" class="btn btn-secondary" id="btnCheckUpdate" onclick="window.app.checkForUpdates()" style="font-size:12px;padding:8px 16px;">
+                  <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="23 4 23 10 17 10"></polyline>
+                    <polyline points="1 20 1 14 7 14"></polyline>
+                    <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                  </svg>
+                  <span id="btnCheckUpdateText">Check for Updates</span>
+                </button>
+                <a href="https://github.com/nimnabrox/NBFC_TRACKER/releases" target="_blank" class="btn btn-secondary" style="font-size:12px;padding:8px 16px;text-decoration:none;">
+                  View Releases on GitHub ↗
+                </a>
+              </div>
+              <!-- Update Result Box -->
+              <div id="updateNoticeBox" style="display:none;margin-top:14px;padding:14px 16px;border-radius:8px;max-width:540px;background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.3);">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+                  <span style="font-size:13px;font-weight:800;color:#fff;" id="updateNoticeTitle">🎉 New Version Available: v0.1.0</span>
+                  <span id="updateNoticeTag" style="font-size:11px;font-weight:700;color:var(--accent);"></span>
+                </div>
+                <div style="font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:12px;" id="updateNoticeBody">
+                  What's new: Performance updates and bug fixes.
+                </div>
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <button type="button" class="btn btn-primary" id="btnApplyUpdate" onclick="window.app.applyUpdate()" style="font-size:12px;padding:7px 16px;">
+                    ⚡ Update Now
+                  </button>
+                  <a id="updateReleaseLink" href="https://github.com/nimnabrox/NBFC_TRACKER/releases" target="_blank" class="btn btn-secondary" style="font-size:12px;padding:7px 14px;text-decoration:none;">
+                    Changelog &amp; Download ↗
+                  </a>
+                </div>
               </div>
             </div>
           </div>

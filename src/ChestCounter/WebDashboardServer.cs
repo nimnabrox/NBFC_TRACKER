@@ -23,6 +23,7 @@ public static class WebDashboardServer
     private static Func<bool>? _isLiveInProgress;
     private static Func<MatchRecord?>? _getLiveMatch;
     private static System.Threading.Timer? _cloudSyncTimer;
+    private static UpdateInfo? _cachedUpdate;
 
     public static void Start(Store store, Config config, TrackerData data, Func<bool>? isLiveInProgress = null, Func<MatchRecord?>? getLiveMatch = null)
     {
@@ -135,29 +136,48 @@ public static class WebDashboardServer
             if (path.Equals("/api/set-base", StringComparison.OrdinalIgnoreCase))
             {
                 var countStr = req.QueryString["count"];
+                var targetProfile = req.QueryString["profile"] ?? req.QueryString["key"];
                 if (_config != null && _store != null && _data != null)
                 {
-                    if (string.IsNullOrWhiteSpace(countStr) ||
-                        countStr.Equals("clear", StringComparison.OrdinalIgnoreCase) ||
-                        countStr.Equals("reset", StringComparison.OrdinalIgnoreCase) ||
-                        countStr.Equals("null", StringComparison.OrdinalIgnoreCase) ||
-                        countStr == "0")
+                    lock (_data)
                     {
-                        _config.BaseChestCount = null;
-                        _store.SaveConfig(_config);
-                        ReportWriter.WriteAll(_store, _config, _data);
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine("  [Base Count Reset] Reverting to replay chest amount (empty default).");
-                        Console.ResetColor();
-                    }
-                    else if (int.TryParse(countStr, out var count) && count > 0)
-                    {
-                        _config.BaseChestCount = count;
-                        _store.SaveConfig(_config);
-                        ReportWriter.WriteAll(_store, _config, _data);
-                        Console.ForegroundColor = ConsoleColor.Cyan;
-                        Console.WriteLine($"  [Base Count Saved] Custom starting chest count saved: {_config.BaseChestCount} (persisted in config.json)");
-                        Console.ResetColor();
+                        var all = Profiles.List(_data);
+                        Profile? target = null;
+                        if (!string.IsNullOrWhiteSpace(targetProfile))
+                        {
+                            target = all.FirstOrDefault(p =>
+                                p.Key.Equals(targetProfile, StringComparison.OrdinalIgnoreCase) ||
+                                (!string.IsNullOrEmpty(p.Name) && p.Name.Equals(targetProfile, StringComparison.OrdinalIgnoreCase)));
+                        }
+                        target ??= Profiles.Current(_data, _config);
+
+                        var pKey = target?.Key ?? targetProfile?.Trim() ?? _config.Profile ?? "";
+                        var pName = target?.Name ?? "";
+
+                        if (string.IsNullOrWhiteSpace(countStr) ||
+                            countStr.Equals("clear", StringComparison.OrdinalIgnoreCase) ||
+                            countStr.Equals("reset", StringComparison.OrdinalIgnoreCase) ||
+                            countStr.Equals("null", StringComparison.OrdinalIgnoreCase) ||
+                            countStr == "0")
+                        {
+                            if (!string.IsNullOrWhiteSpace(pKey)) _config.SetBaseChestForProfile(pKey, null);
+                            if (!string.IsNullOrWhiteSpace(pName)) _config.SetBaseChestForProfile(pName, null);
+                            _store.SaveConfig(_config);
+                            ReportWriter.WriteAll(_store, _config, _data);
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine($"  [Base Count Reset] Reverting to replay chest amount for profile: {pKey} / {pName}");
+                            Console.ResetColor();
+                        }
+                        else if (int.TryParse(countStr, out var count) && count > 0)
+                        {
+                            if (!string.IsNullOrWhiteSpace(pKey)) _config.SetBaseChestForProfile(pKey, count);
+                            if (!string.IsNullOrWhiteSpace(pName)) _config.SetBaseChestForProfile(pName, count);
+                            _store.SaveConfig(_config);
+                            ReportWriter.WriteAll(_store, _config, _data);
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.WriteLine($"  [Base Count Saved] Custom starting chest count saved for {pKey} / {pName}: {count} (persisted in config.json)");
+                            Console.ResetColor();
+                        }
                     }
                     SyncToCloudAsync();
                 }
@@ -175,18 +195,19 @@ public static class WebDashboardServer
                 var profileKey = req.QueryString["key"] ?? req.QueryString["profile"] ?? "";
                 if (_config != null && _store != null && _data != null)
                 {
-                    if (profileKey.Equals("all", StringComparison.OrdinalIgnoreCase) || string.IsNullOrWhiteSpace(profileKey))
+                    lock (_data)
                     {
-                        _config.Profile = "all";
-                    }
-                    else
-                    {
-                        lock (_data)
+                        var all = Profiles.List(_data);
+                        if (all.Count > 0)
                         {
-                            var match = Profiles.List(_data).FirstOrDefault(p =>
+                            var match = all.FirstOrDefault(p =>
                                 p.Key.Equals(profileKey, StringComparison.OrdinalIgnoreCase) ||
                                 (!string.IsNullOrEmpty(p.Name) && p.Name.Equals(profileKey, StringComparison.OrdinalIgnoreCase)));
-                            _config.Profile = match != null ? match.Key : profileKey;
+                            _config.Profile = match != null ? match.Key : (string.IsNullOrWhiteSpace(profileKey) || profileKey.Equals("all", StringComparison.OrdinalIgnoreCase) ? all[0].Key : profileKey);
+                        }
+                        else
+                        {
+                            _config.Profile = profileKey;
                         }
                     }
                     _store.SaveConfig(_config);
@@ -220,14 +241,96 @@ public static class WebDashboardServer
                 }
 
                 var demosFolder = _config?.DemosFolder ?? "";
-                var baseCount = _config?.BaseChestCount;
+                int? baseCount = null;
+                string activePlayer = "";
+                if (_config != null && _data != null)
+                {
+                    lock (_data)
+                    {
+                        var cur = Profiles.Current(_data, _config);
+                        activePlayer = cur?.Name ?? _config.Profile ?? "";
+                        baseCount = _config.GetBaseChestForProfile(cur?.Key) ?? _config.GetBaseChestForProfile(cur?.Name) ?? _config.GetBaseChestForProfile(_config.Profile);
+                    }
+                }
                 var baseStr = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value.ToString() : "null";
                 var startWithFn = _config?.StartWithFortnite ?? false;
 
-                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr}}}";
+                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"version\":\"{AppInfo.DisplayVersion}\"}}";
                 var bytes = Encoding.UTF8.GetBytes(json);
                 res.ContentLength64 = bytes.Length;
                 res.OutputStream.Write(bytes, 0, bytes.Length);
+                res.Close();
+                return;
+            }
+
+            // 2c-2. Check for Updates API
+            if (path.Equals("/api/check-update", StringComparison.OrdinalIgnoreCase))
+            {
+                res.ContentType = "application/json; charset=utf-8";
+                try
+                {
+                    var update = Updater.CheckAsync().GetAwaiter().GetResult();
+                    if (update != null)
+                    {
+                        _cachedUpdate = update;
+                        var json = $"{{\"hasUpdate\":true,\"currentVersion\":\"{AppInfo.DisplayVersion}\",\"latestVersion\":\"{EscapeJson(update.Tag)}\",\"tag\":\"{EscapeJson(update.Tag)}\",\"url\":\"{EscapeJson(update.PageUrl)}\",\"downloadUrl\":\"{EscapeJson(update.AssetUrl)}\",\"size\":{update.Size},\"changelog\":\"{EscapeJson(update.Changelog ?? "")}\"}}";
+                        var bytes = Encoding.UTF8.GetBytes(json);
+                        res.ContentLength64 = bytes.Length;
+                        res.OutputStream.Write(bytes, 0, bytes.Length);
+                    }
+                    else
+                    {
+                        var json = $"{{\"hasUpdate\":false,\"currentVersion\":\"{AppInfo.DisplayVersion}\"}}";
+                        var bytes = Encoding.UTF8.GetBytes(json);
+                        res.ContentLength64 = bytes.Length;
+                        res.OutputStream.Write(bytes, 0, bytes.Length);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var json = $"{{\"hasUpdate\":false,\"currentVersion\":\"{AppInfo.DisplayVersion}\",\"error\":\"{EscapeJson(ex.Message)}\"}}";
+                    var bytes = Encoding.UTF8.GetBytes(json);
+                    res.ContentLength64 = bytes.Length;
+                    res.OutputStream.Write(bytes, 0, bytes.Length);
+                }
+                res.Close();
+                return;
+            }
+
+            // 2c-3. Apply Update API
+            if (path.Equals("/api/apply-update", StringComparison.OrdinalIgnoreCase))
+            {
+                res.ContentType = "application/json; charset=utf-8";
+                try
+                {
+                    var update = _cachedUpdate ?? Updater.CheckAsync().GetAwaiter().GetResult();
+                    if (update != null)
+                    {
+                        Task.Run(() =>
+                        {
+                            Thread.Sleep(500);
+                            Updater.Install(update);
+                        });
+                        var json = $"{{\"success\":true,\"message\":\"Installing update {EscapeJson(update.Tag)} and restarting...\"}}";
+                        var bytes = Encoding.UTF8.GetBytes(json);
+                        res.ContentLength64 = bytes.Length;
+                        res.OutputStream.Write(bytes, 0, bytes.Length);
+                    }
+                    else
+                    {
+                        var json = "{\"success\":false,\"message\":\"No new update available.\"}";
+                        var bytes = Encoding.UTF8.GetBytes(json);
+                        res.ContentLength64 = bytes.Length;
+                        res.OutputStream.Write(bytes, 0, bytes.Length);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    var json = $"{{\"success\":false,\"message\":\"{EscapeJson(ex.Message)}\"}}";
+                    var bytes = Encoding.UTF8.GetBytes(json);
+                    res.ContentLength64 = bytes.Length;
+                    res.OutputStream.Write(bytes, 0, bytes.Length);
+                }
                 res.Close();
                 return;
             }
@@ -518,30 +621,36 @@ public static class WebDashboardServer
 
     private static string GetCloudSyncPayload(string targetRoom)
     {
-        if (_data == null || _config == null)
+        if (_data == null || _config == null || _data.Matches.Count == 0)
         {
-            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":0,\"lastMatch\":0,\"liveChests\":0,\"base\":null,\"session\":0,\"player\":\"nimnabro\",\"accounts\":[],\"matches\":[],\"inProgress\":false}}";
+            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":0,\"lastMatch\":0,\"liveChests\":0,\"base\":null,\"session\":0,\"player\":\"\",\"accounts\":[],\"matches\":[],\"inProgress\":false}}";
         }
 
         try
         {
             MatchRecord[] matchArray;
-            string playerName = "nimnabro";
+            string playerName = "";
+            string profileKey = "";
+            Profile? cur;
             lock (_data)
             {
-                var view = Profiles.View(_data, _config);
-                matchArray = view.Matches.ToArray();
-                var cur = Profiles.Current(_data, _config);
-                if (cur != null && !string.IsNullOrWhiteSpace(cur.Name))
+                cur = Profiles.Current(_data, _config);
+                if (cur != null)
                 {
                     playerName = cur.Name;
+                    profileKey = cur.Key;
                 }
-                else if (string.Equals(_config.Profile, "all", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(_config.Profile))
+                else
                 {
-                    playerName = "All Accounts";
+                    playerName = !string.IsNullOrWhiteSpace(_config.Profile) ? _config.Profile : "";
+                    profileKey = playerName;
                 }
+                var view = Profiles.View(_data, _config);
+                matchArray = view.Matches.ToArray();
             }
-            var baseCount = _config.BaseChestCount;
+
+            // Per-profile starting chest count (strictly isolated between accounts)
+            var baseCount = _config.GetBaseChestForProfile(profileKey) ?? _config.GetBaseChestForProfile(playerName);
             var matches = matchArray.OrderByDescending(ReportWriter.When).ToList();
             var inProgress = _isLiveInProgress?.Invoke() ?? false;
             var liveChests = _getLiveMatch?.Invoke()?.ChestsOpened ?? 0;
@@ -551,10 +660,10 @@ public static class WebDashboardServer
             var lastMatch = matches.Count > 0 ? matches[0].ChestsOpened : 0;
             var baseJson = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value.ToString() : "null";
 
-            // Format accounts list
+            // Format accounts list (ordered by last played descending)
             var profileItems = Profiles.List(_data).Select(p =>
             {
-                var isActive = (string.Equals(p.Key, _config.Profile, StringComparison.OrdinalIgnoreCase) || (!string.IsNullOrEmpty(_config.Profile) && p.Name.Equals(_config.Profile, StringComparison.OrdinalIgnoreCase)));
+                var isActive = cur != null && (string.Equals(p.Key, cur.Key, StringComparison.OrdinalIgnoreCase) || string.Equals(p.Name, cur.Name, StringComparison.OrdinalIgnoreCase));
                 return $"{{\"key\":\"{EscapeJson(p.Key)}\",\"name\":\"{EscapeJson(p.Name)}\",\"matches\":{p.Matches},\"chests\":{p.Chests},\"active\":{(isActive ? "true" : "false")}}}";
             });
             var accountsJson = "[" + string.Join(",", profileItems) + "]";
@@ -564,13 +673,13 @@ public static class WebDashboardServer
         }
         catch
         {
-            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":0,\"lastMatch\":0,\"liveChests\":0,\"base\":null,\"session\":0,\"player\":\"nimnabro\",\"accounts\":[],\"matches\":[],\"inProgress\":false}}";
+            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":0,\"lastMatch\":0,\"liveChests\":0,\"base\":null,\"session\":0,\"player\":\"\",\"accounts\":[],\"matches\":[],\"inProgress\":false}}";
         }
     }
 
     private static string GetLiveStatsJson()
     {
-        string curName = "nimnabro";
+        string curName = "";
         if (_config != null && _data != null)
         {
             lock (_data)
@@ -582,25 +691,25 @@ public static class WebDashboardServer
                 }
             }
         }
-        return GetCloudSyncPayload(curName);
+        return GetCloudSyncPayload(!string.IsNullOrWhiteSpace(curName) ? curName : "default");
     }
 
     private static string GetMatchesJson()
     {
-        if (_data == null || _config == null) return "[]";
+        if (_data == null || _config == null || _data.Matches.Count == 0) return "[]";
         try
         {
             MatchRecord[] matchArray;
-            string curProfileName = "nimnabro";
+            string curProfileName = "";
             lock (_data)
             {
-                var view = Profiles.View(_data, _config);
-                matchArray = view.Matches.ToArray();
                 var cur = Profiles.Current(_data, _config);
                 if (cur != null && !string.IsNullOrWhiteSpace(cur.Name))
                 {
                     curProfileName = cur.Name;
                 }
+                var view = Profiles.View(_data, _config);
+                matchArray = view.Matches.ToArray();
             }
             var items = matchArray.OrderByDescending(ReportWriter.When).Take(150).Select(m =>
             {

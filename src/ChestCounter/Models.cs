@@ -78,8 +78,8 @@ public sealed class Config
     /// <summary>"fr" or "en" (default English).</summary>
     public string? Language { get; set; } = "en";
 
-    /// <summary>Selected profile (Epic id or name of the account the player plays on); default "nimnabro".</summary>
-    public string? Profile { get; set; } = "nimnabro";
+    /// <summary>Selected profile (Epic id or name of the account the player plays on). Default null so it defaults to the latest match player.</summary>
+    public string? Profile { get; set; }
     public string DemosFolder { get; set; } = "";
 
     /// <summary>Open the tool automatically when Fortnite starts (invisible standby process started with Windows).</summary>
@@ -102,8 +102,53 @@ public sealed class Config
     /// <summary>Minimum delay between two readings of the replay in progress (seconds, 10 minimum).</summary>
     public int LiveIntervalSeconds { get; set; } = 30;
 
-    /// <summary>User-configured base chest count (adds to session/new matches). Null = show replay amount.</summary>
+    /// <summary>User-configured base chest count (legacy global fallback). Null = show replay amount.</summary>
     public int? BaseChestCount { get; set; }
+
+    /// <summary>Per-profile user-configured base chest count (e.g. "nimnabro" -> 4084). Keyed by profile name or Epic ID.</summary>
+    public Dictionary<string, int> ProfileBaseChests { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public int? GetBaseChestForProfile(string? profile)
+    {
+        if (!string.IsNullOrWhiteSpace(profile))
+        {
+            var p = profile.Trim();
+            if (ProfileBaseChests.TryGetValue(p, out var val) && val > 0)
+            {
+                return val;
+            }
+        }
+        // Legacy fallback: only if Profile is set and matches this profile
+        if (BaseChestCount.HasValue && BaseChestCount.Value > 0)
+        {
+            if (!string.IsNullOrWhiteSpace(profile) && (string.Equals(profile, Profile, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(Profile)))
+            {
+                return BaseChestCount.Value;
+            }
+        }
+        return null;
+    }
+
+    public void SetBaseChestForProfile(string? profile, int? count)
+    {
+        var p = (!string.IsNullOrWhiteSpace(profile) ? profile : Profile)?.Trim();
+        if (string.IsNullOrWhiteSpace(p)) return;
+
+        if (count.HasValue && count.Value > 0)
+        {
+            ProfileBaseChests[p] = count.Value;
+        }
+        else
+        {
+            ProfileBaseChests.Remove(p);
+        }
+
+        // Sync legacy BaseChestCount if it's the active profile
+        if (string.Equals(p, Profile, StringComparison.OrdinalIgnoreCase))
+        {
+            BaseChestCount = count;
+        }
+    }
 }
 
 public sealed class TrackerData

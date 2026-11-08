@@ -33,15 +33,54 @@ if (typeof Peer !== 'undefined') {
   try { sync.initPeerSync(Peer); } catch {}
 }
 
+// --- Per-Profile Base Starting Chest Counts ---
+let profileBaseCounts = {};
+
+function getActiveProfileKey() {
+  return (STATE.activeAccount || '').toLowerCase().trim();
+}
+
+function getBaseCountForActiveProfile() {
+  const key = getActiveProfileKey();
+  if (key && profileBaseCounts[key] !== undefined && profileBaseCounts[key] > 0) {
+    return profileBaseCounts[key];
+  }
+  return null;
+}
+
+function setBaseCountForActiveProfile(val) {
+  const key = getActiveProfileKey();
+  if (!key) return;
+  if (!val || isNaN(val) || val <= 0) {
+    delete profileBaseCounts[key];
+  } else {
+    profileBaseCounts[key] = parseInt(val, 10);
+  }
+  try {
+    localStorage.setItem('nb_profile_base_counts', JSON.stringify(profileBaseCounts));
+  } catch {}
+}
+
 // --- LocalStorage Persistence ---
 function loadLocalConfig() {
   try {
-    const savedBase = localStorage.getItem('nb_base_chest_count');
-    if (savedBase && !isNaN(parseInt(savedBase, 10))) {
-      STATE.baseChestCount = parseInt(savedBase, 10);
+    const savedProfiles = localStorage.getItem('nb_profile_base_counts');
+    if (savedProfiles) {
+      profileBaseCounts = JSON.parse(savedProfiles) || {};
     }
+    // Migration: If legacy global base exists, migrate it ONLY to nimnabro if not yet set
+    const savedLegacyBase = localStorage.getItem('nb_base_chest_count');
+    if (savedLegacyBase && !isNaN(parseInt(savedLegacyBase, 10))) {
+      const legacyNum = parseInt(savedLegacyBase, 10);
+      if (legacyNum > 0 && !profileBaseCounts['nimnabro']) {
+        profileBaseCounts['nimnabro'] = legacyNum;
+        localStorage.setItem('nb_profile_base_counts', JSON.stringify(profileBaseCounts));
+      }
+      localStorage.removeItem('nb_base_chest_count');
+    }
+
     const savedAccount = localStorage.getItem('nb_active_account');
-    if (savedAccount) {
+    if (savedAccount && savedAccount.toLowerCase() !== 'all' && savedAccount.toLowerCase() !== 'all accounts') {
       STATE.activeAccount = savedAccount;
     }
     const savedMatches = localStorage.getItem('nb_cached_matches');
@@ -203,29 +242,32 @@ export async function handleFileDrop(files) {
   await handleFileInput(files);
 }
 
-// --- Custom Base Starting Chest Count ---
+// --- Custom Base Starting Chest Count (Per-Profile Isolated) ---
 export function saveBaseCount(e) {
   if (e) e.preventDefault();
   const input = document.getElementById('baseInput');
   const val = input ? input.value.trim() : '';
 
+  STATE.daemonTotal = undefined; // Force immediate local recalculation
+
   if (!val || val === '0') {
-    STATE.baseChestCount = null;
-    localStorage.removeItem('nb_base_chest_count');
+    setBaseCountForActiveProfile(null);
   } else {
     const num = parseInt(val, 10);
     if (!isNaN(num) && num > 0) {
-      STATE.baseChestCount = num;
-      localStorage.setItem('nb_base_chest_count', num.toString());
+      setBaseCountForActiveProfile(num);
     }
   }
 
+  const activeBase = getBaseCountForActiveProfile();
   const inTab = document.getElementById('baseInputTab');
-  if (inTab) inTab.value = STATE.baseChestCount || '';
+  if (inTab) inTab.value = activeBase || '';
 
   // Also sync to local daemon if running
   try {
-    fetch(`http://localhost:5088/api/set-base?count=${encodeURIComponent(STATE.baseChestCount || 0)}`, { mode: 'cors' });
+    const p = encodeURIComponent(STATE.activeAccount || '');
+    const cnt = encodeURIComponent(activeBase || 0);
+    fetch(`http://localhost:5088/api/set-base?count=${cnt}&profile=${p}`, { mode: 'cors' });
   } catch {}
 
   renderApp();
@@ -236,52 +278,57 @@ export function saveBaseCountFromTab(e) {
   const input = document.getElementById('baseInputTab');
   const val = input ? input.value.trim() : '';
 
+  STATE.daemonTotal = undefined; // Force immediate local recalculation
+
   if (!val || val === '0') {
-    STATE.baseChestCount = null;
-    localStorage.removeItem('nb_base_chest_count');
+    setBaseCountForActiveProfile(null);
   } else {
     const num = parseInt(val, 10);
     if (!isNaN(num) && num > 0) {
-      STATE.baseChestCount = num;
-      localStorage.setItem('nb_base_chest_count', num.toString());
+      setBaseCountForActiveProfile(num);
     }
   }
 
+  const activeBase = getBaseCountForActiveProfile();
   const inSide = document.getElementById('baseInput');
-  if (inSide) inSide.value = STATE.baseChestCount || '';
+  if (inSide) inSide.value = activeBase || '';
 
   try {
-    fetch(`http://localhost:5088/api/set-base?count=${encodeURIComponent(STATE.baseChestCount || 0)}`, { mode: 'cors' });
+    const p = encodeURIComponent(STATE.activeAccount || '');
+    const cnt = encodeURIComponent(activeBase || 0);
+    fetch(`http://localhost:5088/api/set-base?count=${cnt}&profile=${p}`, { mode: 'cors' });
   } catch {}
 
   renderApp();
 }
 
 export function clearBaseCount() {
-  STATE.baseChestCount = null;
-  localStorage.removeItem('nb_base_chest_count');
+  STATE.daemonTotal = undefined;
+  setBaseCountForActiveProfile(null);
   const input = document.getElementById('baseInput');
   if (input) input.value = '';
   const inputTab = document.getElementById('baseInputTab');
   if (inputTab) inputTab.value = '';
 
   try {
-    fetch('http://localhost:5088/api/set-base?count=clear', { mode: 'cors' });
+    const p = encodeURIComponent(STATE.activeAccount || '');
+    fetch(`http://localhost:5088/api/set-base?count=clear&profile=${p}`, { mode: 'cors' });
   } catch {}
 
   renderApp();
 }
 
 export function clearBaseCountFromTab() {
-  STATE.baseChestCount = null;
-  localStorage.removeItem('nb_base_chest_count');
+  STATE.daemonTotal = undefined;
+  setBaseCountForActiveProfile(null);
   const inputTab = document.getElementById('baseInputTab');
   if (inputTab) inputTab.value = '';
   const inputSide = document.getElementById('baseInput');
   if (inputSide) inputSide.value = '';
 
   try {
-    fetch('http://localhost:5088/api/set-base?count=clear', { mode: 'cors' });
+    const p = encodeURIComponent(STATE.activeAccount || '');
+    fetch(`http://localhost:5088/api/set-base?count=clear&profile=${p}`, { mode: 'cors' });
   } catch {}
 
   renderApp();
@@ -328,10 +375,23 @@ export function switchWebTab(tabId) {
 
 // --- Fortnite Account / Profile Switcher ---
 export async function switchAccount(name) {
+  if (!name || name.toLowerCase() === 'all' || name.toLowerCase() === 'all accounts') return;
   STATE.activeAccount = name;
   localStorage.setItem('nb_active_account', name);
 
-  // 1. Sync to local daemon
+  // Clear daemon overrides so old profile stats do not show
+  STATE.daemonTotal = undefined;
+  STATE.daemonLastMatch = undefined;
+  STATE.daemonSession = undefined;
+
+  // Immediately reflect this account's offset in the UI
+  const profileBase = getBaseCountForActiveProfile();
+  const inputSide = document.getElementById('baseInput');
+  if (inputSide) inputSide.value = profileBase || '';
+  const inputTab = document.getElementById('baseInputTab');
+  if (inputTab) inputTab.value = profileBase || '';
+
+  // 1. Sync profile change to local daemon
   try {
     await fetch(`http://localhost:5088/api/set-profile?key=${encodeURIComponent(name)}`, { mode: 'cors' });
   } catch {}
@@ -405,7 +465,8 @@ function renderApp() {
   } else {
     const accountsMap = new Map();
     for (const m of STATE.matches) {
-      const name = m.playerName || 'nimnabro';
+      const name = m.playerName;
+      if (!name) continue;
       const key = name.toLowerCase();
       const acc = accountsMap.get(key) || { key: name, name, matches: 0, chests: 0, lastPlayed: 0 };
       acc.matches++;
@@ -414,33 +475,40 @@ function renderApp() {
       if (time > acc.lastPlayed) acc.lastPlayed = time;
       accountsMap.set(key, acc);
     }
-    allAccounts = Array.from(accountsMap.values()).sort((a, b) => b.matches - a.matches);
+    // Always default to the account that played the most recent match
+    allAccounts = Array.from(accountsMap.values()).sort((a, b) => b.lastPlayed - a.lastPlayed);
   }
 
-  // Set default active account if none selected
+  // Ensure activeAccount is NEVER 'all' or 'all accounts'
+  if (STATE.activeAccount && (STATE.activeAccount.toLowerCase() === 'all' || STATE.activeAccount.toLowerCase() === 'all accounts')) {
+    STATE.activeAccount = null;
+  }
+
+  // Set default active account to the player of the most recent match
   if (!STATE.activeAccount && allAccounts.length > 0) {
     STATE.activeAccount = allAccounts[0].name || allAccounts[0].key;
+    try { localStorage.setItem('nb_active_account', STATE.activeAccount); } catch {}
   }
 
-  // Filter matches for active account
-  const isAll = !STATE.activeAccount || STATE.activeAccount.toLowerCase() === 'all' || STATE.activeAccount.toLowerCase() === 'all accounts';
-  const activeMatches = isAll
-    ? STATE.matches
-    : STATE.matches.filter(m => (m.playerName || '').toLowerCase() === STATE.activeAccount.toLowerCase());
-  activeMatches.sort((a, b) => new Date(b.matchStart) - new Date(a.matchStart));
+  // Filter matches strictly for active account (never show combined/all accounts)
+  const activeMatches = (STATE.activeAccount && STATE.activeAccount.length > 0)
+    ? STATE.matches.filter(m => (m.playerName || '').toLowerCase() === STATE.activeAccount.toLowerCase())
+    : STATE.matches;
+  activeMatches.sort((a, b) => new Date(b.matchStart || 0) - new Date(a.matchStart || 0));
 
-  // Compute metrics
+  // Compute metrics for active account
   const replayTotalChests = activeMatches.reduce((acc, m) => acc + (m.chestsOpened || 0), 0);
-  const sessionMatches = activeMatches.filter(m => new Date(m.matchStart).getTime() >= STATE.sessionStart - 120000);
+  const sessionMatches = activeMatches.filter(m => new Date(m.matchStart || 0).getTime() >= STATE.sessionStart - 120000);
   const sessionChests = (STATE.isCompanionConnected && STATE.daemonSession !== undefined)
     ? STATE.daemonSession
     : sessionMatches.reduce((acc, m) => acc + (m.chestsOpened || 0), 0);
 
+  const profileBase = getBaseCountForActiveProfile();
   const displayedTotal = (STATE.isCompanionConnected && STATE.daemonTotal !== undefined)
     ? STATE.daemonTotal
-    : ((STATE.baseChestCount && STATE.baseChestCount > 0)
-        ? STATE.baseChestCount + sessionChests
-        : (replayTotalChests > 0 ? replayTotalChests : (STATE.baseChestCount || 0)));
+    : ((profileBase && profileBase > 0)
+        ? profileBase + sessionChests
+        : replayTotalChests);
 
   const lastMatch = (STATE.isCompanionConnected && STATE.daemonLastMatch !== undefined)
     ? STATE.daemonLastMatch
@@ -449,11 +517,25 @@ function renderApp() {
   const avgChests = activeMatches.length > 0 ? (replayTotalChests / activeMatches.length).toFixed(1) : '0.0';
   const victoryRoyales = activeMatches.filter(m => m.placement === 1).length;
 
-  // Update Stat Tiles
-  document.getElementById('statTotal').textContent = Number(displayedTotal).toLocaleString('en-US');
-  document.getElementById('statTotalSub').textContent = STATE.baseChestCount
-    ? `chests counted (${STATE.baseChestCount.toLocaleString()} base + ${sessionChests} session)`
-    : `chests counted across all matches`;
+  // Update Stat Tiles (if user is typing in offset box, keep live typing preview intact)
+  const isInputFocused = (document.activeElement && (document.activeElement.id === 'baseInput' || document.activeElement.id === 'baseInputTab'));
+  if (!isInputFocused) {
+    document.getElementById('statTotal').textContent = Number(displayedTotal).toLocaleString('en-US');
+    document.getElementById('statTotalSub').textContent = (profileBase && profileBase > 0)
+      ? `chests counted (${profileBase.toLocaleString()} base + ${sessionChests} session)`
+      : (STATE.activeAccount ? `chests counted for ${STATE.activeAccount}` : `chests counted across all matches`);
+
+    const obsVal = document.getElementById('obsPreviewVal');
+    if (obsVal) obsVal.textContent = Number(displayedTotal).toLocaleString('en-US');
+    const obsValTab = document.getElementById('obsPreviewValTab');
+    if (obsValTab) obsValTab.textContent = Number(displayedTotal).toLocaleString('en-US');
+
+    // Update starting offset inputs strictly for this active profile (blank if none set)
+    const baseInput = document.getElementById('baseInput');
+    if (baseInput) baseInput.value = (profileBase && profileBase > 0) ? profileBase : '';
+    const baseInputTab = document.getElementById('baseInputTab');
+    if (baseInputTab) baseInputTab.value = (profileBase && profileBase > 0) ? profileBase : '';
+  }
 
   document.getElementById('statLastMatch').textContent = lastMatch;
   document.getElementById('statSession').textContent = sessionChests;
@@ -461,21 +543,9 @@ function renderApp() {
   document.getElementById('statAvg').textContent = avgChests;
   document.getElementById('statTreasures').textContent = victoryRoyales;
 
-  const obsVal = document.getElementById('obsPreviewVal');
-  if (obsVal) obsVal.textContent = Number(displayedTotal).toLocaleString('en-US');
-  const obsValTab = document.getElementById('obsPreviewValTab');
-  if (obsValTab) obsValTab.textContent = Number(displayedTotal).toLocaleString('en-US');
-
   const activeNameEl = document.getElementById('activeAccountName');
   if (activeNameEl) {
     activeNameEl.textContent = STATE.activeAccount || '—';
-  }
-
-  if (STATE.baseChestCount) {
-    const baseInput = document.getElementById('baseInput');
-    if (baseInput && !baseInput.value) baseInput.value = STATE.baseChestCount;
-    const baseInputTab = document.getElementById('baseInputTab');
-    if (baseInputTab && !baseInputTab.value) baseInputTab.value = STATE.baseChestCount;
   }
 
   // Render Account Switcher List
@@ -489,13 +559,13 @@ function renderApp() {
 
   // Broadcast to OBS Overlay & Edge
   const liveState = {
-    room: (STATE.activeAccount || STATE.room || 'nimnabro').toLowerCase(),
+    room: (STATE.activeAccount || STATE.room || 'fortnite').toLowerCase(),
     total: displayedTotal,
     lastMatch,
     liveChests: 0,
-    base: STATE.baseChestCount,
+    base: profileBase,
     session: sessionChests,
-    player: STATE.activeAccount || 'nimnabro',
+    player: STATE.activeAccount || '',
     accounts: allAccounts,
     inProgress: false
   };
@@ -842,28 +912,41 @@ function applyCompanionDaemonState(d) {
     desc.textContent = "Auto-tracking active. Matches and chests update live in real-time.";
   }
 
-  if (d.base && !STATE.baseChestCount) {
-    STATE.baseChestCount = d.base;
-  }
-
   if (d.accounts && Array.isArray(d.accounts)) {
     STATE.accounts = d.accounts;
   }
 
-  if (d.player) {
+  if (d.player && (!STATE.activeAccount || STATE.activeAccount.toLowerCase() === 'all' || STATE.activeAccount.toLowerCase() === 'all accounts')) {
     STATE.activeAccount = d.player;
   }
 
-  if (d.matches && Array.isArray(d.matches)) {
-    STATE.matches = d.matches;
-    STATE.hasLoadedLocalMatches = true;
-    saveLocalMatches();
+  if (d.player) {
+    const pKey = d.player.toLowerCase();
+    if (d.base && d.base > 0) {
+      profileBaseCounts[pKey] = d.base;
+      try { localStorage.setItem('nb_profile_base_counts', JSON.stringify(profileBaseCounts)); } catch {}
+    } else if (d.base === null) {
+      delete profileBaseCounts[pKey];
+      try { localStorage.setItem('nb_profile_base_counts', JSON.stringify(profileBaseCounts)); } catch {}
+    }
   }
 
-  if (d.total !== undefined) {
-    STATE.daemonTotal = d.total;
-    STATE.daemonLastMatch = d.lastMatch || 0;
-    STATE.daemonSession = d.session || 0;
+  // Only apply daemon stats if this payload corresponds to the currently active profile!
+  const isCurrentProfile = !STATE.activeAccount || !d.player ||
+    d.player.toLowerCase() === STATE.activeAccount.toLowerCase();
+
+  if (isCurrentProfile) {
+    if (d.matches && Array.isArray(d.matches)) {
+      STATE.matches = d.matches;
+      STATE.hasLoadedLocalMatches = true;
+      saveLocalMatches();
+    }
+
+    if (d.total !== undefined) {
+      STATE.daemonTotal = d.total;
+      STATE.daemonLastMatch = d.lastMatch || 0;
+      STATE.daemonSession = d.session || 0;
+    }
   }
 
   renderApp();
@@ -873,20 +956,33 @@ function applyEdgeSyncState(d) {
   if (d.accounts && Array.isArray(d.accounts) && d.accounts.length > 0) {
     STATE.accounts = d.accounts;
   }
-  if (d.player) {
+  if (d.player && (!STATE.activeAccount || STATE.activeAccount.toLowerCase() === 'all' || STATE.activeAccount.toLowerCase() === 'all accounts')) {
     STATE.activeAccount = d.player;
   }
-  if (d.base && !STATE.baseChestCount) {
-    STATE.baseChestCount = d.base;
+  if (d.player) {
+    const pKey = d.player.toLowerCase();
+    if (d.base && d.base > 0) {
+      profileBaseCounts[pKey] = d.base;
+      try { localStorage.setItem('nb_profile_base_counts', JSON.stringify(profileBaseCounts)); } catch {}
+    } else if (d.base === null) {
+      delete profileBaseCounts[pKey];
+      try { localStorage.setItem('nb_profile_base_counts', JSON.stringify(profileBaseCounts)); } catch {}
+    }
   }
-  if (d.matches && Array.isArray(d.matches) && d.matches.length > 0) {
-    STATE.matches = d.matches;
-    saveLocalMatches();
-  }
-  if (d.total !== undefined) {
-    STATE.daemonTotal = d.total;
-    STATE.daemonLastMatch = d.lastMatch || 0;
-    STATE.daemonSession = d.session || 0;
+
+  const isCurrentProfile = !STATE.activeAccount || !d.player ||
+    d.player.toLowerCase() === STATE.activeAccount.toLowerCase();
+
+  if (isCurrentProfile) {
+    if (d.matches && Array.isArray(d.matches) && d.matches.length > 0) {
+      STATE.matches = d.matches;
+      saveLocalMatches();
+    }
+    if (d.total !== undefined) {
+      STATE.daemonTotal = d.total;
+      STATE.daemonLastMatch = d.lastMatch || 0;
+      STATE.daemonSession = d.session || 0;
+    }
   }
 
   const engineStatusText = document.getElementById('engineStatusText');
@@ -947,6 +1043,116 @@ async function fetchSettings() {
   } catch {}
 }
 
+// --- Check for Software Updates & Version Control ---
+export async function checkForUpdates(silent = false) {
+  const btnText = document.getElementById('btnCheckUpdateText');
+  if (btnText && !silent) btnText.textContent = "Checking for updates...";
+
+  // 1. Try local daemon API first
+  try {
+    const res = await fetch('http://localhost:5088/api/check-update', { mode: 'cors' });
+    if (res.ok) {
+      const data = await res.json();
+      handleUpdateResult(data, silent);
+      return;
+    }
+  } catch {}
+
+  // 2. Fallback to GitHub REST API directly
+  try {
+    const ghRes = await fetch('https://api.github.com/repos/nimnabrox/NBFC_TRACKER/releases/latest');
+    if (ghRes.ok) {
+      const release = await ghRes.json();
+      const latestTag = release.tag_name || '';
+      const currentVer = 'v0.1.0';
+      const isNewer = latestTag && latestTag.toLowerCase() !== currentVer.toLowerCase();
+      handleUpdateResult({
+        hasUpdate: isNewer,
+        currentVersion: currentVer,
+        latestVersion: latestTag,
+        tag: latestTag,
+        url: release.html_url || 'https://github.com/nimnabrox/NBFC_TRACKER/releases',
+        downloadUrl: release.assets?.[0]?.browser_download_url || release.html_url,
+        changelog: release.body || ''
+      }, silent);
+      return;
+    }
+  } catch {}
+
+  if (btnText && !silent) {
+    btnText.textContent = "Check for Updates";
+    const box = document.getElementById('updateNoticeBox');
+    const title = document.getElementById('updateNoticeTitle');
+    const body = document.getElementById('updateNoticeBody');
+    if (box) {
+      box.style.display = 'block';
+      box.style.background = 'rgba(255,255,255,0.04)';
+      box.style.borderColor = 'var(--line)';
+    }
+    if (title) title.textContent = "Up to date";
+    if (body) body.textContent = "Running version v0.1.0. Check back later for new releases.";
+  }
+}
+
+function handleUpdateResult(data, silent) {
+  const btnText = document.getElementById('btnCheckUpdateText');
+  if (btnText) btnText.textContent = "Check for Updates";
+
+  const box = document.getElementById('updateNoticeBox');
+  const title = document.getElementById('updateNoticeTitle');
+  const body = document.getElementById('updateNoticeBody');
+  const btnApply = document.getElementById('btnApplyUpdate');
+  const link = document.getElementById('updateReleaseLink');
+
+  if (data.hasUpdate) {
+    if (box) {
+      box.style.display = 'block';
+      box.style.background = 'rgba(245, 166, 35, 0.1)';
+      box.style.borderColor = 'rgba(245, 166, 35, 0.4)';
+    }
+    if (title) title.textContent = `🎉 New Update Available: ${data.latestVersion || data.tag}`;
+    if (body) {
+      const notes = data.changelog ? data.changelog.replace(/\r\n/g, '<br>').replace(/\n/g, '<br>') : 'Performance updates, account profile fixes, and new features.';
+      body.innerHTML = `<strong>What's new:</strong><br>${notes}`;
+    }
+    if (link) link.href = data.url || 'https://github.com/nimnabrox/NBFC_TRACKER/releases';
+    if (btnApply) {
+      btnApply.style.display = STATE.isCompanionConnected ? 'inline-flex' : 'none';
+    }
+  } else {
+    if (!silent) {
+      if (box) {
+        box.style.display = 'block';
+        box.style.background = 'rgba(72, 187, 120, 0.08)';
+        box.style.borderColor = 'rgba(72, 187, 120, 0.3)';
+      }
+      if (title) title.textContent = "✅ You're up to date!";
+      if (body) body.textContent = `You are running the latest version (${data.currentVersion || 'v0.1.0'}).`;
+      if (btnApply) btnApply.style.display = 'none';
+      if (link) link.href = 'https://github.com/nimnabrox/NBFC_TRACKER/releases';
+    }
+  }
+}
+
+export async function applyUpdate() {
+  const btn = document.getElementById('btnApplyUpdate');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "Downloading & Installing...";
+  }
+  try {
+    const res = await fetch('http://localhost:5088/api/apply-update', { mode: 'cors' });
+    if (res.ok) {
+      const data = await res.json();
+      alert(data.message || "Update downloaded! The app is restarting now.");
+    } else {
+      alert("Update failed. Please download the new release manually from GitHub.");
+    }
+  } catch (e) {
+    alert("Could not trigger automatic update. Please download from GitHub Releases.");
+  }
+}
+
 // --- Setup Global Window API & Startup ---
 window.app = {
   connectFolder,
@@ -965,12 +1171,57 @@ window.app = {
   setCustomDemosFolderFromTab,
   prevMatchPage,
   nextMatchPage,
-  switchWebTab
+  switchWebTab,
+  checkForUpdates,
+  applyUpdate
 };
+
+function setupBaseInputListeners() {
+  const syncInputs = (source, target) => {
+    if (!source) return;
+    source.addEventListener('input', () => {
+      const val = source.value.trim();
+      if (target && document.activeElement !== target) target.value = val;
+      const num = parseInt(val, 10);
+      if (!isNaN(num) && num >= 0) {
+        const activeMatches = (STATE.activeAccount && STATE.activeAccount.length > 0)
+          ? STATE.matches.filter(m => (m.playerName || '').toLowerCase() === STATE.activeAccount.toLowerCase())
+          : STATE.matches;
+        const sessionMatches = activeMatches.filter(m => new Date(m.matchStart || 0).getTime() >= STATE.sessionStart - 120000);
+        const sessionChests = (STATE.isCompanionConnected && STATE.daemonSession !== undefined)
+          ? STATE.daemonSession
+          : sessionMatches.reduce((acc, m) => acc + (m.chestsOpened || 0), 0);
+
+        const liveTotal = num + sessionChests;
+        const totalEl = document.getElementById('statTotal');
+        if (totalEl) totalEl.textContent = liveTotal.toLocaleString('en-US');
+        const totalSub = document.getElementById('statTotalSub');
+        if (totalSub) totalSub.textContent = `chests counted (${num.toLocaleString()} base + ${sessionChests} session)`;
+        const obsEl = document.getElementById('obsPreviewVal');
+        if (obsEl) obsEl.textContent = liveTotal.toLocaleString('en-US');
+        const obsTab = document.getElementById('obsPreviewValTab');
+        if (obsTab) obsTab.textContent = liveTotal.toLocaleString('en-US');
+      } else if (!val) {
+        renderApp();
+      }
+    });
+
+    source.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        saveBaseCount();
+      }
+    });
+  };
+
+  syncInputs(document.getElementById('baseInput'), document.getElementById('baseInputTab'));
+  syncInputs(document.getElementById('baseInputTab'), document.getElementById('baseInput'));
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   loadLocalConfig();
   renderApp();
+  setupBaseInputListeners();
 
   // Start polling daemon, settings & cloud edge
   pollExternalSync();

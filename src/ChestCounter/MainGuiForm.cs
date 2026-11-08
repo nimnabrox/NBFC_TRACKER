@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
@@ -14,6 +15,69 @@ namespace ChestCounter;
 /// </summary>
 public class MainGuiForm : Form
 {
+    [DllImport("dwmapi.dll")]
+    private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
+
+    private const int DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1 = 19;
+    private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+    private const int DWMWA_BORDER_COLOR = 34;
+    private const int DWMWA_CAPTION_COLOR = 35;
+    private const int DWMWA_TEXT_COLOR = 36;
+
+    private static void ApplyDarkTitleBar(IntPtr hWnd)
+    {
+        try
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                int darkMode = 1;
+                // Attribute 20 (Windows 10 2004+ and Windows 11)
+                if (DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int)) != 0)
+                {
+                    // Fallback to Attribute 19 (Windows 10 1809 - 1909)
+                    DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE_BEFORE_20H1, ref darkMode, sizeof(int));
+                }
+
+                // Custom Caption Color for Windows 11 (#0d0f14 -> BGR 0x00140F0D)
+                int captionColor = 0x00140F0D;
+                DwmSetWindowAttribute(hWnd, DWMWA_CAPTION_COLOR, ref captionColor, sizeof(int));
+
+                // Text Color (White)
+                int textColor = 0x00FFFFFF;
+                DwmSetWindowAttribute(hWnd, DWMWA_TEXT_COLOR, ref textColor, sizeof(int));
+
+                // Border Color (#1f242d -> BGR 0x002D241F)
+                int borderColor = 0x002D241F;
+                DwmSetWindowAttribute(hWnd, DWMWA_BORDER_COLOR, ref borderColor, sizeof(int));
+            }
+        }
+        catch { }
+    }
+
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        ApplyDarkTitleBar(this.Handle);
+    }
+
+    protected override void OnLoad(EventArgs e)
+    {
+        base.OnLoad(e);
+        ApplyDarkTitleBar(this.Handle);
+    }
+
+    protected override void OnShown(EventArgs e)
+    {
+        base.OnShown(e);
+        ApplyDarkTitleBar(this.Handle);
+    }
+
+    protected override void OnActivated(EventArgs e)
+    {
+        base.OnActivated(e);
+        ApplyDarkTitleBar(this.Handle);
+    }
+
     private readonly WebView2 _webView;
     private readonly string _dashboardUrl;
     private readonly Action? _onExit;

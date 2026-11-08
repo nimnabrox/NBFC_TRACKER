@@ -7,8 +7,8 @@
   'use strict';
 
   const STATE = {
-    room: 'nimnabro',
-    player: 'nimnabro',
+    room: '',
+    player: '',
     accounts: [],
     total: 0,
     lastMatch: 0,
@@ -157,11 +157,35 @@
   const inputBase = document.getElementById('inputBaseChest');
 
   if (btnSaveBase && inputBase) {
+    inputBase.addEventListener('input', () => {
+      const val = parseInt(inputBase.value.trim(), 10);
+      if (!isNaN(val) && val >= 0) {
+        const liveTotal = val + STATE.session;
+        const totalEl = document.getElementById('statTotalChests');
+        if (totalEl) totalEl.textContent = Number(liveTotal).toLocaleString('en-US');
+        const previewEl = document.getElementById('previewChestsVal');
+        if (previewEl) previewEl.textContent = Number(liveTotal).toLocaleString('en-US');
+      } else if (!inputBase.value.trim()) {
+        const totalEl = document.getElementById('statTotalChests');
+        if (totalEl) totalEl.textContent = Number(STATE.total).toLocaleString('en-US');
+        const previewEl = document.getElementById('previewChestsVal');
+        if (previewEl) previewEl.textContent = Number(STATE.total).toLocaleString('en-US');
+      }
+    });
+
+    inputBase.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        btnSaveBase.click();
+      }
+    });
+
     btnSaveBase.addEventListener('click', async () => {
       const val = parseInt(inputBase.value, 10);
       if (isNaN(val) || val <= 0) return;
       try {
-        await fetch(`http://localhost:5088/api/set-base?count=${val}`);
+        const p = encodeURIComponent(STATE.player || '');
+        await fetch(`http://localhost:5088/api/set-base?count=${val}&profile=${p}`);
         showToast(`Starting Offset Saved: ${val}`);
         pollLive();
       } catch (e) {
@@ -173,7 +197,8 @@
   if (btnResetBase && inputBase) {
     btnResetBase.addEventListener('click', async () => {
       try {
-        await fetch('http://localhost:5088/api/set-base?count=clear');
+        const p = encodeURIComponent(STATE.player || '');
+        await fetch(`http://localhost:5088/api/set-base?count=clear&profile=${p}`);
         inputBase.value = '';
         showToast("Offset Reset to Replays Default");
         pollLive();
@@ -213,12 +238,19 @@
     STATE.player = d.player || 'nimnabro';
     STATE.inProgress = !!d.inProgress;
 
-    // Update numbers
-    const totalEl = document.getElementById('statTotalChests');
-    if (totalEl) totalEl.textContent = Number(STATE.total).toLocaleString('en-US');
+    // Update numbers (unless user is actively typing an offset)
+    const inputBase = document.getElementById('inputBaseChest');
+    const isBaseFocused = (inputBase && document.activeElement === inputBase);
 
-    const previewEl = document.getElementById('previewChestsVal');
-    if (previewEl) previewEl.textContent = Number(STATE.total).toLocaleString('en-US');
+    if (!isBaseFocused) {
+      const totalEl = document.getElementById('statTotalChests');
+      if (totalEl) totalEl.textContent = Number(STATE.total).toLocaleString('en-US');
+
+      const previewEl = document.getElementById('previewChestsVal');
+      if (previewEl) previewEl.textContent = Number(STATE.total).toLocaleString('en-US');
+
+      if (inputBase) inputBase.value = (d.base && d.base > 0) ? d.base : '';
+    }
 
     const lastEl = document.getElementById('statLastMatch');
     if (lastEl) lastEl.textContent = Number(STATE.lastMatch).toLocaleString('en-US');
@@ -227,7 +259,7 @@
     if (sessEl) sessEl.textContent = Number(STATE.session).toLocaleString('en-US');
 
     const nameEl = document.getElementById('activePlayerName');
-    if (nameEl) nameEl.textContent = STATE.player;
+    if (nameEl) nameEl.textContent = STATE.player || '—';
 
     const progEl = document.getElementById('statMatchProgress');
     if (progEl) {
@@ -235,27 +267,27 @@
       progEl.style.color = STATE.inProgress ? "#48bb78" : "#8c93a4";
     }
 
-    // Populate profile dropdown if accounts list changed
+    // Populate profile dropdown if accounts list changed (strictly individual profiles, never 'all')
     if (d.accounts && Array.isArray(d.accounts) && d.accounts.length > 0) {
       const accountsJson = JSON.stringify(d.accounts);
       if (accountsJson !== STATE._lastAccountsJson) {
         STATE._lastAccountsJson = accountsJson;
         STATE.accounts = d.accounts;
         if (profileDropdown) {
-          profileDropdown.innerHTML = '<option value="all">All Accounts</option>';
+          profileDropdown.innerHTML = '';
           let anySelected = false;
           d.accounts.forEach(acc => {
             const opt = document.createElement('option');
             opt.value = acc.key || acc.name;
-            opt.textContent = `${acc.name || acc.key} (${acc.chests || 0} chests)`;
+            opt.textContent = `${acc.name || acc.key} (${(acc.chests || 0).toLocaleString()} chests)`;
             if (acc.active) {
               opt.selected = true;
               anySelected = true;
             }
             profileDropdown.appendChild(opt);
           });
-          if (!anySelected && (!d.player || d.player === 'All Accounts')) {
-            profileDropdown.value = 'all';
+          if (!anySelected && profileDropdown.options.length > 0) {
+            profileDropdown.selectedIndex = 0;
           }
         }
       }
