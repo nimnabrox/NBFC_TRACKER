@@ -524,6 +524,7 @@ if (!isCli && OperatingSystem.IsWindows())
     {
         try
         {
+            MainGuiForm.InitializeTheme();
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

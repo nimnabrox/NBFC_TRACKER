@@ -201,7 +201,7 @@ public static class ReportWriter
         var baseCount = config.BaseChestCount;
         var sessionMatches = matches.Where(IsThisSession).ToList();
         var session = sessionMatches.Sum(m => m.ChestsOpened);
-        var displayedTotal = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value + session : totalChests;
+        var displayedTotal = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value : totalChests;
         var lastMatchChests = matches.Count > 0 ? matches[0].ChestsOpened : 0;
 
         var sb = new StringBuilder();

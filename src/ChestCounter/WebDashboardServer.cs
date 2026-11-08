@@ -386,6 +386,18 @@ public static class WebDashboardServer
                 return;
             }
 
+            // 2f. YouTube Live Status API (Cached 60s, Zero Quotas)
+            if (path.Equals("/api/youtube-live", StringComparison.OrdinalIgnoreCase))
+            {
+                res.ContentType = "application/json; charset=utf-8";
+                var json = GetYouTubeLiveStatusJson();
+                var bytes = Encoding.UTF8.GetBytes(json);
+                res.ContentLength64 = bytes.Length;
+                res.OutputStream.Write(bytes, 0, bytes.Length);
+                res.Close();
+                return;
+            }
+
             // 3. Serve Chest Image for OBS Overlay and Dashboard
             if (path.Equals("/assets/chest.png", StringComparison.OrdinalIgnoreCase) || 
                 path.Equals("/assets/chest_fnv1.png", StringComparison.OrdinalIgnoreCase))
@@ -656,7 +668,7 @@ public static class WebDashboardServer
             var liveChests = _getLiveMatch?.Invoke()?.ChestsOpened ?? 0;
             var sessionChests = matches.Where(ReportWriter.IsThisSession).Sum(m => m.ChestsOpened) + liveChests;
             var totalChests = matches.Sum(m => m.ChestsOpened) + liveChests;
-            var displayedTotal = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value + sessionChests : totalChests;
+            var displayedTotal = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value + liveChests : totalChests;
             var lastMatch = matches.Count > 0 ? matches[0].ChestsOpened : 0;
             var baseJson = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value.ToString() : "null";
 
@@ -868,5 +880,72 @@ public static class WebDashboardServer
             _listener?.Close();
         }
         catch { }
+    }
+
+    private static DateTime _ytLastCheckUtc = DateTime.MinValue;
+    private static string _ytCachedStatusJson = "";
+    private static readonly object _ytLock = new();
+
+    private static string GetYouTubeLiveStatusJson()
+    {
+        lock (_ytLock)
+        {
+            if ((DateTime.UtcNow - _ytLastCheckUtc).TotalSeconds < 60 && !string.IsNullOrEmpty(_ytCachedStatusJson))
+            {
+                return _ytCachedStatusJson;
+            }
+        }
+
+        try
+        {
+            using var reqMsg = new HttpRequestMessage(HttpMethod.Get, "https://www.youtube.com/@nimna_bro_/live");
+            reqMsg.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+            var resMsg = _syncClient.Send(reqMsg);
+            using var reader = new StreamReader(resMsg.Content.ReadAsStream());
+            var html = reader.ReadToEnd();
+
+            bool isLive = html.Contains("\"videoType\":\"VIEW_COUNT_VIDEO_TYPE_LIVE\"") ||
+                          html.Contains("\"isLive\":true") ||
+                          html.Contains("\"isLiveNow\":true") ||
+                          html.Contains("watching now");
+
+            string videoId = "o5pBvr1jqm0";
+            var vIdx = html.IndexOf("\"videoId\":\"", StringComparison.Ordinal);
+            if (vIdx >= 0)
+            {
+                var start = vIdx + 11;
+                var end = html.IndexOf('"', start);
+                if (end > start)
+                {
+                    var id = html.Substring(start, end - start);
+                    if (id.Length == 11) videoId = id;
+                }
+            }
+
+            string title = isLive ? "🔴 Fortnite Live Stream - Nimna Bro" : "Fortnite Highlights & Stream - Nimna Bro";
+            var tIdx = html.IndexOf("<title>", StringComparison.OrdinalIgnoreCase);
+            if (tIdx >= 0)
+            {
+                var tEnd = html.IndexOf("</title>", tIdx, StringComparison.OrdinalIgnoreCase);
+                if (tEnd > tIdx)
+                {
+                    var rawTitle = html.Substring(tIdx + 7, tEnd - (tIdx + 7)).Replace(" - YouTube", "").Trim();
+                    if (!string.IsNullOrWhiteSpace(rawTitle)) title = rawTitle;
+                }
+            }
+
+            var jsonResult = $"{{\"isLive\":{(isLive ? "true" : "false")},\"videoId\":\"{EscapeJson(videoId)}\",\"title\":\"{EscapeJson(title)}\",\"channelUrl\":\"https://www.youtube.com/@nimna_bro_\",\"liveUrl\":\"https://www.youtube.com/@nimna_bro_/live\",\"subUrl\":\"https://www.youtube.com/@nimna_bro_?sub_confirmation=1\",\"thumbnail\":\"https://i.ytimg.com/vi/{videoId}/hqdefault.jpg\",\"creatorCode\":\"NIMNABRO\"}}";
+
+            lock (_ytLock)
+            {
+                _ytLastCheckUtc = DateTime.UtcNow;
+                _ytCachedStatusJson = jsonResult;
+            }
+            return jsonResult;
+        }
+        catch
+        {
+            return "{\"isLive\":false,\"videoId\":\"o5pBvr1jqm0\",\"title\":\"Nimna Bro - Fortnite Streams & Content\",\"channelUrl\":\"https://www.youtube.com/@nimna_bro_\",\"liveUrl\":\"https://www.youtube.com/@nimna_bro_/live\",\"subUrl\":\"https://www.youtube.com/@nimna_bro_?sub_confirmation=1\",\"thumbnail\":\"https://i.ytimg.com/vi/o5pBvr1jqm0/hqdefault.jpg\",\"creatorCode\":\"NIMNABRO\"}";
+        }
     }
 }

@@ -248,8 +248,6 @@ export function saveBaseCount(e) {
   const input = document.getElementById('baseInput');
   const val = input ? input.value.trim() : '';
 
-  STATE.daemonTotal = undefined; // Force immediate local recalculation
-
   if (!val || val === '0') {
     setBaseCountForActiveProfile(null);
   } else {
@@ -278,8 +276,6 @@ export function saveBaseCountFromTab(e) {
   const input = document.getElementById('baseInputTab');
   const val = input ? input.value.trim() : '';
 
-  STATE.daemonTotal = undefined; // Force immediate local recalculation
-
   if (!val || val === '0') {
     setBaseCountForActiveProfile(null);
   } else {
@@ -303,7 +299,6 @@ export function saveBaseCountFromTab(e) {
 }
 
 export function clearBaseCount() {
-  STATE.daemonTotal = undefined;
   setBaseCountForActiveProfile(null);
   const input = document.getElementById('baseInput');
   if (input) input.value = '';
@@ -319,7 +314,6 @@ export function clearBaseCount() {
 }
 
 export function clearBaseCountFromTab() {
-  STATE.daemonTotal = undefined;
   setBaseCountForActiveProfile(null);
   const inputTab = document.getElementById('baseInputTab');
   if (inputTab) inputTab.value = '';
@@ -507,7 +501,7 @@ function renderApp() {
   const displayedTotal = (STATE.isCompanionConnected && STATE.daemonTotal !== undefined)
     ? STATE.daemonTotal
     : ((profileBase && profileBase > 0)
-        ? profileBase + sessionChests
+        ? profileBase
         : replayTotalChests);
 
   const lastMatch = (STATE.isCompanionConnected && STATE.daemonLastMatch !== undefined)
@@ -517,25 +511,11 @@ function renderApp() {
   const avgChests = activeMatches.length > 0 ? (replayTotalChests / activeMatches.length).toFixed(1) : '0.0';
   const victoryRoyales = activeMatches.filter(m => m.placement === 1).length;
 
-  // Update Stat Tiles (if user is typing in offset box, keep live typing preview intact)
-  const isInputFocused = (document.activeElement && (document.activeElement.id === 'baseInput' || document.activeElement.id === 'baseInputTab'));
-  if (!isInputFocused) {
-    document.getElementById('statTotal').textContent = Number(displayedTotal).toLocaleString('en-US');
-    document.getElementById('statTotalSub').textContent = (profileBase && profileBase > 0)
-      ? `chests counted (${profileBase.toLocaleString()} base + ${sessionChests} session)`
-      : (STATE.activeAccount ? `chests counted for ${STATE.activeAccount}` : `chests counted across all matches`);
-
-    const obsVal = document.getElementById('obsPreviewVal');
-    if (obsVal) obsVal.textContent = Number(displayedTotal).toLocaleString('en-US');
-    const obsValTab = document.getElementById('obsPreviewValTab');
-    if (obsValTab) obsValTab.textContent = Number(displayedTotal).toLocaleString('en-US');
-
-    // Update starting offset inputs strictly for this active profile (blank if none set)
-    const baseInput = document.getElementById('baseInput');
-    if (baseInput) baseInput.value = (profileBase && profileBase > 0) ? profileBase : '';
-    const baseInputTab = document.getElementById('baseInputTab');
-    if (baseInputTab) baseInputTab.value = (profileBase && profileBase > 0) ? profileBase : '';
-  }
+  // Update Stat Tiles
+  document.getElementById('statTotal').textContent = Number(displayedTotal).toLocaleString('en-US');
+  document.getElementById('statTotalSub').textContent = (profileBase && profileBase > 0)
+    ? `custom starting offset: ${profileBase.toLocaleString()} chests`
+    : (STATE.activeAccount ? `chests counted for ${STATE.activeAccount}` : `chests counted across all matches`);
 
   document.getElementById('statLastMatch').textContent = lastMatch;
   document.getElementById('statSession').textContent = sessionChests;
@@ -543,9 +523,24 @@ function renderApp() {
   document.getElementById('statAvg').textContent = avgChests;
   document.getElementById('statTreasures').textContent = victoryRoyales;
 
+  const obsVal = document.getElementById('obsPreviewVal');
+  if (obsVal) obsVal.textContent = Number(displayedTotal).toLocaleString('en-US');
+  const obsValTab = document.getElementById('obsPreviewValTab');
+  if (obsValTab) obsValTab.textContent = Number(displayedTotal).toLocaleString('en-US');
+
   const activeNameEl = document.getElementById('activeAccountName');
   if (activeNameEl) {
     activeNameEl.textContent = STATE.activeAccount || '—';
+  }
+
+  // Update starting offset inputs strictly for this active profile (blank if none set)
+  const baseInput = document.getElementById('baseInput');
+  if (baseInput && document.activeElement !== baseInput) {
+    baseInput.value = (profileBase && profileBase > 0) ? profileBase : '';
+  }
+  const baseInputTab = document.getElementById('baseInputTab');
+  if (baseInputTab && document.activeElement !== baseInputTab) {
+    baseInputTab.value = (profileBase && profileBase > 0) ? profileBase : '';
   }
 
   // Render Account Switcher List
@@ -916,7 +911,7 @@ function applyCompanionDaemonState(d) {
     STATE.accounts = d.accounts;
   }
 
-  if (d.player && (!STATE.activeAccount || STATE.activeAccount.toLowerCase() === 'all' || STATE.activeAccount.toLowerCase() === 'all accounts')) {
+  if (d.player && d.player !== 'All Accounts') {
     STATE.activeAccount = d.player;
   }
 
@@ -931,22 +926,16 @@ function applyCompanionDaemonState(d) {
     }
   }
 
-  // Only apply daemon stats if this payload corresponds to the currently active profile!
-  const isCurrentProfile = !STATE.activeAccount || !d.player ||
-    d.player.toLowerCase() === STATE.activeAccount.toLowerCase();
+  if (d.matches && Array.isArray(d.matches)) {
+    STATE.matches = d.matches;
+    STATE.hasLoadedLocalMatches = true;
+    saveLocalMatches();
+  }
 
-  if (isCurrentProfile) {
-    if (d.matches && Array.isArray(d.matches)) {
-      STATE.matches = d.matches;
-      STATE.hasLoadedLocalMatches = true;
-      saveLocalMatches();
-    }
-
-    if (d.total !== undefined) {
-      STATE.daemonTotal = d.total;
-      STATE.daemonLastMatch = d.lastMatch || 0;
-      STATE.daemonSession = d.session || 0;
-    }
+  if (d.total !== undefined) {
+    STATE.daemonTotal = d.total;
+    STATE.daemonLastMatch = d.lastMatch || 0;
+    STATE.daemonSession = d.session || 0;
   }
 
   renderApp();
@@ -956,7 +945,7 @@ function applyEdgeSyncState(d) {
   if (d.accounts && Array.isArray(d.accounts) && d.accounts.length > 0) {
     STATE.accounts = d.accounts;
   }
-  if (d.player && (!STATE.activeAccount || STATE.activeAccount.toLowerCase() === 'all' || STATE.activeAccount.toLowerCase() === 'all accounts')) {
+  if (d.player && d.player !== 'All Accounts') {
     STATE.activeAccount = d.player;
   }
   if (d.player) {
@@ -969,20 +958,14 @@ function applyEdgeSyncState(d) {
       try { localStorage.setItem('nb_profile_base_counts', JSON.stringify(profileBaseCounts)); } catch {}
     }
   }
-
-  const isCurrentProfile = !STATE.activeAccount || !d.player ||
-    d.player.toLowerCase() === STATE.activeAccount.toLowerCase();
-
-  if (isCurrentProfile) {
-    if (d.matches && Array.isArray(d.matches) && d.matches.length > 0) {
-      STATE.matches = d.matches;
-      saveLocalMatches();
-    }
-    if (d.total !== undefined) {
-      STATE.daemonTotal = d.total;
-      STATE.daemonLastMatch = d.lastMatch || 0;
-      STATE.daemonSession = d.session || 0;
-    }
+  if (d.matches && Array.isArray(d.matches) && d.matches.length > 0) {
+    STATE.matches = d.matches;
+    saveLocalMatches();
+  }
+  if (d.total !== undefined) {
+    STATE.daemonTotal = d.total;
+    STATE.daemonLastMatch = d.lastMatch || 0;
+    STATE.daemonSession = d.session || 0;
   }
 
   const engineStatusText = document.getElementById('engineStatusText');
@@ -1184,32 +1167,14 @@ function setupBaseInputListeners() {
       if (target && document.activeElement !== target) target.value = val;
       const num = parseInt(val, 10);
       if (!isNaN(num) && num >= 0) {
-        const activeMatches = (STATE.activeAccount && STATE.activeAccount.length > 0)
-          ? STATE.matches.filter(m => (m.playerName || '').toLowerCase() === STATE.activeAccount.toLowerCase())
-          : STATE.matches;
-        const sessionMatches = activeMatches.filter(m => new Date(m.matchStart || 0).getTime() >= STATE.sessionStart - 120000);
-        const sessionChests = (STATE.isCompanionConnected && STATE.daemonSession !== undefined)
-          ? STATE.daemonSession
-          : sessionMatches.reduce((acc, m) => acc + (m.chestsOpened || 0), 0);
-
-        const liveTotal = num + sessionChests;
         const totalEl = document.getElementById('statTotal');
-        if (totalEl) totalEl.textContent = liveTotal.toLocaleString('en-US');
-        const totalSub = document.getElementById('statTotalSub');
-        if (totalSub) totalSub.textContent = `chests counted (${num.toLocaleString()} base + ${sessionChests} session)`;
+        if (totalEl) totalEl.textContent = num.toLocaleString('en-US');
         const obsEl = document.getElementById('obsPreviewVal');
-        if (obsEl) obsEl.textContent = liveTotal.toLocaleString('en-US');
+        if (obsEl) obsEl.textContent = num.toLocaleString('en-US');
         const obsTab = document.getElementById('obsPreviewValTab');
-        if (obsTab) obsTab.textContent = liveTotal.toLocaleString('en-US');
+        if (obsTab) obsTab.textContent = num.toLocaleString('en-US');
       } else if (!val) {
         renderApp();
-      }
-    });
-
-    source.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        saveBaseCount();
       }
     });
   };

@@ -38,7 +38,8 @@ jobs:
             - **Default to Active Match Account**: The app and web dashboard automatically select the player account from the most recent match by default.
             - **Native Windows Dark Mode Title Bar**: Styled the native desktop companion title bar in dark mode to seamlessly match the UI.
             - **Built-in 1-Click Update System**: Automatic update detection directly via GitHub Releases.
-            - **100% KV-Free Unlimited Cloud Edge Relay & Local OBS Overlay**: High performance with zero quotas.
+            - **Unlimited Real-Time Live Sync & OBS Overlay**: Ultra-fast updates with zero quotas or limits.
+            - **Nimna Bro YouTube Live Hub**: Built-in channel & livestream promoter for @nimna_bro_.
 
             **Installation:**
             - Download `NBFC TRACKER.exe` below.

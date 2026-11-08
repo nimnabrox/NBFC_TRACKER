@@ -151,61 +151,109 @@
     });
   }
 
-  // --- Starting Chest Offset ---
+  // --- Starting Chest Offset (Tab 1 Hero & Tab 2 Settings) ---
+  const inputBaseHero = document.getElementById('inputBaseHero');
+  const btnSaveBaseHero = document.getElementById('btnSaveBaseHero');
+  const btnResetBaseHero = document.getElementById('btnResetBaseHero');
+  const heroBaseBadge = document.getElementById('heroBaseBadge');
+
+  const inputBase = document.getElementById('inputBaseChest');
   const btnSaveBase = document.getElementById('btnSaveBaseChest');
   const btnResetBase = document.getElementById('btnResetBaseChest');
-  const inputBase = document.getElementById('inputBaseChest');
 
-  if (btnSaveBase && inputBase) {
-    inputBase.addEventListener('input', () => {
-      const val = parseInt(inputBase.value.trim(), 10);
+  function syncBaseTyping(source, target) {
+    if (!source) return;
+    source.addEventListener('input', () => {
+      const raw = source.value.trim();
+      if (target && document.activeElement !== target) target.value = raw;
+      const val = parseInt(raw, 10);
       if (!isNaN(val) && val >= 0) {
-        const liveTotal = val + STATE.session;
+        // Show EXACTLY the custom typed amount (never add session)
         const totalEl = document.getElementById('statTotalChests');
-        if (totalEl) totalEl.textContent = Number(liveTotal).toLocaleString('en-US');
+        if (totalEl) totalEl.textContent = val.toLocaleString('en-US');
         const previewEl = document.getElementById('previewChestsVal');
-        if (previewEl) previewEl.textContent = Number(liveTotal).toLocaleString('en-US');
-      } else if (!inputBase.value.trim()) {
+        if (previewEl) previewEl.textContent = val.toLocaleString('en-US');
+        if (heroBaseBadge) heroBaseBadge.textContent = 'Typing Custom Offset...';
+      } else if (!raw) {
         const totalEl = document.getElementById('statTotalChests');
         if (totalEl) totalEl.textContent = Number(STATE.total).toLocaleString('en-US');
         const previewEl = document.getElementById('previewChestsVal');
         if (previewEl) previewEl.textContent = Number(STATE.total).toLocaleString('en-US');
+        if (heroBaseBadge) heroBaseBadge.textContent = (STATE.base && STATE.base > 0) ? 'Custom Offset' : 'Replay Count';
       }
     });
 
-    inputBase.addEventListener('keydown', (e) => {
+    source.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        btnSaveBase.click();
-      }
-    });
-
-    btnSaveBase.addEventListener('click', async () => {
-      const val = parseInt(inputBase.value, 10);
-      if (isNaN(val) || val <= 0) return;
-      try {
-        const p = encodeURIComponent(STATE.player || '');
-        await fetch(`http://localhost:5088/api/set-base?count=${val}&profile=${p}`);
-        showToast(`Starting Offset Saved: ${val}`);
-        pollLive();
-      } catch (e) {
-        alert("Could not save offset: " + e.message);
+        saveBaseCount();
       }
     });
   }
 
-  if (btnResetBase && inputBase) {
-    btnResetBase.addEventListener('click', async () => {
-      try {
-        const p = encodeURIComponent(STATE.player || '');
-        await fetch(`http://localhost:5088/api/set-base?count=clear&profile=${p}`);
-        inputBase.value = '';
-        showToast("Offset Reset to Replays Default");
-        pollLive();
-      } catch (e) {
-        alert("Could not reset offset: " + e.message);
+  syncBaseTyping(inputBaseHero, inputBase);
+  syncBaseTyping(inputBase, inputBaseHero);
+
+  async function saveBaseCount() {
+    const raw = (inputBaseHero && inputBaseHero.value.trim()) || (inputBase && inputBase.value.trim()) || '';
+    const val = parseInt(raw, 10);
+    if (isNaN(val) || val < 0) return;
+    try {
+      const p = encodeURIComponent(STATE.player || '');
+      await fetch(`http://localhost:5088/api/set-base?count=${val}&profile=${p}`);
+      STATE.base = val;
+      STATE.total = val;
+      const totalEl = document.getElementById('statTotalChests');
+      if (totalEl) totalEl.textContent = val.toLocaleString('en-US');
+      const previewEl = document.getElementById('previewChestsVal');
+      if (previewEl) previewEl.textContent = val.toLocaleString('en-US');
+      if (heroBaseBadge) heroBaseBadge.textContent = 'Custom Offset';
+      showToast(`Custom Offset Saved: ${val.toLocaleString()} chests`);
+      pollLive();
+    } catch (e) {
+      alert("Could not save offset: " + e.message);
+    }
+  }
+
+  async function resetBaseCount() {
+    try {
+      const p = encodeURIComponent(STATE.player || '');
+      await fetch(`http://localhost:5088/api/set-base?count=clear&profile=${p}`);
+      STATE.base = null;
+      if (inputBaseHero) inputBaseHero.value = '';
+      if (inputBase) inputBase.value = '';
+      if (heroBaseBadge) heroBaseBadge.textContent = 'Replay Count';
+      showToast("Offset Reset to Replays Default");
+      pollLive();
+    } catch (e) {
+      alert("Could not reset offset: " + e.message);
+    }
+  }
+
+  if (btnSaveBaseHero) btnSaveBaseHero.addEventListener('click', saveBaseCount);
+  if (btnResetBaseHero) btnResetBaseHero.addEventListener('click', resetBaseCount);
+  if (btnSaveBase) btnSaveBase.addEventListener('click', saveBaseCount);
+  if (btnResetBase) btnResetBase.addEventListener('click', resetBaseCount);
+
+  // --- YouTube Live Status Check ---
+  async function checkYouTubeLiveMini() {
+    const badge = document.getElementById('ytLiveBadgeMini');
+    if (!badge) return;
+    try {
+      const res = await fetch('http://localhost:5088/api/youtube-live', { signal: AbortSignal.timeout(1500) });
+      if (res.ok) {
+        const d = await res.json();
+        if (d && d.isLive) {
+          badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#ff0000;box-shadow:0 0 8px #ff0000;animation:pulse 1s infinite;"></span><span>🔴 LIVE NOW</span>';
+          badge.style.background = 'rgba(255, 0, 0, 0.2)';
+          badge.style.borderColor = '#ff0000';
+        } else {
+          badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#ff0000;box-shadow:0 0 6px #ff0000;"></span><span>YOUTUBE LIVE</span>';
+          badge.style.background = 'rgba(255, 0, 0, 0.12)';
+          badge.style.borderColor = 'rgba(255, 0, 0, 0.3)';
+        }
       }
-    });
+    } catch {}
   }
 
   // --- Live Polling Engine (Low Spec, 0 memory leaks) ---
@@ -236,11 +284,11 @@
     STATE.lastMatch = d.lastMatch || 0;
     STATE.session = d.session || 0;
     STATE.player = d.player || 'nimnabro';
+    STATE.base = d.base || null;
     STATE.inProgress = !!d.inProgress;
 
     // Update numbers (unless user is actively typing an offset)
-    const inputBase = document.getElementById('inputBaseChest');
-    const isBaseFocused = (inputBase && document.activeElement === inputBase);
+    const isBaseFocused = (inputBase && document.activeElement === inputBase) || (inputBaseHero && document.activeElement === inputBaseHero);
 
     if (!isBaseFocused) {
       const totalEl = document.getElementById('statTotalChests');
@@ -250,6 +298,8 @@
       if (previewEl) previewEl.textContent = Number(STATE.total).toLocaleString('en-US');
 
       if (inputBase) inputBase.value = (d.base && d.base > 0) ? d.base : '';
+      if (inputBaseHero) inputBaseHero.value = (d.base && d.base > 0) ? d.base : '';
+      if (heroBaseBadge) heroBaseBadge.textContent = (d.base && d.base > 0) ? 'Custom Offset' : 'Replay Count';
     }
 
     const lastEl = document.getElementById('statLastMatch');
@@ -309,8 +359,10 @@
           const det = document.getElementById('detectedFolderText');
           if (det) det.textContent = s.demosFolder;
         }
-        if (s.baseChestCount && inputBase) {
-          inputBase.value = s.baseChestCount;
+        if (s.baseChestCount) {
+          if (inputBase) inputBase.value = s.baseChestCount;
+          if (inputBaseHero) inputBaseHero.value = s.baseChestCount;
+          if (heroBaseBadge) heroBaseBadge.textContent = 'Custom Offset';
         }
       }
     } catch {}
@@ -319,5 +371,7 @@
   // --- Start Engines ---
   fetchSettingsOnce();
   pollLive();
+  checkYouTubeLiveMini();
   setInterval(pollLive, 1000);
+  setInterval(checkYouTubeLiveMini, 60000);
 })();

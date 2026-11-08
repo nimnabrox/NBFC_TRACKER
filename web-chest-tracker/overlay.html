@@ -103,11 +103,30 @@
     let lastTotal = null;
     let animTimeout = null;
 
+    // Restore last known total immediately on startup (never start at 0 if previously counted)
+    try {
+      const cached = localStorage.getItem('nb_last_overlay_total_' + room) || localStorage.getItem('nb_last_overlay_total');
+      if (cached && !isNaN(Number(cached)) && Number(cached) > 0) {
+        lastTotal = Number(cached);
+        el.textContent = lastTotal.toLocaleString('en-US');
+      }
+    } catch {}
+
     function updateTotal(val) {
       const num = Number(val);
       if (isNaN(num)) return;
+
+      // GUARD: When desktop app closes or disconnects, KEEP the latest amount before close! Never turn to 0!
+      if (num === 0 && lastTotal !== null && lastTotal > 0) {
+        return;
+      }
+
       if (num !== lastTotal) {
         lastTotal = num;
+        try {
+          localStorage.setItem('nb_last_overlay_total_' + room, String(num));
+          localStorage.setItem('nb_last_overlay_total', String(num));
+        } catch {}
         el.textContent = num.toLocaleString('en-US');
         el.style.transform = 'scale(1.10)';
         if (animTimeout) clearTimeout(animTimeout);

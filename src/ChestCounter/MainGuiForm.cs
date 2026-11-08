@@ -15,6 +15,15 @@ namespace ChestCounter;
 /// </summary>
 public class MainGuiForm : Form
 {
+    [DllImport("uxtheme.dll", EntryPoint = "#135", SetLastError = true)]
+    private static extern int SetPreferredAppMode(int preferredAppMode);
+
+    [DllImport("uxtheme.dll", EntryPoint = "#133", SetLastError = true)]
+    private static extern bool AllowDarkModeForWindow(IntPtr hWnd, bool allow);
+
+    [DllImport("uxtheme.dll", CharSet = CharSet.Auto)]
+    private static extern int SetWindowTheme(IntPtr hWnd, string textSubAppName, string? textSubIdList);
+
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 
@@ -24,12 +33,28 @@ public class MainGuiForm : Form
     private const int DWMWA_CAPTION_COLOR = 35;
     private const int DWMWA_TEXT_COLOR = 36;
 
+    public static void InitializeTheme()
+    {
+        try
+        {
+            if (OperatingSystem.IsWindows())
+            {
+                SetPreferredAppMode(2); // 2 = ForceDark
+            }
+        }
+        catch { }
+    }
+
     private static void ApplyDarkTitleBar(IntPtr hWnd)
     {
         try
         {
             if (OperatingSystem.IsWindows())
             {
+                try { SetPreferredAppMode(2); } catch { }
+                try { AllowDarkModeForWindow(hWnd, true); } catch { }
+                try { SetWindowTheme(hWnd, "DarkMode_Explorer", null); } catch { }
+
                 int darkMode = 1;
                 // Attribute 20 (Windows 10 2004+ and Windows 11)
                 if (DwmSetWindowAttribute(hWnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref darkMode, sizeof(int)) != 0)
@@ -96,7 +121,7 @@ public class MainGuiForm : Form
         Text = "NBFC TRACKER";
         Size = new Size(540, 720);
         MinimumSize = new Size(460, 560);
-        MaximumSize = new Size(700, 920);
+        MaximumSize = Size.Empty;
         StartPosition = FormStartPosition.CenterScreen;
         BackColor = Color.FromArgb(13, 15, 20);
 

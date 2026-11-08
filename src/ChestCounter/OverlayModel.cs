@@ -17,7 +17,7 @@ public static class OverlayModel
         var session = d.Matches.Where(ReportWriter.IsThisSession).ToList();
         var sessionTotal = session.Sum(m => m.ChestsOpened) + liveChests;
         var totalChests = d.Matches.Sum(m => m.ChestsOpened) + liveChests;
-        var total = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value + sessionTotal : totalChests;
+        var total = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value + liveChests : totalChests;
         var rows = new List<OverlayRow>();
 
         // Session: chests, then small grey "n parties · moy. x" (finished matches of this session).
