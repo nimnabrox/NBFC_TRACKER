@@ -5,7 +5,8 @@ const tag = 'v' + version, check = process.argv.includes('--check');
 const tagIndex = process.argv.indexOf('--tag');
 if (tagIndex >= 0 && process.argv[tagIndex + 1] !== tag) throw new Error(`Release tag must match VERSION (${tag})`);
 async function output(path, content) {
-  if (check) { if (await readFile(path, 'utf8') !== content) throw new Error(`Version out of sync: ${path}. Run npm run version:sync.`); }
+  // Git's Windows checkout may use CRLF; compare generated text independently of line endings.
+  if (check) { if ((await readFile(path, 'utf8')).replace(/\r\n/g, '\n') !== content.replace(/\r\n/g, '\n')) throw new Error(`Version out of sync: ${path}. Run npm run version:sync.`); }
   else await writeFile(path, content);
 }
 for (const path of ['package.json', 'package-lock.json']) {
