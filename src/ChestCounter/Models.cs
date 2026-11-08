@@ -110,6 +110,16 @@ public sealed class Config
 
     public int? GetBaseChestForProfile(string? profile)
     {
+        // One-time migration of legacy BaseChestCount strictly to nimnabro
+        if (BaseChestCount.HasValue && BaseChestCount.Value > 0)
+        {
+            if (!ProfileBaseChests.ContainsKey("nimnabro"))
+            {
+                ProfileBaseChests["nimnabro"] = BaseChestCount.Value;
+            }
+            BaseChestCount = null;
+        }
+
         if (!string.IsNullOrWhiteSpace(profile))
         {
             var p = profile.Trim();
@@ -118,19 +128,12 @@ public sealed class Config
                 return val;
             }
         }
-        // Legacy fallback: only if Profile is set and matches this profile
-        if (BaseChestCount.HasValue && BaseChestCount.Value > 0)
-        {
-            if (!string.IsNullOrWhiteSpace(profile) && (string.Equals(profile, Profile, StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(Profile)))
-            {
-                return BaseChestCount.Value;
-            }
-        }
         return null;
     }
 
     public void SetBaseChestForProfile(string? profile, int? count)
     {
+        BaseChestCount = null; // Always clear legacy single-value so it never bleeds across profiles
         var p = (!string.IsNullOrWhiteSpace(profile) ? profile : Profile)?.Trim();
         if (string.IsNullOrWhiteSpace(p)) return;
 
@@ -141,12 +144,6 @@ public sealed class Config
         else
         {
             ProfileBaseChests.Remove(p);
-        }
-
-        // Sync legacy BaseChestCount if it's the active profile
-        if (string.Equals(p, Profile, StringComparison.OrdinalIgnoreCase))
-        {
-            BaseChestCount = count;
         }
     }
 }
