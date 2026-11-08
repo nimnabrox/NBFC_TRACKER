@@ -47,6 +47,9 @@ jobs:
             - Clean OBS URLs, remembered overlay totals and verified GitHub downloads.
             - One stable overlay URL that follows saved settings, language and profile changes.
             - Frontend-only Cloudflare hosting; live updates stay on the same PC with no cloud API polling.
+            - Download homepage with setup instructions, source links and download-verification information.
+            - Saved app zoom from 50% to 150%, with a 100% reset.
+            - Ready-to-copy YouTube and X drafts and a 16:9 poster in the repository's advertisement folder.
             - Automated UI, version consistency, profile and download-integrity checks.
           generate_release_notes: true
           files: |
