@@ -14,7 +14,7 @@ public static class Profiles
     public static string Key(MatchRecord m) => !string.IsNullOrEmpty(m.EpicId) ? m.EpicId : m.PlayerName ?? "";
 
     public static List<Profile> List(TrackerData d) => d.Matches
-        .GroupBy(Key)
+        .GroupBy(Key, StringComparer.OrdinalIgnoreCase)
         .Select(g =>
         {
             var latest = g.OrderByDescending(When).First();
@@ -53,7 +53,9 @@ public static class Profiles
             Version = d.Version,
             AnalyzerVersion = d.AnalyzerVersion,
             CreatedUtc = d.CreatedUtc,
-            Matches = d.Matches.Where(m => Key(m) == current.Key).ToList(),
+            Matches = d.Matches.Where(m =>
+                string.Equals(Key(m), current.Key, StringComparison.OrdinalIgnoreCase) ||
+                (!string.IsNullOrEmpty(current.Name) && string.Equals(m.PlayerName, current.Name, StringComparison.OrdinalIgnoreCase))).ToList(),
             ProcessedFiles = d.ProcessedFiles,
         };
     }

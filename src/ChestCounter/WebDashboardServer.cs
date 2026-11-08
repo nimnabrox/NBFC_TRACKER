@@ -554,7 +554,7 @@ public static class WebDashboardServer
             // Format accounts list
             var profileItems = Profiles.List(_data).Select(p =>
             {
-                var isActive = (p.Key == _config.Profile || (!string.IsNullOrEmpty(_config.Profile) && p.Name.Equals(_config.Profile, StringComparison.OrdinalIgnoreCase)));
+                var isActive = (string.Equals(p.Key, _config.Profile, StringComparison.OrdinalIgnoreCase) || (!string.IsNullOrEmpty(_config.Profile) && p.Name.Equals(_config.Profile, StringComparison.OrdinalIgnoreCase)));
                 return $"{{\"key\":\"{EscapeJson(p.Key)}\",\"name\":\"{EscapeJson(p.Name)}\",\"matches\":{p.Matches},\"chests\":{p.Chests},\"active\":{(isActive ? "true" : "false")}}}";
             });
             var accountsJson = "[" + string.Join(",", profileItems) + "]";
@@ -570,7 +570,19 @@ public static class WebDashboardServer
 
     private static string GetLiveStatsJson()
     {
-        return GetCloudSyncPayload("nimnabro");
+        string curName = "nimnabro";
+        if (_config != null && _data != null)
+        {
+            lock (_data)
+            {
+                var cur = Profiles.Current(_data, _config);
+                if (cur != null && !string.IsNullOrWhiteSpace(cur.Name))
+                {
+                    curName = cur.Name;
+                }
+            }
+        }
+        return GetCloudSyncPayload(curName);
     }
 
     private static string GetMatchesJson()
@@ -579,10 +591,16 @@ public static class WebDashboardServer
         try
         {
             MatchRecord[] matchArray;
+            string curProfileName = "nimnabro";
             lock (_data)
             {
                 var view = Profiles.View(_data, _config);
                 matchArray = view.Matches.ToArray();
+                var cur = Profiles.Current(_data, _config);
+                if (cur != null && !string.IsNullOrWhiteSpace(cur.Name))
+                {
+                    curProfileName = cur.Name;
+                }
             }
             var items = matchArray.OrderByDescending(ReportWriter.When).Take(150).Select(m =>
             {
@@ -591,7 +609,7 @@ public static class WebDashboardServer
                 var pl = m.Playlist ?? "Battle Royale";
                 var place = m.Placement.HasValue ? m.Placement.Value.ToString() : "null";
                 var elim = m.Eliminations.HasValue ? m.Eliminations.Value.ToString() : "0";
-                var player = EscapeJson(m.PlayerName ?? "nimnabro");
+                var player = EscapeJson(!string.IsNullOrEmpty(m.PlayerName) ? m.PlayerName : curProfileName);
                 return $"{{\"fileName\":\"{EscapeJson(fn)}\",\"matchStart\":\"{start}\",\"durationSeconds\":{m.DurationSeconds},\"playlist\":\"{EscapeJson(pl)}\",\"placement\":{place},\"chestsOpened\":{m.ChestsOpened},\"eliminations\":{elim},\"playerName\":\"{player}\"}}";
             });
             return "[" + string.Join(",", items) + "]";

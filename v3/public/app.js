@@ -336,7 +336,19 @@ export async function switchAccount(name) {
     await fetch(`http://localhost:5088/api/set-profile?key=${encodeURIComponent(name)}`, { mode: 'cors' });
   } catch {}
 
-  // 2. Fetch updated matches for this profile
+  // 2. Immediately query daemon live stats for this profile
+  try {
+    const liveRes = await fetch(`http://localhost:5088/api/live`, { mode: 'cors' });
+    if (liveRes.ok) {
+      const d = await liveRes.json();
+      if (d) {
+        applyCompanionDaemonState(d);
+        return;
+      }
+    }
+  } catch {}
+
+  // 3. Fallback: fetch matches directly
   try {
     const res = await fetch(`http://localhost:5088/api/matches`, { mode: 'cors' });
     if (res.ok) {
@@ -387,40 +399,27 @@ function updateObsLinks() {
 // --- Main App Render ---
 function renderApp() {
   // 1. Group matches and compute accounts dynamically
-  const accountsMap = new Map();
-  for (const m of STATE.matches) {
-    const name = m.playerName || 'nimnabro';
-    const acc = accountsMap.get(name) || { name, matches: 0, chests: 0, lastPlayed: 0 };
-    acc.matches++;
-    acc.chests += (m.chestsOpened || 0);
-    const time = new Date(m.matchStart || 0).getTime();
-    if (time > acc.lastPlayed) acc.lastPlayed = time;
-    accountsMap.set(name, acc);
-  }
-
-  // Also include accounts from local daemon
+  let allAccounts = [];
   if (STATE.accounts && STATE.accounts.length > 0) {
-    for (const da of STATE.accounts) {
-      if (!accountsMap.has(da.name)) {
-        accountsMap.set(da.name, {
-          name: da.name,
-          matches: da.matches,
-          chests: da.chests,
-          lastPlayed: Date.now()
-        });
-      }
+    allAccounts = STATE.accounts;
+  } else {
+    const accountsMap = new Map();
+    for (const m of STATE.matches) {
+      const name = m.playerName || 'nimnabro';
+      const key = name.toLowerCase();
+      const acc = accountsMap.get(key) || { key: name, name, matches: 0, chests: 0, lastPlayed: 0 };
+      acc.matches++;
+      acc.chests += (m.chestsOpened || 0);
+      const time = new Date(m.matchStart || 0).getTime();
+      if (time > acc.lastPlayed) acc.lastPlayed = time;
+      accountsMap.set(key, acc);
     }
+    allAccounts = Array.from(accountsMap.values()).sort((a, b) => b.matches - a.matches);
   }
 
-  const allAccounts = Array.from(accountsMap.values()).sort((a, b) => b.matches - a.matches);
-
-  // Set default active account
-  if (allAccounts.length > 0) {
-    if (!STATE.activeAccount || !accountsMap.has(STATE.activeAccount)) {
-      STATE.activeAccount = allAccounts[0].name;
-    }
-  } else {
-    STATE.activeAccount = null;
+  // Set default active account if none selected
+  if (!STATE.activeAccount && allAccounts.length > 0) {
+    STATE.activeAccount = allAccounts[0].name || allAccounts[0].key;
   }
 
   // Filter matches for active account
@@ -433,12 +432,20 @@ function renderApp() {
   // Compute metrics
   const replayTotalChests = activeMatches.reduce((acc, m) => acc + (m.chestsOpened || 0), 0);
   const sessionMatches = activeMatches.filter(m => new Date(m.matchStart).getTime() >= STATE.sessionStart - 120000);
-  const sessionChests = sessionMatches.reduce((acc, m) => acc + (m.chestsOpened || 0), 0);
-  const displayedTotal = (STATE.baseChestCount && STATE.baseChestCount > 0)
-    ? STATE.baseChestCount + sessionChests
-    : (replayTotalChests > 0 ? replayTotalChests : (STATE.baseChestCount || 0));
+  const sessionChests = (STATE.isCompanionConnected && STATE.daemonSession !== undefined)
+    ? STATE.daemonSession
+    : sessionMatches.reduce((acc, m) => acc + (m.chestsOpened || 0), 0);
 
-  const lastMatch = activeMatches.length > 0 ? (activeMatches[0].chestsOpened || 0) : 0;
+  const displayedTotal = (STATE.isCompanionConnected && STATE.daemonTotal !== undefined)
+    ? STATE.daemonTotal
+    : ((STATE.baseChestCount && STATE.baseChestCount > 0)
+        ? STATE.baseChestCount + sessionChests
+        : (replayTotalChests > 0 ? replayTotalChests : (STATE.baseChestCount || 0)));
+
+  const lastMatch = (STATE.isCompanionConnected && STATE.daemonLastMatch !== undefined)
+    ? STATE.daemonLastMatch
+    : (activeMatches.length > 0 ? (activeMatches[0].chestsOpened || 0) : 0);
+
   const avgChests = activeMatches.length > 0 ? (replayTotalChests / activeMatches.length).toFixed(1) : '0.0';
   const victoryRoyales = activeMatches.filter(m => m.placement === 1).length;
 
@@ -510,19 +517,21 @@ function renderAccountSwitcher(accounts) {
 
   let html = '';
   for (const acc of accounts) {
-    const isActive = acc.name === STATE.activeAccount;
+    const isActive = (acc.name || '').toLowerCase() === (STATE.activeAccount || '').toLowerCase() ||
+                     (acc.key || '').toLowerCase() === (STATE.activeAccount || '').toLowerCase();
     const matchLabel = acc.matches === 1 ? '1 match' : `${acc.matches} matches`;
     const chestLabel = `${acc.chests.toLocaleString()} chests`;
+    const switchKey = acc.key || acc.name;
 
     html += `
-      <div class="account-pill ${isActive ? 'active' : ''}" onclick="window.app.switchAccount('${acc.name}')">
+      <div class="account-pill ${isActive ? 'active' : ''}" onclick="window.app.switchAccount('${switchKey}')">
         <div class="account-info">
           <div class="account-name" style="display:flex;align-items:center;gap:6px;">
             <svg class="svg-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
               <circle cx="12" cy="7" r="4"></circle>
             </svg>
-            <span>${acc.name}</span>
+            <span>${acc.name || acc.key}</span>
           </div>
           <div class="account-meta">${matchLabel} · ${chestLabel}</div>
         </div>
@@ -841,17 +850,20 @@ function applyCompanionDaemonState(d) {
     STATE.accounts = d.accounts;
   }
 
-  if (d.player && (!STATE.activeAccount || STATE.activeAccount === '—')) {
+  if (d.player) {
     STATE.activeAccount = d.player;
   }
 
-  if (d.total !== undefined && (!STATE.matches || STATE.matches.length === 0)) {
-    const totalEl = document.getElementById('statTotal');
-    if (totalEl) totalEl.textContent = Number(d.total).toLocaleString('en-US');
-    const lastEl = document.getElementById('statLastMatch');
-    if (lastEl) lastEl.textContent = Number(d.lastMatch || 0).toLocaleString('en-US');
-    const sessionEl = document.getElementById('statSession');
-    if (sessionEl) sessionEl.textContent = Number(d.session || 0).toLocaleString('en-US');
+  if (d.matches && Array.isArray(d.matches)) {
+    STATE.matches = d.matches;
+    STATE.hasLoadedLocalMatches = true;
+    saveLocalMatches();
+  }
+
+  if (d.total !== undefined) {
+    STATE.daemonTotal = d.total;
+    STATE.daemonLastMatch = d.lastMatch || 0;
+    STATE.daemonSession = d.session || 0;
   }
 
   renderApp();
@@ -861,7 +873,7 @@ function applyEdgeSyncState(d) {
   if (d.accounts && Array.isArray(d.accounts) && d.accounts.length > 0) {
     STATE.accounts = d.accounts;
   }
-  if (d.player && (!STATE.activeAccount || STATE.activeAccount === '—')) {
+  if (d.player) {
     STATE.activeAccount = d.player;
   }
   if (d.base && !STATE.baseChestCount) {
@@ -872,12 +884,9 @@ function applyEdgeSyncState(d) {
     saveLocalMatches();
   }
   if (d.total !== undefined) {
-    const totalEl = document.getElementById('statTotal');
-    if (totalEl) totalEl.textContent = Number(d.total).toLocaleString('en-US');
-    const lastEl = document.getElementById('statLastMatch');
-    if (lastEl) lastEl.textContent = Number(d.lastMatch || 0).toLocaleString('en-US');
-    const sessionEl = document.getElementById('statSession');
-    if (sessionEl) sessionEl.textContent = Number(d.session || 0).toLocaleString('en-US');
+    STATE.daemonTotal = d.total;
+    STATE.daemonLastMatch = d.lastMatch || 0;
+    STATE.daemonSession = d.session || 0;
   }
 
   const engineStatusText = document.getElementById('engineStatusText');
