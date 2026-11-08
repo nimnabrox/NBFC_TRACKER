@@ -3,10 +3,6 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#0d0f14">
-  <meta name="color-scheme" content="dark">
-  <meta name="msapplication-navbutton-color" content="#0d0f14">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>NBFC TRACKER</title>
   <link rel="icon" type="image/png" href="assets/chest_fnv1.png">
   <link rel="shortcut icon" type="image/png" href="assets/chest_fnv1.png">
@@ -490,25 +486,45 @@
         </div>
 
         <!-- Nimna Bro Official YouTube Channel & Stream -->
-        <div class="mini-card" style="padding:14px;background:linear-gradient(180deg, #181b22 0%, #11141b 100%);border:1px solid rgba(255, 0, 0, 0.25);">
+        <div class="mini-card" style="padding:14px;background:linear-gradient(180deg, #181b22 0%, #11141b 100%);border:1px solid rgba(245, 166, 35, 0.25);">
+          <!-- Channel Header -->
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <img src="https://yt3.googleusercontent.com/Hpgfbtw9JC7Z6OXKQ4YHDLwZCEos6Gw7ewfTIYM1ZWkq6605Xw31yQuuPp8DbrD_TO00H_ZKDsw=s200-c-k-c0x00ffffff-no-rj" alt="Nimna Bro" style="width:28px;height:28px;border-radius:50%;border:1px solid #ff0000;object-fit:cover;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <img src="assets/nimnabrologo.png" onerror="this.onerror=null;this.src='assets/chest_fnv1.png'" alt="Nimna Bro" style="width:34px;height:34px;border-radius:50%;border:2px solid #f5a623;object-fit:cover;box-shadow:0 0 10px rgba(245,166,35,0.3);">
               <div>
                 <div style="font-size:13px;font-weight:900;color:#fff;">Nimna Bro</div>
-                <div style="font-size:10px;color:#8c93a4;font-weight:700;">@nimna_bro_</div>
+                <div style="font-size:10px;color:#f5a623;font-weight:700;">@nimna_bro_</div>
               </div>
             </div>
-            <div id="ytLiveBadgeMini" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;padding:3px 8px;border-radius:12px;background:rgba(255,0,0,0.12);color:#ff4d4d;border:1px solid rgba(255,0,0,0.3);">
-              <span style="width:6px;height:6px;border-radius:50%;background:#ff0000;box-shadow:0 0 6px #ff0000;"></span>
-              <span>YOUTUBE LIVE</span>
+            <div id="ytLiveBadgeMini" style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;padding:3px 10px;border-radius:12px;background:rgba(255,255,255,0.06);color:#a0aec0;border:1px solid rgba(255,255,255,0.12);">
+              <span id="ytLiveDotMini" style="width:6px;height:6px;border-radius:50%;background:#8c93a4;"></span>
+              <span id="ytLiveTextMini">YOUTUBE STREAM</span>
             </div>
           </div>
 
-          <div style="font-size:11px;color:#8c93a4;line-height:1.4;margin-bottom:10px;">
-            Watch daily Fortnite live streams, chest routes &amp; giveaways! Support-A-Creator: <strong style="color:#f5a623;">NIMNABRO</strong>
+          <!-- Video / Live Stream Thumbnail Preview -->
+          <a id="ytThumbLinkMini" href="https://www.youtube.com/@nimna_bro_/live" target="_blank" style="display:block;position:relative;width:100%;height:130px;border-radius:8px;overflow:hidden;margin-bottom:10px;border:1px solid rgba(255,255,255,0.1);background:#0a0c10;text-decoration:none;">
+            <img id="ytThumbImgMini" src="https://i.ytimg.com/vi/WNAE8-0VOLE/hqdefault.jpg" onerror="this.onerror=null;this.src='assets/nimnabrologo.png'" alt="Stream Thumbnail" style="width:100%;height:100%;object-fit:cover;">
+            <div style="position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 60%);display:flex;align-items:flex-end;padding:8px 10px;">
+              <div id="ytVideoTitleMini" style="font-size:11px;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Fortnite Live Stream &amp; Highlights</div>
+            </div>
+            <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:36px;height:36px;background:rgba(204,0,0,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(255,0,0,0.5);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="#fff"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>
+            </div>
+          </a>
+
+          <!-- Prominent Fortnite Item Shop Creator Code Card -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:rgba(245,166,35,0.1);border:1px solid rgba(245,166,35,0.35);border-radius:8px;margin-bottom:10px;">
+            <div>
+              <div style="font-size:9px;font-weight:800;color:#8c93a4;text-transform:uppercase;letter-spacing:0.5px;">Support In Fortnite Item Shop</div>
+              <div style="font-size:13px;font-weight:900;color:#f5a623;letter-spacing:0.8px;">USE CODE: NIMNABRO</div>
+            </div>
+            <button type="button" id="btnCopyCodeMini" class="btn-secondary" style="padding:5px 12px;font-size:11px;font-weight:800;border-radius:6px;width:auto;cursor:pointer;border-color:rgba(245,166,35,0.4);color:#f5a623;">
+              <span id="btnCopyCodeMiniText">Copy Code</span>
+            </button>
           </div>
 
+          <!-- Action Buttons -->
           <div style="display:flex;gap:6px;">
             <a href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" class="btn-gold" style="background:#cc0000;border-color:#ff1a1a;color:#fff;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;flex:1;padding:8px 12px;font-size:11px;font-weight:800;border-radius:6px;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">

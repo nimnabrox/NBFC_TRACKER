@@ -1136,6 +1136,69 @@ export async function applyUpdate() {
   }
 }
 
+export function copyCreatorCode() {
+  const code = 'NIMNABRO';
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(code).catch(() => {});
+  }
+  const textEl = document.getElementById('creatorCodePillText');
+  if (textEl) {
+    const orig = textEl.textContent;
+    textEl.textContent = 'Copied!';
+    setTimeout(() => { textEl.textContent = orig; }, 1800);
+  }
+  const sideEl = document.getElementById('creatorCodeSidebarText');
+  if (sideEl) {
+    const orig = sideEl.textContent;
+    sideEl.textContent = 'Copied! 💛';
+    setTimeout(() => { sideEl.textContent = orig; }, 1800);
+  }
+}
+
+export async function checkYouTubeLiveStatus() {
+  const badge = document.getElementById('ytLiveStatusBadge');
+  if (!badge) return;
+  try {
+    const res = await fetch('http://localhost:5088/api/youtube-live', { signal: AbortSignal.timeout(1500) });
+    if (res.ok) {
+      const d = await res.json();
+      const dot = document.getElementById('ytLiveDot');
+      const text = document.getElementById('ytLiveStatusText');
+      if (d && d.isLive) {
+        if (dot) {
+          dot.style.background = '#ff0000';
+          dot.style.boxShadow = '0 0 10px #ff0000';
+          dot.style.animation = 'pulse 1s infinite';
+        }
+        if (text) text.textContent = '🔴 LIVE NOW';
+        badge.style.background = 'rgba(255,0,0,0.2)';
+        badge.style.borderColor = '#ff0000';
+        badge.style.color = '#ff4d4d';
+        if (d.title) {
+          const tEl = document.getElementById('ytVideoTitle');
+          if (tEl) tEl.textContent = '🔴 ' + d.title;
+        }
+        if (d.videoId) {
+          const iframe = document.getElementById('ytLiveIframe');
+          if (iframe && !iframe.src.includes(d.videoId)) {
+            iframe.src = `https://www.youtube-nocookie.com/embed/${d.videoId}?autoplay=0`;
+          }
+        }
+      } else {
+        if (dot) {
+          dot.style.background = '#8c93a4';
+          dot.style.boxShadow = 'none';
+          dot.style.animation = 'none';
+        }
+        if (text) text.textContent = 'YOUTUBE STREAM';
+        badge.style.background = 'rgba(255,255,255,0.06)';
+        badge.style.borderColor = 'rgba(255,255,255,0.12)';
+        badge.style.color = '#a0aec0';
+      }
+    }
+  } catch {}
+}
+
 // --- Setup Global Window API & Startup ---
 window.app = {
   connectFolder,
@@ -1156,7 +1219,9 @@ window.app = {
   nextMatchPage,
   switchWebTab,
   checkForUpdates,
-  applyUpdate
+  applyUpdate,
+  copyCreatorCode,
+  checkYouTubeLiveStatus
 };
 
 function setupBaseInputListeners() {
@@ -1192,6 +1257,10 @@ document.addEventListener('DOMContentLoaded', () => {
   pollExternalSync();
   fetchSettings();
   setInterval(pollExternalSync, 2000);
+
+  // Check YouTube live stream status & poll every 60s
+  checkYouTubeLiveStatus();
+  setInterval(checkYouTubeLiveStatus, 60000);
 
   // Setup drag & drop handlers
   window.addEventListener('dragover', (e) => e.preventDefault());

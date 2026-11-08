@@ -105,7 +105,7 @@
 
     // Restore last known total immediately on startup (never start at 0 if previously counted)
     try {
-      const cached = localStorage.getItem('nb_last_overlay_total_' + room) || localStorage.getItem('nb_last_overlay_total');
+      const cached = localStorage.getItem('nb_last_overlay_total_' + room);
       if (cached && !isNaN(Number(cached)) && Number(cached) > 0) {
         lastTotal = Number(cached);
         el.textContent = lastTotal.toLocaleString('en-US');
@@ -123,10 +123,7 @@
 
       if (num !== lastTotal) {
         lastTotal = num;
-        try {
-          localStorage.setItem('nb_last_overlay_total_' + room, String(num));
-          localStorage.setItem('nb_last_overlay_total', String(num));
-        } catch {}
+        try { localStorage.setItem('nb_last_overlay_total_' + room, String(num)); } catch {}
         el.textContent = num.toLocaleString('en-US');
         el.style.transform = 'scale(1.10)';
         if (animTimeout) clearTimeout(animTimeout);

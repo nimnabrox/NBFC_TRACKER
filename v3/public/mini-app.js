@@ -235,6 +235,26 @@
   if (btnSaveBase) btnSaveBase.addEventListener('click', saveBaseCount);
   if (btnResetBase) btnResetBase.addEventListener('click', resetBaseCount);
 
+  // --- Item Shop Creator Code Copy ---
+  const btnCopyCodeMini = document.getElementById('btnCopyCodeMini');
+  if (btnCopyCodeMini) {
+    btnCopyCodeMini.addEventListener('click', () => {
+      const code = 'NIMNABRO';
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(code).catch(() => fallbackCopy(code));
+      } else {
+        fallbackCopy(code);
+      }
+      showToast("Creator Code NIMNABRO Copied! 💛");
+      const textEl = document.getElementById('btnCopyCodeMiniText');
+      if (textEl) {
+        const orig = textEl.textContent;
+        textEl.textContent = 'Copied!';
+        setTimeout(() => { textEl.textContent = orig; }, 1800);
+      }
+    });
+  }
+
   // --- YouTube Live Status Check ---
   async function checkYouTubeLiveMini() {
     const badge = document.getElementById('ytLiveBadgeMini');
@@ -247,10 +267,25 @@
           badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#ff0000;box-shadow:0 0 8px #ff0000;animation:pulse 1s infinite;"></span><span>🔴 LIVE NOW</span>';
           badge.style.background = 'rgba(255, 0, 0, 0.2)';
           badge.style.borderColor = '#ff0000';
+          badge.style.color = '#ff4d4d';
         } else {
-          badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#ff0000;box-shadow:0 0 6px #ff0000;"></span><span>YOUTUBE LIVE</span>';
-          badge.style.background = 'rgba(255, 0, 0, 0.12)';
-          badge.style.borderColor = 'rgba(255, 0, 0, 0.3)';
+          badge.innerHTML = '<span style="width:6px;height:6px;border-radius:50%;background:#8c93a4;"></span><span>YOUTUBE STREAM</span>';
+          badge.style.background = 'rgba(255, 255, 255, 0.06)';
+          badge.style.borderColor = 'rgba(255, 255, 255, 0.12)';
+          badge.style.color = '#a0aec0';
+        }
+
+        if (d.thumbnail) {
+          const img = document.getElementById('ytThumbImgMini');
+          if (img && img.src !== d.thumbnail) img.src = d.thumbnail;
+        }
+        if (d.title) {
+          const titleEl = document.getElementById('ytVideoTitleMini');
+          if (titleEl) titleEl.textContent = (d.isLive ? '🔴 ' : '') + d.title;
+        }
+        if (d.liveUrl) {
+          const link = document.getElementById('ytThumbLinkMini');
+          if (link) link.href = d.liveUrl;
         }
       }
     } catch {}

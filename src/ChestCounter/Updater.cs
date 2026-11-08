@@ -133,17 +133,26 @@ public static class Updater
     public static void CleanupOld()
     {
         var exe = AppInfo.ExePath;
-        var dir = exe != null ? Path.GetDirectoryName(exe) : null;
-        if (dir == null)
+        var dir = exe != null ? Path.GetDirectoryName(exe) : AppDomain.CurrentDomain.BaseDirectory;
+        if (dir == null || !Directory.Exists(dir))
         {
             return;
         }
-        foreach (var f in Directory.EnumerateFiles(dir, "ChestCounter.exe.*"))
+
+        var patterns = new[] { "NBFC TRACKER.exe.*", "NBFC TRACKER*.old", "ChestCounter.exe.*", "ChestCounter*.old", "*.download" };
+        foreach (var pattern in patterns)
         {
-            if (f.EndsWith(".old", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".download", StringComparison.OrdinalIgnoreCase))
+            try
             {
-                try { File.Delete(f); } catch { /* still in use: next time */ }
+                foreach (var f in Directory.EnumerateFiles(dir, pattern))
+                {
+                    if (f.EndsWith(".old", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".download", StringComparison.OrdinalIgnoreCase))
+                    {
+                        try { File.Delete(f); } catch { /* still in use: next time */ }
+                    }
+                }
             }
+            catch { }
         }
     }
 }

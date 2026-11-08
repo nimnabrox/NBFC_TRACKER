@@ -1147,6 +1147,12 @@ export function copyCreatorCode() {
     textEl.textContent = 'Copied!';
     setTimeout(() => { textEl.textContent = orig; }, 1800);
   }
+  const sideEl = document.getElementById('creatorCodeSidebarText');
+  if (sideEl) {
+    const orig = sideEl.textContent;
+    sideEl.textContent = 'Copied! 💛';
+    setTimeout(() => { sideEl.textContent = orig; }, 1800);
+  }
 }
 
 export async function checkYouTubeLiveStatus() {
@@ -1156,10 +1162,18 @@ export async function checkYouTubeLiveStatus() {
     const res = await fetch('http://localhost:5088/api/youtube-live', { signal: AbortSignal.timeout(1500) });
     if (res.ok) {
       const d = await res.json();
+      const dot = document.getElementById('ytLiveDot');
+      const text = document.getElementById('ytLiveStatusText');
       if (d && d.isLive) {
-        badge.innerHTML = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#ff0000;box-shadow:0 0 10px #ff0000;animation:pulse 1s infinite;"></span><span>🔴 LIVE NOW</span>';
+        if (dot) {
+          dot.style.background = '#ff0000';
+          dot.style.boxShadow = '0 0 10px #ff0000';
+          dot.style.animation = 'pulse 1s infinite';
+        }
+        if (text) text.textContent = '🔴 LIVE NOW';
         badge.style.background = 'rgba(255,0,0,0.2)';
         badge.style.borderColor = '#ff0000';
+        badge.style.color = '#ff4d4d';
         if (d.title) {
           const tEl = document.getElementById('ytVideoTitle');
           if (tEl) tEl.textContent = '🔴 ' + d.title;
@@ -1171,9 +1185,15 @@ export async function checkYouTubeLiveStatus() {
           }
         }
       } else {
-        badge.innerHTML = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#8c93a4;"></span><span>OFFLINE · PAST STREAMS</span>';
+        if (dot) {
+          dot.style.background = '#8c93a4';
+          dot.style.boxShadow = 'none';
+          dot.style.animation = 'none';
+        }
+        if (text) text.textContent = 'YOUTUBE STREAM';
         badge.style.background = 'rgba(255,255,255,0.06)';
         badge.style.borderColor = 'rgba(255,255,255,0.12)';
+        badge.style.color = '#a0aec0';
       }
     }
   } catch {}
@@ -1214,22 +1234,12 @@ function setupBaseInputListeners() {
       if (!isNaN(num) && num >= 0) {
         const totalEl = document.getElementById('statTotal');
         if (totalEl) totalEl.textContent = num.toLocaleString('en-US');
-        const totalSub = document.getElementById('statTotalSub');
-        if (totalSub) totalSub.textContent = `custom starting offset: ${num.toLocaleString('en-US')} chests`;
         const obsEl = document.getElementById('obsPreviewVal');
         if (obsEl) obsEl.textContent = num.toLocaleString('en-US');
         const obsTab = document.getElementById('obsPreviewValTab');
         if (obsTab) obsTab.textContent = num.toLocaleString('en-US');
       } else if (!val) {
         renderApp();
-      }
-    });
-
-    source.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        if (source.id === 'baseInputTab') saveBaseCountFromTab();
-        else saveBaseCount();
       }
     });
   };

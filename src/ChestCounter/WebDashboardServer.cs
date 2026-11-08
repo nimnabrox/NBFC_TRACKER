@@ -422,6 +422,32 @@ public static class WebDashboardServer
                 }
             }
 
+            // 3b. Serve Nimna Bro Channel Logo
+            if (path.Equals("/assets/nimnabrologo.png", StringComparison.OrdinalIgnoreCase) ||
+                path.Equals("/nimnabrologo.png", StringComparison.OrdinalIgnoreCase))
+            {
+                var candidatePaths = new[]
+                {
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "public", "assets", "nimnabrologo.png"),
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "nimnabrologo.png"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "public", "assets", "nimnabrologo.png"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "nimnabrologo.png"),
+                    @"D:\Projects_Codes\Projects_Codes\NB FORTNITE CHEST TRACKER v2\nimnabrologo.png",
+                    @"D:\Projects_Codes\Projects_Codes\NB FORTNITE CHEST TRACKER v2\public\assets\nimnabrologo.png"
+                };
+
+                var assetPath = candidatePaths.FirstOrDefault(File.Exists);
+                if (assetPath != null)
+                {
+                    res.ContentType = "image/png";
+                    var bytes = File.ReadAllBytes(assetPath);
+                    res.ContentLength64 = bytes.Length;
+                    res.OutputStream.Write(bytes, 0, bytes.Length);
+                    res.Close();
+                    return;
+                }
+            }
+
             // 4. OBS Studio Overlay (transparent, ultra-lightweight, zero-flicker)
             if (path.Equals("/overlay", StringComparison.OrdinalIgnoreCase) || path.Equals("/obs", StringComparison.OrdinalIgnoreCase))
             {
@@ -904,12 +930,17 @@ public static class WebDashboardServer
             using var reader = new StreamReader(resMsg.Content.ReadAsStream());
             var html = reader.ReadToEnd();
 
-            bool isLive = html.Contains("\"videoType\":\"VIEW_COUNT_VIDEO_TYPE_LIVE\"") ||
-                          html.Contains("\"isLive\":true") ||
-                          html.Contains("\"isLiveNow\":true") ||
-                          html.Contains("watching now");
+            bool isOffline = html.Contains("LIVE_STREAM_OFFLINE") ||
+                             html.Contains("LOGIN_REQUIRED") ||
+                             html.Contains("This live stream is not available") ||
+                             html.Contains("\"status\":\"UPCOMING\"");
 
-            string videoId = "o5pBvr1jqm0";
+            bool isLive = !isOffline && (
+                html.Contains("\"isLiveBroadcast\":true") ||
+                (html.Contains("watching now") && html.Contains("\"videoType\":\"VIEW_COUNT_VIDEO_TYPE_LIVE\""))
+            );
+
+            string videoId = "WNAE8-0VOLE";
             var vIdx = html.IndexOf("\"videoId\":\"", StringComparison.Ordinal);
             if (vIdx >= 0)
             {
