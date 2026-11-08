@@ -74,8 +74,8 @@ GitHub Actions can deploy on changes to `main` after repository secrets `CLOUDFL
 Tag a verified commit as `vX.Y.Z` and push the tag. The release workflow runs web checks, desktop smoke checks and a self-contained Windows publish. It uploads `NBFC.TRACKER.exe`, a web ZIP and SHA-256 checksums. The tag sets the executable version. The in-app updater selects the named tracker executable, validates its size and GitHub SHA-256 digest when supplied, and restarts after the previous instance exits. Unauthenticated update checks require a public repository; private releases require access through your signed-in GitHub browser.
 
 ~~~powershell
-git tag v0.2.0
-git push origin main v0.2.0
+git tag v0.2.1
+git push origin main v0.2.1
 ~~~
 
 ## Data and project notes

@@ -1,6 +1,6 @@
 # NBFC TRACKER v3 package
 
-This is the maintained desktop and web package. The application release version is currently **0.2.0**; `v3` is the package directory name.
+This is the maintained desktop and web package. The application release version is currently **0.2.1**; `v3` is the package directory name.
 
 - `public/`: authoritative shared desktop/web UI and 18 language files.
 - `web-cloud/_worker.js`: persistent room sync using Cloudflare Durable Objects.
