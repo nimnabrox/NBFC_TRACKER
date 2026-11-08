@@ -4,7 +4,7 @@
 
 你的對戰、你的目標、你的下一份寶藏。盡在一處。
 
-[儀表板](https://nbfct.nimnabro.com)  /  [下載 Windows 版](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[儀表板](https://nbfct.nimnabro.com/dashboard)  /  [下載 Windows 版](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## 準備發現更多了嗎？
 
@@ -16,15 +16,17 @@
 
 - **寶箱起始數量:** 設定此檔案的目前累計數量。新寶箱會自動累加。清空後使用重播總數。
 - **重播資料夾:** 需要 Windows 搭配應用程式。除非重播儲存在其他位置，否則請保留預設資料夾。
-- **雲端房間:** 輸入搭配應用程式圖層連結中的房間名稱，即可在其他裝置查看。房間連結是公開的。
+- **應用程式縮放:** 50%–150%.
 - **語言:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## 直播覆蓋圖層
 
 將計數器新增為 OBS 瀏覽器來源。尺寸：420 × 120。
 
+在此儲存設定，OBS 會透過同一連結自動更新。請在同一台電腦上執行配套應用程式和 OBS。
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=zh-Hant
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 讀取本機重播檔案。不存取遊戲記憶體。與 Epic Games 無關聯。

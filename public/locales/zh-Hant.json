@@ -104,5 +104,20 @@
   "overlayLabelText": "標籤文字",
   "overlayShowLast": "顯示 + 上一場",
   "overlayDefaultLabel": "已開啟寶箱",
-  "overlayEditHint": "修改會更新預覽及複製的連結。預設僅顯示總數。"
+  "overlayEditHint": "在此儲存設定，OBS 會透過同一連結自動更新。請在同一台電腦上執行配套應用程式和 OBS。",
+  "homeTitle": "每個寶箱，都有紀錄。",
+  "homeIntro": "從重播自動統計 Fortnite 寶箱。目標、比賽紀錄和 OBS 圖層，一應俱全。",
+  "freeOpen": "免費開源",
+  "viewSource": "查看原始碼",
+  "howWorks": "使用方式",
+  "localTitle": "你的重播。你的電腦。",
+  "localBody": "讀取已儲存的重播檔案，不存取遊戲記憶體，也不要求登入 Epic。資料保存在本機。",
+  "verifyTitle": "安裝前先檢查",
+  "verifyBody": "原始碼和 SHA-256 校驗值公開可查。此 Windows 應用程式未簽署：執行前請閱讀安全警告並驗證下載檔案。",
+  "requirements": "Windows 10/11 · 64 位元 · WebView2 Runtime",
+  "autoTitle": "一次設定，自動更新。",
+  "autoBody": "新開啟的寶箱自動計數，圖層設定透過同一連結同步到 OBS。請在同一台電腦上執行應用程式和 OBS。",
+  "appZoom": "應用程式縮放",
+  "zoomIn": "放大",
+  "zoomOut": "縮小"
 }

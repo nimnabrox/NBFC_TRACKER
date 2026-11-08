@@ -104,5 +104,20 @@
   "overlayLabelText": "Texto de la etiqueta",
   "overlayShowLast": "Mostrar + última partida",
   "overlayDefaultLabel": "Cofres abiertos",
-  "overlayEditHint": "Los cambios actualizan la vista previa y la URL copiada. Por defecto solo se muestra el total."
+  "overlayEditHint": "Guarda los ajustes aquí. OBS se actualiza automáticamente con la misma URL. Ejecuta la aplicación y OBS en el mismo PC.",
+  "homeTitle": "Cada cofre. Lleva la cuenta.",
+  "homeIntro": "Cuenta automáticamente cofres de Fortnite desde tus repeticiones. Tus objetivos, historial y overlay de OBS, juntos.",
+  "freeOpen": "Gratis y de código abierto",
+  "viewSource": "Ver código fuente",
+  "howWorks": "Cómo funciona",
+  "localTitle": "Tus repeticiones. Tu PC.",
+  "localBody": "Lee archivos de repetición guardados. Sin acceder a la memoria del juego ni iniciar sesión en Epic. Los datos permanecen en este PC.",
+  "verifyTitle": "Revisa antes de instalar",
+  "verifyBody": "Código público y sumas SHA-256. Esta aplicación de Windows no está firmada: revisa las alertas de seguridad y verifica la descarga antes de ejecutarla.",
+  "requirements": "Windows 10/11 · 64 bits · WebView2 Runtime",
+  "autoTitle": "Configura una vez. Se actualiza solo.",
+  "autoBody": "Los cofres nuevos se cuentan automáticamente. Los ajustes del overlay llegan a OBS con la misma URL. Ejecuta OBS y la aplicación en el mismo PC.",
+  "appZoom": "Zoom de la aplicación",
+  "zoomIn": "Acercar",
+  "zoomOut": "Alejar"
 }

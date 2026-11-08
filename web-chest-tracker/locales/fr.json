@@ -104,5 +104,20 @@
   "overlayLabelText": "Texte du libellé",
   "overlayShowLast": "Afficher + dernière partie",
   "overlayDefaultLabel": "Coffres ouverts",
-  "overlayEditHint": "Les modifications actualisent l’aperçu et l’URL copiée. Par défaut, seul le total est affiché."
+  "overlayEditHint": "Enregistrez les réglages ici. OBS se met à jour automatiquement avec la même URL. Lancez l’application et OBS sur le même PC.",
+  "homeTitle": "Chaque coffre. Gardez le compte.",
+  "homeIntro": "Comptez automatiquement les coffres Fortnite depuis vos replays. Objectifs, historique et overlay OBS réunis.",
+  "freeOpen": "Gratuit et open source",
+  "viewSource": "Voir le code",
+  "howWorks": "Comment ça marche",
+  "localTitle": "Vos replays. Votre PC.",
+  "localBody": "Lit les fichiers de replay enregistrés. Aucun accès à la mémoire du jeu ni connexion Epic. Les données restent sur ce PC.",
+  "verifyTitle": "Vérifiez avant d’installer",
+  "verifyBody": "Code public et sommes SHA-256. Cette application Windows n’est pas signée : examinez les alertes de sécurité et vérifiez le téléchargement avant de l’exécuter.",
+  "requirements": "Windows 10/11 · 64 bits · WebView2 Runtime",
+  "autoTitle": "Configurez une fois. Mise à jour automatique.",
+  "autoBody": "Les nouveaux coffres sont comptés automatiquement. Les réglages de l’overlay arrivent dans OBS avec la même URL. Lancez OBS et l’application sur le même PC.",
+  "appZoom": "Zoom de l’application",
+  "zoomIn": "Agrandir",
+  "zoomOut": "Réduire"
 }

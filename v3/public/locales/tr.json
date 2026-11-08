@@ -104,5 +104,20 @@
   "overlayLabelText": "Etiket metni",
   "overlayShowLast": "+ son maçı göster",
   "overlayDefaultLabel": "Açılan sandıklar",
-  "overlayEditHint": "Değişiklikler önizlemeyi ve kopyalanan URL’yi günceller. Varsayılan görünüm yalnızca toplamı gösterir."
+  "overlayEditHint": "Ayarları burada kaydedin. OBS aynı URL üzerinden otomatik güncellenir. Uygulamayı ve OBS’yi aynı bilgisayarda çalıştırın.",
+  "homeTitle": "Her sandık. Saymaya devam.",
+  "homeIntro": "Tekrar dosyalarından otomatik Fortnite sandık sayımı. Hedeflerin, maç geçmişin ve OBS katmanın bir arada.",
+  "freeOpen": "Ücretsiz ve açık kaynak",
+  "viewSource": "Kaynak kodunu gör",
+  "howWorks": "Nasıl çalışır",
+  "localTitle": "Tekrarların. Bilgisayarın.",
+  "localBody": "Kayıtlı tekrar dosyalarını okur. Oyun belleğine erişmez, Epic girişi istemez. Veriler bu bilgisayarda kalır.",
+  "verifyTitle": "Yüklemeden önce incele",
+  "verifyBody": "Açık kaynak kodu ve SHA-256 sağlama toplamları. Bu Windows uygulaması imzasızdır: çalıştırmadan önce güvenlik uyarılarını ve indirmeyi doğrula.",
+  "requirements": "Windows 10/11 · 64 bit · WebView2 Runtime",
+  "autoTitle": "Bir kez ayarla. Otomatik güncellensin.",
+  "autoBody": "Yeni sandıklar otomatik sayılır. Kaydedilen katman ayarları aynı URL ile OBS’ye ulaşır. OBS ve uygulamayı aynı bilgisayarda çalıştır.",
+  "appZoom": "Uygulama yakınlaştırması",
+  "zoomIn": "Yakınlaştır",
+  "zoomOut": "Uzaklaştır"
 }

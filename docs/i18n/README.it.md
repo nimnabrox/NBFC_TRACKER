@@ -4,7 +4,7 @@
 
 Le tue partite, i tuoi traguardi, il tuo prossimo tesoro. Tutto in un unico posto.
 
-[Pannello](https://nbfct.nimnabro.com)  /  [Scarica per Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Pannello](https://nbfct.nimnabro.com/dashboard)  /  [Scarica per Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Pronto a scoprire altro?
 
@@ -16,15 +16,17 @@ Le tue partite, i tuoi traguardi, il tuo prossimo tesoro. Tutto in un unico post
 
 - **Conteggio iniziale dei forzieri:** Imposta il traguardo attuale per questo profilo. I nuovi forzieri si aggiungono automaticamente. Svuota per usare i totali dei replay.
 - **Cartella replay:** Richiede l’app Windows. Mantieni la cartella predefinita se i replay non sono altrove.
-- **Stanza cloud:** Inserisci la stanza dall’URL dell’overlay dell’app per visualizzarla su un altro dispositivo. I link sono pubblici.
+- **Zoom dell’app:** 50%–150%.
 - **Lingua:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Overlay streaming
 
 Aggiungi il contatore come sorgente browser di OBS. Dimensioni: 420 × 120.
 
+Salva qui le impostazioni. OBS si aggiorna automaticamente con lo stesso URL. Esegui l’app e OBS sullo stesso PC.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=it
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Legge replay locali. Nessun accesso alla memoria del gioco. Non affiliato a Epic Games.

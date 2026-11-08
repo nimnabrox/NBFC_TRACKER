@@ -192,7 +192,7 @@ public class MainGuiForm : Form
         {
             try
             {
-                Process.Start(new ProcessStartInfo("https://nbfct.nimnabro.com/?room=" + Uri.EscapeDataString(WebDashboardServer.CurrentCloudRoom)) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo("https://nbfct.nimnabro.com/dashboard") { UseShellExecute = true });
             }
             catch { }
         });
@@ -272,6 +272,8 @@ public class MainGuiForm : Form
             _webView.CoreWebView2.Settings.IsStatusBarEnabled = false;
             _webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
             _webView.CoreWebView2.Settings.AreDevToolsEnabled = false;
+            _webView.CoreWebView2.Settings.IsZoomControlEnabled = false;
+            SetZoomPercent(WebDashboardServer.UiZoomPercent);
             _webView.CoreWebView2.NewWindowRequested += (_, e) =>
             {
                 e.Handled = true;
@@ -315,6 +317,13 @@ public class MainGuiForm : Form
             pnl.Controls.Add(lbl);
             Controls.Add(pnl);
         }
+    }
+
+    public void SetZoomPercent(int percent)
+    {
+        if (IsDisposed) return;
+        if (InvokeRequired) { BeginInvoke(new Action(() => SetZoomPercent(percent))); return; }
+        _webView.ZoomFactor = Math.Clamp(percent, 50, 150) / 100.0;
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)

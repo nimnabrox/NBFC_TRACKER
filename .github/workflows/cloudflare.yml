@@ -2,7 +2,7 @@ name: Deploy v3 to Cloudflare
 on:
   push:
     branches: [main]
-    paths: ['VERSION', 'v3/public/**', 'v3/web-cloud/_worker.js', 'v3/web-cloud/wrangler.toml', 'package*.json']
+    paths: ['VERSION', 'v3/public/**', 'v3/web-cloud/wrangler.toml', 'package*.json']
   workflow_dispatch:
 permissions:
   contents: read

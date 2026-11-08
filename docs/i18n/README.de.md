@@ -4,7 +4,7 @@
 
 Deine Spiele, deine Meilensteine, dein nächster Schatz. Alles an einem Ort.
 
-[Übersicht](https://nbfct.nimnabro.com)  /  [Für Windows herunterladen](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Übersicht](https://nbfct.nimnabro.com/dashboard)  /  [Für Windows herunterladen](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Bereit für mehr Funde?
 
@@ -16,15 +16,17 @@ Deine Spiele, deine Meilensteine, dein nächster Schatz. Alles an einem Ort.
 
 - **Startwert für Truhen:** Lege deinen aktuellen Meilenstein für dieses Profil fest. Neue Truhen werden automatisch addiert. Leeren nutzt Replay-Summen.
 - **Replay-Ordner:** Windows-Begleit-App erforderlich. Behalte den Standardordner bei, sofern deine Replays nicht woanders liegen.
-- **Cloud-Raum:** Gib den Raum aus der Overlay-URL deiner Begleit-App ein, um ihn auf einem anderen Gerät zu sehen. Raumlinks sind öffentlich.
+- **App-Zoom:** 50%–150%.
 - **Sprache:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Stream-Overlay
 
 Füge den Zähler als OBS-Browserquelle hinzu. Größe: 420 × 120.
 
+Hier Einstellungen speichern. OBS übernimmt Änderungen automatisch über dieselbe URL. Begleit-App und OBS müssen auf demselben PC laufen.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=de
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Liest lokale Replays. Kein Zugriff auf den Spielspeicher. Nicht mit Epic Games verbunden.

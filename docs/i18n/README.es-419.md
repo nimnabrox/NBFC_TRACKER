@@ -4,7 +4,7 @@
 
 Tus partidas, tus metas y tu próximo tesoro. Todo en un solo lugar.
 
-[Panel](https://nbfct.nimnabro.com)  /  [Descargar para Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Panel](https://nbfct.nimnabro.com/dashboard)  /  [Descargar para Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## ¿Listo para descubrir más?
 
@@ -16,15 +16,17 @@ Tus partidas, tus metas y tu próximo tesoro. Todo en un solo lugar.
 
 - **Cantidad inicial de cofres:** Establece tu total actual para este perfil. Los cofres nuevos se suman automáticamente. Bórralo para usar las repeticiones.
 - **Carpeta de repeticiones:** Requiere la aplicación de Windows. Conserva la carpeta predeterminada si tus repeticiones no están en otro lugar.
-- **Sala en la nube:** Ingresa la sala de la URL del overlay de tu aplicación para verla en otro dispositivo. Los enlaces son públicos.
+- **Zoom de la aplicación:** 50%–150%.
 - **Idioma:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Overlay de transmisión
 
 Agrega el contador como fuente de navegador en OBS. Tamaño: 420 × 120.
 
+Guarda los ajustes aquí. OBS se actualiza automáticamente con la misma URL. Ejecuta la aplicación y OBS en la misma PC.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=es-419
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Lee repeticiones locales. No accede a la memoria del juego. Sin afiliación con Epic Games.

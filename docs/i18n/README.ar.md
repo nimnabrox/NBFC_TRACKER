@@ -4,7 +4,7 @@
 
 مبارياتك وإنجازاتك وكنزك القادم. كلها في مكان واحد.
 
-[لوحة التحكم](https://nbfct.nimnabro.com)  /  [تنزيل لنظام Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[لوحة التحكم](https://nbfct.nimnabro.com/dashboard)  /  [تنزيل لنظام Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## مستعد لاكتشاف المزيد؟
 
@@ -16,15 +16,17 @@
 
 - **عدد الصناديق الابتدائي:** حدد إجمالي هذا الملف الحالي. تُضاف الصناديق الجديدة تلقائيًا. امسح القيمة لاستخدام إجمالي الإعادات.
 - **مجلد الإعادات:** يتطلب تطبيق Windows. اترك المجلد الافتراضي ما لم تكن الإعادات في مكان آخر.
-- **غرفة سحابية:** أدخل الغرفة من رابط عداد التطبيق لعرضها على جهاز آخر. روابط الغرف عامة.
+- **تكبير التطبيق:** 50%–150%.
 - **اللغة:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## عداد البث
 
 أضف العداد كمصدر متصفح في OBS. الأبعاد: 420 × 120.
 
+احفظ الإعدادات هنا. يتحدث OBS تلقائيًا باستخدام الرابط نفسه. شغّل التطبيق المرافق وOBS على الكمبيوتر نفسه.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=ar
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 يقرأ الإعادات المحلية. لا يصل إلى ذاكرة اللعبة. غير تابع لـ Epic Games.

@@ -104,5 +104,20 @@
   "overlayLabelText": "Nội dung nhãn",
   "overlayShowLast": "Hiện + trận gần nhất",
   "overlayDefaultLabel": "Rương đã mở",
-  "overlayEditHint": "Thay đổi cập nhật bản xem trước và URL được sao chép. Mặc định chỉ hiện tổng số."
+  "overlayEditHint": "Lưu cài đặt tại đây. OBS tự cập nhật bằng cùng một URL. Chạy ứng dụng đồng hành và OBS trên cùng máy tính.",
+  "homeTitle": "Mỗi chiếc rương. Luôn ghi nhận.",
+  "homeIntro": "Tự động đếm rương Fortnite từ bản phát lại. Cột mốc, lịch sử trận đấu và lớp phủ OBS trong một ứng dụng.",
+  "freeOpen": "Miễn phí & mã nguồn mở",
+  "viewSource": "Xem mã nguồn",
+  "howWorks": "Cách hoạt động",
+  "localTitle": "Bản phát lại của bạn. Máy tính của bạn.",
+  "localBody": "Đọc tệp phát lại đã lưu. Không truy cập bộ nhớ trò chơi hay yêu cầu đăng nhập Epic. Dữ liệu ở lại máy tính này.",
+  "verifyTitle": "Kiểm tra trước khi cài đặt",
+  "verifyBody": "Mã nguồn và mã kiểm SHA-256 công khai. Ứng dụng Windows chưa được ký: xem cảnh báo bảo mật và xác minh tệp tải xuống trước khi chạy.",
+  "requirements": "Windows 10/11 · 64-bit · WebView2 Runtime",
+  "autoTitle": "Thiết lập một lần. Tự động cập nhật.",
+  "autoBody": "Rương mới được đếm tự động. Cài đặt lớp phủ được gửi tới OBS qua cùng URL. Chạy OBS và ứng dụng trên cùng máy tính.",
+  "appZoom": "Thu phóng ứng dụng",
+  "zoomIn": "Phóng to",
+  "zoomOut": "Thu nhỏ"
 }

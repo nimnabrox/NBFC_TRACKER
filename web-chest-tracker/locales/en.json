@@ -104,5 +104,20 @@
   "overlayLabelText": "Label text",
   "overlayShowLast": "Show + last match",
   "overlayDefaultLabel": "Chests opened",
-  "overlayEditHint": "Changes update the preview and copied URL. The default shows only the total."
+  "overlayEditHint": "Save settings here. OBS updates automatically using the same URL. Keep the companion and OBS on the same PC.",
+  "homeTitle": "Every chest. Keep the count.",
+  "homeIntro": "Automatic Fortnite chest counting from your replays. Your milestones, match history and OBS overlay, together.",
+  "freeOpen": "Free & open source",
+  "viewSource": "View source",
+  "howWorks": "How it works",
+  "localTitle": "Your replays. Your PC.",
+  "localBody": "Reads saved replay files. No game memory access or Epic login required. Your replay data stays on this PC.",
+  "verifyTitle": "Inspect before you install",
+  "verifyBody": "Public source and SHA-256 checksums. This Windows app is unsigned: review security warnings and verify your download before running it.",
+  "requirements": "Windows 10/11 · 64-bit · WebView2 Runtime",
+  "autoTitle": "Set once. Updates automatically.",
+  "autoBody": "New chests count automatically. Saved overlay settings reach OBS through the same URL. Run OBS and the companion on the same PC.",
+  "appZoom": "App zoom",
+  "zoomIn": "Zoom in",
+  "zoomOut": "Zoom out"
 }

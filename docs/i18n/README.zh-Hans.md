@@ -4,7 +4,7 @@
 
 你的对局、你的目标、你的下一份宝藏。尽在一处。
 
-[仪表盘](https://nbfct.nimnabro.com)  /  [下载 Windows 版](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[仪表盘](https://nbfct.nimnabro.com/dashboard)  /  [下载 Windows 版](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## 准备发现更多了吗？
 
@@ -16,15 +16,17 @@
 
 - **宝箱起始数量:** 设置此档案的当前累计数量。新宝箱将自动累加。清空后使用回放总数。
 - **回放文件夹:** 需要 Windows 伴侣应用。除非回放保存在其他位置，否则请保留默认文件夹。
-- **云端房间:** 输入伴侣应用叠加层链接中的房间名称，即可在其他设备查看。房间链接是公开的。
+- **应用缩放:** 50%–150%.
 - **语言:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## 直播叠加层
 
 将计数器添加为 OBS 浏览器源。尺寸：420 × 120。
 
+在此保存设置，OBS 会通过同一链接自动更新。请在同一台电脑上运行配套应用和 OBS。
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=zh-Hans
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 读取本地回放文件。不访问游戏内存。与 Epic Games 无关联。

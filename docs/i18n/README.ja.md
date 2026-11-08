@@ -4,7 +4,7 @@
 
 マッチも、目標も、次の宝探しも。すべてをひとつに。
 
-[ダッシュボード](https://nbfct.nimnabro.com)  /  [Windows版をダウンロード](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[ダッシュボード](https://nbfct.nimnabro.com/dashboard)  /  [Windows版をダウンロード](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## 次の発見の準備はできましたか？
 
@@ -16,15 +16,17 @@
 
 - **宝箱の開始カウント:** このプロフィールの現在の累計を設定。新しい宝箱は自動加算されます。空にするとリプレイの合計を使用します。
 - **リプレイフォルダー:** Windows連携アプリが必要です。保存先を変更していなければ既定のままにしてください。
-- **クラウドルーム:** 連携アプリのオーバーレイURLにあるルーム名を入力すると、別の端末でも表示できます。リンクは公開されています。
+- **アプリの表示倍率:** 50%–150%.
 - **言語:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## 配信オーバーレイ
 
 OBSのブラウザソースにカウンターを追加。サイズ：420 × 120。
 
+ここで設定を保存すると、同じURLのままOBSに自動反映されます。連携アプリとOBSは同じPCで実行してください。
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=ja
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 ローカルのリプレイを読み取ります。ゲームメモリへのアクセスはありません。Epic Gamesとは無関係です。

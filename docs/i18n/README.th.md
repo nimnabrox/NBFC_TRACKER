@@ -4,7 +4,7 @@
 
 การแข่งขัน เป้าหมาย และสมบัติชิ้นต่อไปของคุณ รวมอยู่ที่เดียว
 
-[แดชบอร์ด](https://nbfct.nimnabro.com)  /  [ดาวน์โหลดสำหรับ Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[แดชบอร์ด](https://nbfct.nimnabro.com/dashboard)  /  [ดาวน์โหลดสำหรับ Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## พร้อมค้นพบเพิ่มเติมหรือยัง?
 
@@ -16,15 +16,17 @@
 
 - **จำนวนหีบเริ่มต้น:** ตั้งยอดปัจจุบันของโปรไฟล์นี้ หีบใหม่จะเพิ่มโดยอัตโนมัติ ล้างค่าเพื่อใช้ยอดจากรีเพลย์
 - **โฟลเดอร์รีเพลย์:** ต้องใช้แอปคู่หู Windows ใช้โฟลเดอร์เริ่มต้นหากรีเพลย์ไม่ได้อยู่ที่อื่น
-- **ห้องคลาวด์:** ใส่ชื่อห้องจาก URL โอเวอร์เลย์ของแอปเพื่อดูบนอุปกรณ์อื่น ลิงก์ห้องเป็นสาธารณะ
+- **การซูมแอป:** 50%–150%.
 - **ภาษา:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## โอเวอร์เลย์สตรีม
 
 เพิ่มตัวนับเป็นแหล่งเบราว์เซอร์ใน OBS ขนาด: 420 × 120
 
+บันทึกการตั้งค่าที่นี่ OBS จะอัปเดตอัตโนมัติด้วย URL เดิม ให้เปิดแอปคู่หูและ OBS บนพีซีเครื่องเดียวกัน
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=th
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 อ่านรีเพลย์ในเครื่อง ไม่เข้าถึงหน่วยความจำเกม ไม่มีส่วนเกี่ยวข้องกับ Epic Games

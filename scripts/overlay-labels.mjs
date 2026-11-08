@@ -19,4 +19,24 @@ ja:'オーバーレイを編集|ラベルを表示|ラベルのテキスト|＋�
 'zh-Hant':'編輯圖層|顯示標籤|標籤文字|顯示 + 上一場|已開啟寶箱|修改會更新預覽及複製的連結。預設僅顯示總數。',
 ko:'오버레이 편집|라벨 표시|라벨 텍스트|+ 최근 매치 표시|연 상자|변경 사항은 미리 보기와 복사할 URL에 반영됩니다. 기본값은 합계만 표시합니다.'
 };
-export function overlayLabels(code){const values=rows[code]?.split('|');if(values?.length!==keys.length)throw new Error('Missing overlay labels: '+code);return Object.fromEntries(keys.map((key,i)=>[key,values[i]]));}
+const stableHints={
+en:'Save settings here. OBS updates automatically using the same URL. Keep the companion and OBS on the same PC.',
+id:'Simpan pengaturan di sini. OBS diperbarui otomatis dengan URL yang sama. Jalankan aplikasi pendamping dan OBS di PC yang sama.',
+de:'Hier Einstellungen speichern. OBS übernimmt Änderungen automatisch über dieselbe URL. Begleit-App und OBS müssen auf demselben PC laufen.',
+es:'Guarda los ajustes aquí. OBS se actualiza automáticamente con la misma URL. Ejecuta la aplicación y OBS en el mismo PC.',
+'es-419':'Guarda los ajustes aquí. OBS se actualiza automáticamente con la misma URL. Ejecuta la aplicación y OBS en la misma PC.',
+fr:'Enregistrez les réglages ici. OBS se met à jour automatiquement avec la même URL. Lancez l’application et OBS sur le même PC.',
+it:'Salva qui le impostazioni. OBS si aggiorna automaticamente con lo stesso URL. Esegui l’app e OBS sullo stesso PC.',
+pl:'Zapisz ustawienia tutaj. OBS aktualizuje się automatycznie pod tym samym adresem URL. Uruchom aplikację i OBS na tym samym komputerze.',
+'pt-BR':'Salve as configurações aqui. O OBS atualiza automaticamente com a mesma URL. Execute o aplicativo e o OBS no mesmo PC.',
+vi:'Lưu cài đặt tại đây. OBS tự cập nhật bằng cùng một URL. Chạy ứng dụng đồng hành và OBS trên cùng máy tính.',
+tr:'Ayarları burada kaydedin. OBS aynı URL üzerinden otomatik güncellenir. Uygulamayı ve OBS’yi aynı bilgisayarda çalıştırın.',
+ru:'Сохраните настройки здесь. OBS обновится автоматически по той же ссылке. Запускайте приложение и OBS на одном ПК.',
+ar:'احفظ الإعدادات هنا. يتحدث OBS تلقائيًا باستخدام الرابط نفسه. شغّل التطبيق المرافق وOBS على الكمبيوتر نفسه.',
+th:'บันทึกการตั้งค่าที่นี่ OBS จะอัปเดตอัตโนมัติด้วย URL เดิม ให้เปิดแอปคู่หูและ OBS บนพีซีเครื่องเดียวกัน',
+ja:'ここで設定を保存すると、同じURLのままOBSに自動反映されます。連携アプリとOBSは同じPCで実行してください。',
+'zh-Hans':'在此保存设置，OBS 会通过同一链接自动更新。请在同一台电脑上运行配套应用和 OBS。',
+'zh-Hant':'在此儲存設定，OBS 會透過同一連結自動更新。請在同一台電腦上執行配套應用程式和 OBS。',
+ko:'여기에서 설정을 저장하면 같은 URL로 OBS가 자동 업데이트됩니다. 연동 앱과 OBS를 같은 PC에서 실행하세요.'
+};
+export function overlayLabels(code){const values=rows[code]?.split('|');if(values?.length!==keys.length||!stableHints[code])throw new Error('Missing overlay labels: '+code);return {...Object.fromEntries(keys.map((key,i)=>[key,values[i]])),overlayEditHint:stableHints[code]};}

@@ -4,7 +4,7 @@
 
 Trận đấu, cột mốc và kho báu tiếp theo. Tất cả ở một nơi.
 
-[Tổng quan](https://nbfct.nimnabro.com)  /  [Tải cho Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Tổng quan](https://nbfct.nimnabro.com/dashboard)  /  [Tải cho Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Sẵn sàng khám phá thêm?
 
@@ -16,15 +16,17 @@ Trận đấu, cột mốc và kho báu tiếp theo. Tất cả ở một nơi.
 
 - **Số rương ban đầu:** Đặt cột mốc hiện tại cho hồ sơ này. Rương mới được cộng tự động. Xóa để dùng tổng từ bản phát lại.
 - **Thư mục bản phát lại:** Cần ứng dụng Windows. Giữ thư mục mặc định nếu bản phát lại không nằm nơi khác.
-- **Phòng đám mây:** Nhập phòng từ URL lớp phủ của ứng dụng để xem trên thiết bị khác. Liên kết phòng là công khai.
+- **Thu phóng ứng dụng:** 50%–150%.
 - **Ngôn ngữ:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Lớp phủ phát trực tiếp
 
 Thêm bộ đếm làm Nguồn trình duyệt trong OBS. Kích thước: 420 × 120.
 
+Lưu cài đặt tại đây. OBS tự cập nhật bằng cùng một URL. Chạy ứng dụng đồng hành và OBS trên cùng máy tính.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=vi
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Đọc bản phát lại cục bộ. Không truy cập bộ nhớ trò chơi. Không liên kết với Epic Games.

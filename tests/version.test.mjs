@@ -8,7 +8,7 @@ test('one version source controls native build, website, package and release met
   assert.equal(JSON.parse(await readFile('package.json','utf8')).version,central);
   assert.equal(JSON.parse(await readFile('package-lock.json','utf8')).version,central);
   assert.equal(JSON.parse(await readFile('v3/public/version.json','utf8')).displayVersion,displayVersion);
-  for(const page of ['index.html','app.html','modern.html']){
+  for(const page of ['index.html','dashboard.html','app.html','modern.html']){
     const html=await readFile('v3/public/'+page,'utf8');
     for(const [,text] of html.matchAll(/class="version">([^<]+)/g))assert.equal(text,displayVersion);
     assert.ok(html.includes('sub_confirmation=1'));

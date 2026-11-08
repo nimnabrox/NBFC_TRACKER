@@ -4,7 +4,7 @@
 
 Suas partidas, suas metas e seu próximo tesouro. Tudo em um só lugar.
 
-[Painel](https://nbfct.nimnabro.com)  /  [Baixar para Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Painel](https://nbfct.nimnabro.com/dashboard)  /  [Baixar para Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Pronto para descobrir mais?
 
@@ -16,15 +16,17 @@ Suas partidas, suas metas e seu próximo tesouro. Tudo em um só lugar.
 
 - **Quantidade inicial de baús:** Defina sua meta atual para este perfil. Novos baús são somados automaticamente. Limpe para usar os totais das replays.
 - **Pasta de replays:** Requer o aplicativo Windows. Mantenha a pasta padrão se as replays não estiverem em outro local.
-- **Sala na nuvem:** Digite a sala da URL do overlay do aplicativo para acessá-la em outro dispositivo. Os links são públicos.
+- **Zoom do aplicativo:** 50%–150%.
 - **Idioma:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Overlay de transmissão
 
 Adicione o contador como fonte de navegador do OBS. Tamanho: 420 × 120.
 
+Salve as configurações aqui. O OBS atualiza automaticamente com a mesma URL. Execute o aplicativo e o OBS no mesmo PC.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=pt-BR
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Lê replays locais. Não acessa a memória do jogo. Sem afiliação com a Epic Games.

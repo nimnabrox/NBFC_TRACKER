@@ -239,7 +239,7 @@ public static class ReportWriter
               </form>
             </div>
             <div class="card" style="margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding:12px 18px;font-size:14px;background:var(--card);border:1px solid var(--line);">
-              <div>📺 <b>OBS Studio Browser Source URL:</b> <code style="background:var(--line);padding:4px 10px;border-radius:6px;user-select:all;font-weight:700;color:var(--accent);margin-left:6px;">https://nbfct.nimnabro.com/overlay?room={Uri.EscapeDataString(player.ToLowerInvariant())}</code></div>
+              <div>📺 <b>OBS Studio Browser Source URL:</b> <code style="background:var(--line);padding:4px 10px;border-radius:6px;user-select:all;font-weight:700;color:var(--accent);margin-left:6px;">https://nbfct.nimnabro.com/overlay</code></div>
               <div style="display:flex;gap:10px;">
                 <a href="/overlay" target="_blank" style="color:var(--accent);font-weight:700;text-decoration:none;background:var(--accent-soft);padding:4px 12px;border-radius:6px;">Preview Overlay ↗</a>
               </div>

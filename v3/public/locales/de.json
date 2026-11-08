@@ -104,5 +104,20 @@
   "overlayLabelText": "Beschriftung",
   "overlayShowLast": "+ letztes Spiel anzeigen",
   "overlayDefaultLabel": "Geöffnete Truhen",
-  "overlayEditHint": "Änderungen aktualisieren Vorschau und kopierte URL. Standardmäßig wird nur die Gesamtzahl angezeigt."
+  "overlayEditHint": "Hier Einstellungen speichern. OBS übernimmt Änderungen automatisch über dieselbe URL. Begleit-App und OBS müssen auf demselben PC laufen.",
+  "homeTitle": "Jede Truhe. Behalte den Überblick.",
+  "homeIntro": "Automatische Fortnite-Truhenzählung aus deinen Replays. Meilensteine, Spielverlauf und OBS-Overlay an einem Ort.",
+  "freeOpen": "Kostenlos & quelloffen",
+  "viewSource": "Quellcode ansehen",
+  "howWorks": "So funktioniert es",
+  "localTitle": "Deine Replays. Dein PC.",
+  "localBody": "Liest gespeicherte Replay-Dateien. Kein Zugriff auf den Spielspeicher und keine Epic-Anmeldung. Replay-Daten bleiben auf diesem PC.",
+  "verifyTitle": "Vor der Installation prüfen",
+  "verifyBody": "Öffentlicher Quellcode und SHA-256-Prüfsummen. Diese Windows-App ist nicht signiert: Sicherheitswarnungen beachten und den Download vor dem Start prüfen.",
+  "requirements": "Windows 10/11 · 64 Bit · WebView2 Runtime",
+  "autoTitle": "Einmal einrichten. Automatisch aktuell.",
+  "autoBody": "Neue Truhen werden automatisch gezählt. Gespeicherte Overlay-Einstellungen erreichen OBS über dieselbe URL. OBS und App müssen auf demselben PC laufen.",
+  "appZoom": "App-Zoom",
+  "zoomIn": "Vergrößern",
+  "zoomOut": "Verkleinern"
 }

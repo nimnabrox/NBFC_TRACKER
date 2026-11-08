@@ -16,13 +16,13 @@ public static class WebDashboardServer
     public static string Url => $"http://localhost:{Port}/";
     public static string OverlayUrl => $"http://localhost:{Port}/overlay";
     public static bool IsListening => _listener != null && _listener.IsListening;
+    public static int UiZoomPercent => Math.Clamp(_config?.UiZoomPercent ?? 100, 50, 150);
 
     private static Store? _store;
     private static Config? _config;
     private static TrackerData? _data;
     private static Func<bool>? _isLiveInProgress;
     private static Func<MatchRecord?>? _getLiveMatch;
-    private static System.Threading.Timer? _cloudSyncTimer;
     private static UpdateInfo? _cachedUpdate;
     private static int _installingUpdate;
     private static volatile string _updateStatus = "idle";
@@ -73,9 +73,6 @@ public static class WebDashboardServer
             Console.WriteLine($"  [OBS Overlay]   Live at {OverlayUrl}");
             Console.ResetColor();
 
-            // Sync initial state once on startup (no periodic spam timer!)
-            SyncToCloudAsync();
-            _cloudSyncTimer = new System.Threading.Timer(_ => SyncToCloudAsync(), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
         }
         catch (Exception ex)
         {
@@ -205,7 +202,6 @@ public static class WebDashboardServer
                             Console.ResetColor();
                         }
                     }
-                    SyncToCloudAsync();
                 }
                 res.ContentType = "application/json; charset=utf-8";
                 var bytes = Encoding.UTF8.GetBytes("{\"ok\":true}");
@@ -241,7 +237,6 @@ public static class WebDashboardServer
                     Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.WriteLine($"  [Account Switched] Active profile switched to: {_config.Profile}");
                     Console.ResetColor();
-                    SyncToCloudAsync();
                 }
                 res.ContentType = "application/json; charset=utf-8";
                 var bytes = Encoding.UTF8.GetBytes("{\"ok\":true}");
@@ -282,7 +277,7 @@ public static class WebDashboardServer
                 var startWithFn = _config?.StartWithFortnite ?? false;
 
                 var overlayOptions = System.Text.Json.JsonSerializer.Serialize(_config?.OverlayOptions ?? new(), new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web));
-                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"uiLanguage\":\"{EscapeJson(_config?.UiLanguage ?? _config?.Language ?? "en")}\",\"version\":\"{AppInfo.DisplayVersion}\",\"overlayOptions\":{overlayOptions}}}";
+                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"uiLanguage\":\"{EscapeJson(_config?.UiLanguage ?? _config?.Language ?? "en")}\",\"version\":\"{AppInfo.DisplayVersion}\",\"overlayOptions\":{overlayOptions},\"uiZoomPercent\":{UiZoomPercent}}}";
                 var bytes = Encoding.UTF8.GetBytes(json);
                 res.ContentLength64 = bytes.Length;
                 res.OutputStream.Write(bytes, 0, bytes.Length);
@@ -305,6 +300,17 @@ public static class WebDashboardServer
                     WriteJson(res, new { ok = true });
                 }
                 catch { res.StatusCode = 400; res.Close(); }
+                return;
+            }
+            if (path.Equals("/api/set-zoom", StringComparison.OrdinalIgnoreCase))
+            {
+                if (_config == null || _store == null) { res.StatusCode = 503; res.Close(); return; }
+                if (!int.TryParse(req.QueryString["percent"], out var percent) || percent < 50 || percent > 150)
+                { res.StatusCode = 400; res.Close(); return; }
+                _config.UiZoomPercent = percent;
+                _store.SaveConfig(_config);
+                MainGuiForm.CurrentInstance?.SetZoomPercent(percent);
+                WriteJson(res, new { ok = true, uiZoomPercent = percent });
                 return;
             }
             if (path.Equals("/api/check-update", StringComparison.OrdinalIgnoreCase))
@@ -516,6 +522,10 @@ public static class WebDashboardServer
             {
                 cleanPath = "overlay.html";
             }
+            else if (cleanPath.Equals("dashboard", StringComparison.OrdinalIgnoreCase))
+            {
+                cleanPath = "dashboard.html";
+            }
             else if (cleanPath.Equals("overlay-modern", StringComparison.OrdinalIgnoreCase))
             {
                 cleanPath = "overlay-modern.html";
@@ -617,37 +627,7 @@ public static class WebDashboardServer
         }
     }
 
-    private static readonly HttpClient _syncClient = new() { Timeout = TimeSpan.FromSeconds(5) };
-    private static readonly SemaphoreSlim _syncGate = new(1, 1);
-    private static string _lastSyncedPayload = "";
-    private static DateTime _lastSyncUtc;
-
-    public static void SyncToCloudAsync()
-    {
-        if (Environment.GetEnvironmentVariable("NBFC_DISABLE_CLOUD_SYNC") == "1") return;
-        Task.Run(async () =>
-        {
-            if (!await _syncGate.WaitAsync(0)) return;
-            try
-            {
-                // Each player publishes only their own room. Never overwrite a global creator room.
-                var room = CurrentCloudRoom;
-                if (string.IsNullOrWhiteSpace(room)) return;
-                var payload = GetCloudSyncPayload(room);
-                if (payload == _lastSyncedPayload && DateTime.UtcNow - _lastSyncUtc < TimeSpan.FromSeconds(25)) return;
-                using var content = new StringContent(payload, Encoding.UTF8, "application/json");
-                using var response = await _syncClient.PostAsync("https://nbfct.nimnabro.com/api/sync", content);
-                response.EnsureSuccessStatusCode();
-                // A failed upload must be retried, even when the counts have not changed.
-                _lastSyncedPayload = payload;
-                _lastSyncUtc = DateTime.UtcNow;
-            }
-            catch { /* Retry on the next heartbeat or replay change. */ }
-            finally { _syncGate.Release(); }
-        });
-    }
-
-    private static string GetCloudSyncPayload(string targetRoom)
+    private static string GetSnapshotJson(string targetRoom)
     {
         if (_data == null || _config == null || _data.Matches.Count == 0)
         {
@@ -727,7 +707,9 @@ public static class WebDashboardServer
                 }
             }
         }
-        return GetCloudSyncPayload(!string.IsNullOrWhiteSpace(curName) ? curName : "default");
+        var snapshot = GetSnapshotJson(!string.IsNullOrWhiteSpace(curName) ? curName : "default");
+        var options = System.Text.Json.JsonSerializer.Serialize(_config?.OverlayOptions ?? new(), new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web));
+        return snapshot[..^1] + ",\"uiLanguage\":\"" + EscapeJson(_config?.UiLanguage ?? _config?.Language ?? "en") + "\",\"overlayOptions\":" + options + "}";
     }
 
     private static string GetMatchesJson()
@@ -774,25 +756,7 @@ public static class WebDashboardServer
 
     private static string EscapeJson(string s) => System.Text.Json.JsonSerializer.Serialize(s ?? "")[1..^1];
 
-    public static string CurrentCloudRoom
-    {
-        get
-        {
-            if (_data == null || _config == null) return "";
-            lock (_data) return Profiles.Current(_data, _config)?.Name.ToLowerInvariant() ?? "";
-        }
-    }
-    public static string CurrentCloudOverlayUrl
-    {
-        get
-        {
-            var url = "https://nbfct.nimnabro.com/overlay?room=" + Uri.EscapeDataString(CurrentCloudRoom) + "&lang=" + DashboardLanguage.Code;
-            var options = _config?.OverlayOptions;
-            if (options?.ShowLabel == true) url += "&label=" + Uri.EscapeDataString(string.IsNullOrWhiteSpace(options.Label) ? DashboardLanguage.Text("overlayDefaultLabel") : options.Label.Trim());
-            if (options?.ShowLastMatch == true) url += "&last=1";
-            return url;
-        }
-    }
+    public static string CurrentCloudOverlayUrl => "https://nbfct.nimnabro.com/overlay";
 
     private static string GetObsOverlayHtml()
     {
@@ -937,6 +901,7 @@ public static class WebDashboardServer
     }
 
     private static DateTime _ytLastCheckUtc = DateTime.MinValue;
+    private static readonly HttpClient _youtubeClient = new() { Timeout = TimeSpan.FromSeconds(5) };
     private static string _ytCachedStatusJson = "";
     private static readonly object _ytLock = new();
 
@@ -954,7 +919,7 @@ public static class WebDashboardServer
         {
             using var reqMsg = new HttpRequestMessage(HttpMethod.Get, "https://www.youtube.com/@nimna_bro_/live");
             reqMsg.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
-            var resMsg = _syncClient.Send(reqMsg);
+            using var resMsg = _youtubeClient.Send(reqMsg);
             using var reader = new StreamReader(resMsg.Content.ReadAsStream());
             var html = reader.ReadToEnd();
 

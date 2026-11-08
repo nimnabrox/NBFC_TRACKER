@@ -1,68 +1,74 @@
 import { resolveLanguage } from './i18n.js';
+
+// The URL identifies the overlay page, never a frozen copy of its settings.
 const params = new URLSearchParams(location.search);
-const room = (params.get('room') || '').trim().toLowerCase();
-const locale = resolveLanguage(params.get('lang') || navigator.language);
-document.documentElement.lang = locale;
-document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr';
-const formatter = new Intl.NumberFormat(locale);
-const element = document.getElementById('total');
-const label = (params.get('label') || '').replace(/[\u0000-\u001f\u007f]/g, '').slice(0,64).trim();
-const showLast = params.get('last') === '1';
-const labelElement = document.getElementById('overlayCaption'), lastElement = document.getElementById('overlayLast');
-document.body.classList.toggle('detailed', !!label || showLast);
-const cacheKey = 'nbfc_overlay_v1_' + (room || 'local');
-let polling = false, lastUpdate = 0, total = null, lastMatch = null;
+const legacyRoom = (params.get('room') || '').trim().toLowerCase();
+const local = ['localhost', '127.0.0.1'].includes(location.hostname);
+const companion = local ? location.origin : 'http://localhost:5088';
+const cacheKey = 'nbfc_overlay_v2_local';
+const cleanLabel = value => String(value || '').replace(/[\u0000-\u001f\u007f]/g, '').slice(0,64).trim();
+let language = resolveLanguage(params.get('lang') || navigator.language);
+let options = { showLabel: params.has('label'), label: cleanLabel(params.get('label')), showLastMatch: params.get('last') === '1' };
+let total = null, lastMatch = null, polling = false;
+let defaultLabel = 'Chests opened';
+const labels = new Map();
 const validCount = value => Number.isSafeInteger(value) && value >= 0;
+const normalize = value => ({ showLabel: value?.showLabel === true, label: cleanLabel(value?.label), showLastMatch: value?.showLastMatch === true });
+
 function paint() {
-  element.textContent = total === null ? '—' : formatter.format(total);
-  if (labelElement) { labelElement.hidden = !label; labelElement.textContent = label; labelElement.title = label; }
-  if (lastElement) { lastElement.hidden = !showLast || lastMatch === null; lastElement.textContent = lastMatch === null ? '' : '+' + formatter.format(lastMatch); }
+  document.documentElement.lang = language;
+  document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
+  document.body.classList.toggle('detailed', options.showLabel || options.showLastMatch);
+  const format = new Intl.NumberFormat(language);
+  document.getElementById('total').textContent = total === null ? '—' : format.format(total);
+  const caption = document.getElementById('overlayCaption'), last = document.getElementById('overlayLast');
+  caption.hidden = !options.showLabel; caption.textContent = options.label || defaultLabel; caption.title = caption.textContent;
+  last.hidden = !options.showLastMatch || lastMatch === null;
+  last.textContent = lastMatch === null ? '' : '+' + format.format(lastMatch);
+}
+function remember() {
+  try { localStorage.setItem(cacheKey, JSON.stringify({ total, lastMatch, options, language })); } catch {}
 }
 try {
-  const saved = JSON.parse(localStorage.getItem(cacheKey));
-  if (saved && validCount(saved.total)) {
-    total = saved.total;
+  const saved = JSON.parse(localStorage.getItem(cacheKey) || localStorage.getItem('nbfc_overlay_v1_' + (legacyRoom || 'local')));
+  if (saved) {
+    if (validCount(saved.total)) total = saved.total;
     if (validCount(saved.lastMatch)) lastMatch = saved.lastMatch;
-    lastUpdate = Number(saved.updatedAt) || 0;
+    if (saved.options) options = normalize(saved.options);
+    if (saved.language) language = resolveLanguage(saved.language);
   }
-} catch { /* Cloud persistence still works when browser storage is disabled. */ }
+} catch { /* The companion remains usable when browser storage is disabled. */ }
 paint();
-const local = ['localhost', '127.0.0.1'].includes(location.hostname) && location.port === '5088';
-const cloud = local ? 'https://nbfct.nimnabro.com' : location.origin;
-function show(data, native = false) {
-  if (!validCount(data.total)) return;
-  // An empty/offline response is not a reset. A known profile may genuinely reset to zero.
-  if (data.total === 0 && !data.player) return;
-  const timestamp = native ? Date.now() : Number(data.updatedAt) || 0;
-  if (!native && timestamp < lastUpdate) return;
-  lastUpdate = timestamp;
-  total = data.total;
-  if (validCount(data.lastMatch)) lastMatch = data.lastMatch;
-  paint();
-  try { localStorage.setItem(cacheKey, JSON.stringify({ total, lastMatch, updatedAt: timestamp })); } catch {}
-}
-async function read(url) {
-  const response = await fetch(url, { cache: 'no-store', signal: AbortSignal.timeout(1800) });
-  if (!response.ok) throw new Error('Unavailable');
-  return response.json();
+
+async function translateLabel() {
+  const code = language;
+  if (!labels.has(code)) {
+    try {
+      const response = await fetch(new URL(`./locales/${code}.json`, import.meta.url));
+      if (!response.ok) return;
+      const dict = await response.json(); labels.set(code, dict.overlayDefaultLabel || 'Chests opened');
+    } catch { return; }
+  }
+  if (language === code) { defaultLabel = labels.get(code); paint(); }
 }
 async function poll() {
   if (polling) return; polling = true;
   try {
-    let data;
-    try {
-      const candidate = await read('http://localhost:5088/api/live');
-      if ((!room && local) || room === (candidate.room || '').toLowerCase()) {
-        if (candidate.total !== 0 || candidate.player) data = candidate;
-      }
-    } catch {}
-    if (data) show(data, true);
-    else if (room) {
-      const candidate = await read(`${cloud}/api/sync?room=${encodeURIComponent(room)}`);
-      if (candidate.updatedAt) show(candidate);
+    const response = await fetch(companion + '/api/live', { cache: 'no-store', signal: AbortSignal.timeout(1800) });
+    if (!response.ok) throw new Error('Companion unavailable');
+    const data = await response.json();
+    // Saved settings supersede even old URLs containing label/last/room parameters.
+    if (data.overlayOptions) options = normalize(data.overlayOptions);
+    if (data.uiLanguage) language = resolveLanguage(data.uiLanguage);
+    // Empty/offline data cannot erase a saved value. A real profile can reset to zero.
+    if (validCount(data.total) && (data.total !== 0 || data.player)) {
+      total = data.total;
+      if (validCount(data.lastMatch)) lastMatch = data.lastMatch;
     }
-  } catch { /* Keep the last verified value while the companion or network is unavailable. */ }
+    paint(); remember();
+  } catch { /* Keep the last count and appearance when the companion closes. */ }
   finally { polling = false; }
+  if (options.showLabel && !options.label) await translateLabel();
 }
 await poll();
 const timer = setInterval(poll, 2000);

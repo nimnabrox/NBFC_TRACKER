@@ -4,7 +4,7 @@
 
 Pertandingan, pencapaian, dan harta karun berikutnya. Semua di satu tempat.
 
-[Dasbor](https://nbfct.nimnabro.com)  /  [Unduh untuk Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Dasbor](https://nbfct.nimnabro.com/dashboard)  /  [Unduh untuk Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Siap menemukan lebih banyak?
 
@@ -16,15 +16,17 @@ Pertandingan, pencapaian, dan harta karun berikutnya. Semua di satu tempat.
 
 - **Jumlah peti awal:** Atur jumlah saat ini untuk profil ini. Peti baru ditambahkan otomatis. Kosongkan untuk memakai total replay.
 - **Folder replay:** Memerlukan pendamping Windows. Gunakan folder bawaan kecuali replay disimpan di tempat lain.
-- **Ruang cloud:** Masukkan ruang dari URL overlay pendamping untuk melihatnya di perangkat lain. Tautan ruang bersifat publik.
+- **Zoom aplikasi:** 50%–150%.
 - **Bahasa:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Overlay siaran
 
 Tambahkan penghitung sebagai Sumber Browser OBS. Ukuran: 420 × 120.
 
+Simpan pengaturan di sini. OBS diperbarui otomatis dengan URL yang sama. Jalankan aplikasi pendamping dan OBS di PC yang sama.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=id
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Membaca replay lokal. Tidak mengakses memori game. Tidak berafiliasi dengan Epic Games.

@@ -104,5 +104,20 @@
   "overlayLabelText": "标签文字",
   "overlayShowLast": "显示 + 上一局",
   "overlayDefaultLabel": "已开启宝箱",
-  "overlayEditHint": "修改会更新预览及复制的链接。默认仅显示总数。"
+  "overlayEditHint": "在此保存设置，OBS 会通过同一链接自动更新。请在同一台电脑上运行配套应用和 OBS。",
+  "homeTitle": "每个宝箱，都有记录。",
+  "homeIntro": "从回放自动统计 Fortnite 宝箱。目标、比赛记录和 OBS 叠加层，一应俱全。",
+  "freeOpen": "免费开源",
+  "viewSource": "查看源代码",
+  "howWorks": "使用方法",
+  "localTitle": "你的回放。你的电脑。",
+  "localBody": "读取已保存的回放文件，不访问游戏内存，也不要求登录 Epic。数据保存在本机。",
+  "verifyTitle": "安装前先检查",
+  "verifyBody": "源代码和 SHA-256 校验值公开可查。此 Windows 应用未签名：运行前请阅读安全警告并验证下载文件。",
+  "requirements": "Windows 10/11 · 64 位 · WebView2 Runtime",
+  "autoTitle": "一次设置，自动更新。",
+  "autoBody": "新开的宝箱自动计数，叠加层设置通过同一链接同步到 OBS。请在同一台电脑上运行应用和 OBS。",
+  "appZoom": "应用缩放",
+  "zoomIn": "放大",
+  "zoomOut": "缩小"
 }

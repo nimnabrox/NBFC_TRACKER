@@ -87,6 +87,7 @@ public sealed class Config
     // Dashboard/tray supports 18 languages independently of the legacy CLI language.
     public string? UiLanguage { get; set; }
     public OverlayPreferences OverlayOptions { get; set; } = new();
+    public int UiZoomPercent { get; set; } = 100;
 
     /// <summary>Selected profile (Epic id or name of the account the player plays on). Default null so it defaults to the latest match player.</summary>
     public string? Profile { get; set; }

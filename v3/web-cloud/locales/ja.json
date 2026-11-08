@@ -104,5 +104,20 @@
   "overlayLabelText": "ラベルのテキスト",
   "overlayShowLast": "＋直近マッチを表示",
   "overlayDefaultLabel": "開けた宝箱",
-  "overlayEditHint": "変更はプレビューとコピーするURLに反映されます。初期設定では合計のみ表示します。"
+  "overlayEditHint": "ここで設定を保存すると、同じURLのままOBSに自動反映されます。連携アプリとOBSは同じPCで実行してください。",
+  "homeTitle": "すべての宝箱を、記録に。",
+  "homeIntro": "リプレイからFortniteの宝箱を自動集計。目標、マッチ履歴、OBSオーバーレイをひとつに。",
+  "freeOpen": "無料・オープンソース",
+  "viewSource": "ソースを見る",
+  "howWorks": "使い方",
+  "localTitle": "あなたのリプレイ。あなたのPC。",
+  "localBody": "保存済みリプレイを読み取ります。ゲームメモリへのアクセスやEpicへのログインは不要です。データはこのPCに保存されます。",
+  "verifyTitle": "インストール前に確認",
+  "verifyBody": "ソースとSHA-256チェックサムを公開しています。このWindowsアプリは未署名です。実行前に警告を確認し、ダウンロードしたファイルを検証してください。",
+  "requirements": "Windows 10/11・64ビット・WebView2 Runtime",
+  "autoTitle": "一度設定すれば、自動更新。",
+  "autoBody": "新しく開けた宝箱を自動集計。同じURLのまま設定をOBSへ反映します。アプリとOBSは同じPCで実行してください。",
+  "appZoom": "アプリの表示倍率",
+  "zoomIn": "拡大",
+  "zoomOut": "縮小"
 }

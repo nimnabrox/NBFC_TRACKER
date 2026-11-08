@@ -4,7 +4,7 @@
 
 Maçların, hedeflerin ve sıradaki hazinen. Hepsi bir arada.
 
-[Gösterge paneli](https://nbfct.nimnabro.com)  /  [Windows için indir](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Gösterge paneli](https://nbfct.nimnabro.com/dashboard)  /  [Windows için indir](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Daha fazlasını keşfetmeye hazır mısın?
 
@@ -16,15 +16,17 @@ Maçların, hedeflerin ve sıradaki hazinen. Hepsi bir arada.
 
 - **Başlangıç sandık sayısı:** Bu profilin mevcut toplamını ayarla. Yeni sandıklar otomatik eklenir. Tekrar toplamlarını kullanmak için temizle.
 - **Tekrar klasörü:** Windows uygulaması gerekir. Tekrarlar başka yerde değilse varsayılan klasörü koru.
-- **Bulut odası:** Başka cihazdan görmek için uygulamanın katman URL’sindeki odayı gir. Oda bağlantıları herkese açıktır.
+- **Uygulama yakınlaştırması:** 50%–150%.
 - **Dil:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Yayın katmanı
 
 Sayacı OBS Tarayıcı Kaynağı olarak ekle. Boyut: 420 × 120.
 
+Ayarları burada kaydedin. OBS aynı URL üzerinden otomatik güncellenir. Uygulamayı ve OBS’yi aynı bilgisayarda çalıştırın.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=tr
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Yerel tekrar dosyalarını okur. Oyun belleğine erişmez. Epic Games ile bağlantılı değildir.

@@ -8,13 +8,13 @@ if (args.Contains("--verify-private-update"))
 {
     Environment.SetEnvironmentVariable("CHESTCOUNTER_UPDATE_API", null);
     var actual = await Updater.CheckDetailedAsync();
-    Check(actual.ErrorCode == null && actual.Release != null, "Authenticated private release lookup");
+    Check(actual.ErrorCode == null && actual.Release != null, "Published GitHub release lookup");
     Check(actual.Release!.Tag == AppInfo.DisplayVersion, "GitHub release and desktop version match");
     Check(!actual.HasUpdate, "Current version correctly reports up to date");
     if (args.Contains("--download"))
     {
         await Updater.DownloadAsync(actual.Release, Path.GetFullPath("dist/private-update-verified.exe"));
-        Console.WriteLine("PASS Private release executable downloaded and SHA-256 verified");
+        Console.WriteLine("PASS Published release executable downloaded and SHA-256 verified");
     }
     return;
 }
@@ -66,7 +66,7 @@ Check((await http.GetAsync(WebDashboardServer.Url + "api/set-base?count=1.5")).S
 Check((await http.GetAsync(WebDashboardServer.Url + "api/set-demos-folder?folder=Z%3A%5Cmissing-nbfc-folder")).StatusCode == HttpStatusCode.BadRequest, "Missing folder rejected");
 await Get("api/set-language?code=ar");
 Check((await Get("api/settings")).GetProperty("uiLanguage").GetString() == "ar", "Native language persists");
-Check((await http.GetStringAsync(WebDashboardServer.Url)).Contains("app-layout"), "Original website dashboard serves");
+Check((await http.GetStringAsync(WebDashboardServer.Url + "dashboard")).Contains("app-layout"), "Original website dashboard serves");
 Check((await http.GetStringAsync(WebDashboardServer.Url + "app.html")).Contains("mini-shell"), "Original compact desktop serves");
 Check((await http.GetStringAsync(WebDashboardServer.Url + "modern.html")).Contains("app-layout"), "Old dashboard URL keeps the original UI");
 Check((await http.GetStringAsync(WebDashboardServer.Url + "overlay")).Contains("chest-halo"), "Local OBS alias serves restored overlay");
@@ -82,8 +82,16 @@ Check(!WebDashboardServer.CurrentCloudOverlayUrl.Contains(".html"), "Copied nati
 using (var content = new StringContent("{\"showLabel\":true,\"label\":\"Chests opened\",\"showLastMatch\":true}",System.Text.Encoding.UTF8,"application/json"))
     Check((await http.PostAsync(WebDashboardServer.Url+"api/set-overlay-options",content)).IsSuccessStatusCode,"Overlay editor saves through native API");
 Check((await Get("api/settings")).GetProperty("overlayOptions").GetProperty("showLastMatch").GetBoolean(),"Overlay editing settings persist");
-Check(WebDashboardServer.CurrentCloudOverlayUrl.Contains("label=Chests%20opened")&&WebDashboardServer.CurrentCloudOverlayUrl.Contains("last=1"),"Tray overlay URL includes the edited caption and last-match option");
+Check(WebDashboardServer.CurrentCloudOverlayUrl == "https://nbfct.nimnabro.com/overlay", "Tray overlay URL stays identical after editing");
+var overlayState = await Get("api/live");
+Check(overlayState.GetProperty("overlayOptions").GetProperty("label").GetString() == "Chests opened" && overlayState.GetProperty("overlayOptions").GetProperty("showLastMatch").GetBoolean(), "Live snapshot carries saved overlay changes without replacing the URL");
+Check(overlayState.GetProperty("uiLanguage").GetString() == "ar", "Overlay receives current language from companion");
 Check(!(await Get("api/update-status")).GetProperty("installing").GetBoolean(), "Update status starts idle");
+await Get("api/set-zoom?percent=80");
+Check((await Get("api/settings")).GetProperty("uiZoomPercent").GetInt32() == 80, "App zoom saves through native API");
+Check(store.LoadConfig()?.UiZoomPercent == 80, "Zoom persists across app restarts");
+Check((await http.GetAsync(WebDashboardServer.Url + "api/set-zoom?percent=10")).StatusCode == HttpStatusCode.BadRequest, "Invalid zoom rejected");
+Check((await http.GetStringAsync(WebDashboardServer.Url)).Contains("download-home"), "Root serves the download homepage");
 Console.WriteLine("All desktop smoke checks passed.");
 using var releaseApi = new HttpListener();
 releaseApi.Prefixes.Add("http://localhost:15089/"); releaseApi.Start();

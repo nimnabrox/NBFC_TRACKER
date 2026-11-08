@@ -4,7 +4,7 @@
 
 Twoje mecze, osiągnięcia i następny skarb. Wszystko w jednym miejscu.
 
-[Panel](https://nbfct.nimnabro.com)  /  [Pobierz na Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Panel](https://nbfct.nimnabro.com/dashboard)  /  [Pobierz na Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Gotów na więcej odkryć?
 
@@ -16,15 +16,17 @@ Twoje mecze, osiągnięcia i następny skarb. Wszystko w jednym miejscu.
 
 - **Początkowa liczba skrzyń:** Ustaw bieżący wynik tego profilu. Nowe skrzynie będą dodawane automatycznie. Wyczyść, aby używać sumy z powtórek.
 - **Folder powtórek:** Wymagana aplikacja Windows. Zachowaj domyślny folder, chyba że powtórki zapisujesz gdzie indziej.
-- **Pokój w chmurze:** Wpisz pokój z adresu nakładki aplikacji, aby wyświetlić go na innym urządzeniu. Linki są publiczne.
+- **Powiększenie aplikacji:** 50%–150%.
 - **Język:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Nakładka transmisji
 
 Dodaj licznik jako źródło przeglądarki w OBS. Rozmiar: 420 × 120.
 
+Zapisz ustawienia tutaj. OBS aktualizuje się automatycznie pod tym samym adresem URL. Uruchom aplikację i OBS na tym samym komputerze.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=pl
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Odczytuje lokalne powtórki. Bez dostępu do pamięci gry. Brak powiązań z Epic Games.

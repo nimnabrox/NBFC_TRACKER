@@ -2,7 +2,7 @@
 
 A Fortnite replay companion by **NimnaBro**. Track chest milestones, review matches, and add a transparent OBS counter. The original website, compact desktop app and original OBS design support 18 languages.
 
-[Web dashboard](https://nbfct.nimnabro.com) · [Windows download](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest) · [Report an issue](https://github.com/nimnabrox/NBFC_TRACKER/issues)
+[Download homepage](https://nbfct.nimnabro.com) · [Web dashboard](https://nbfct.nimnabro.com/dashboard) · [Windows release](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest) · [Report an issue](https://github.com/nimnabrox/NBFC_TRACKER/issues)
 
 ## Read in your language
 
@@ -13,7 +13,7 @@ A Fortnite replay companion by **NimnaBro**. Track chest milestones, review matc
 1. In Fortnite, enable **Settings → Game → Replays → Record Replays**. Enable the other replay options for the modes you play.
 2. Download **NBFC.TRACKER.exe** from Releases and run it on Windows 10/11 x64. Microsoft Edge WebView2 Runtime is required for the embedded dashboard; the app offers a browser fallback when it cannot load.
 3. The companion watches `%LOCALAPPDATA%\FortniteGame\Saved\Demos`. Play a match and let Fortnite finish writing the replay. Live analysis updates periodically; it is not an instantaneous game feed.
-4. Choose a language from the readable dark language menu. Settings includes the replay folder, starting count and overlay editor. Accounts are detected from saved replays; each keeps its own totals and starting milestone. Closing the window keeps tracking in the system tray.
+4. Choose a language from the readable dark language menu. Settings includes the replay folder, starting count, overlay editor and **App zoom** controls from 50% to 150%, with a 100% reset. Zoom is saved across restarts; accidental Ctrl+wheel zoom is disabled in the native window. Accounts are detected from saved replays; each keeps its own totals and starting milestone. Closing the window keeps tracking in the system tray.
 5. Copy the overlay URL from your dashboard into an OBS **Browser Source**, width **420**, height **120**. Keep the companion running for updates.
 
 Only locally available replays can be analyzed. The tracker cannot recover missing career history. Set a **Starting chest count** for a profile to begin at an existing milestone; new replay and live chests are then added. Reset uses recorded replay totals. Match history, charts, average, and victory count show the latest 150 exported matches; the main total includes the full saved profile history.
@@ -24,20 +24,24 @@ Fortnite keeps a limited set of local replays, often around 100 matches. The fir
 
 The website displays counts from the Windows companion. It does not estimate counts from file size or invent placements. The previous browser-only parser has been removed because it could not accurately decode Fortnite network replay events. The original layout is restored from the version before the redesign. Setup instructions remain collapsed by default.
 
-Only the original design is offered. The native app opens in its compact window with Stats, Settings and OBS tabs. **Edit overlay** optionally adds a custom label such as “Chests opened” and a `+ last match` count. Both are off by default, so the normal overlay shows only the total. Preview and copy the edited URL into OBS. These preferences are remembered in the browser and, when connected, in the desktop configuration and tray shortcut.
+Only the original design is offered. The native app opens in its compact window with Stats, Settings and OBS tabs. **Edit overlay** optionally adds a custom label such as “Chests opened” and a `+ last match` count. Both are off by default. Changes save to the desktop configuration and reach OBS automatically, including language and active-profile changes. Copy the URL once; it stays the same when settings change. Existing URLs containing old room, label, language or last-match parameters also follow the current companion settings.
 
-The overlay saves the most recent total and last-match amount per room. If the companion closes, the network disconnects or the browser source reloads, it keeps the last verified count. An empty response does not reset it to zero; an intentional zero from a known profile is still accepted. Cloud room storage is an additional fallback. Clearing browser storage removes the local cache.
+The overlay saves the most recent total, last-match amount and appearance in browser storage. If the companion closes or the browser source reloads, it keeps the last verified count. An empty response does not reset it to zero; an intentional zero from a known profile is still accepted. Previous per-room caches migrate automatically. Clearing browser storage removes the local cache.
 
-On another device, open Settings → **Cloud room** and enter the room from the companion's overlay link. Direct URLs work too:
+Run the Windows companion, dashboard and OBS on the **same PC**. The hosted frontend reads the companion at `http://localhost:5088`; there is no hosted sync service or remote-device room feature. Use this permanent Browser Source URL:
 
 ~~~text
-https://nbfct.nimnabro.com/?room=YOUR_ROOM&lang=en
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=ja
+https://nbfct.nimnabro.com/dashboard
+https://nbfct.nimnabro.com/overlay
 ~~~
 
-Room names currently follow player display names. Rooms are public and unauthenticated; anyone who knows a room can view or replace its snapshot. They are intended for public stream counters, not private data. Cloud snapshots include player names, profile summaries, match statistics and replay filenames, never replay file contents. Cloudflare Durable Objects persist the latest snapshot per room; a heartbeat refreshes its connection status every 30 seconds. An unavailable companion leaves the last saved snapshot visible, marked offline. A real zero/reset is displayed correctly.
+Replay files, player statistics and settings stay on this PC. The companion no longer uploads snapshots or heartbeats to Cloudflare. The static site has no Worker handler, cloud database, API polling or account sign-in. Static files are downloaded when pages load, and translations load when needed.
 
-The local dashboard can also be used at `http://localhost:5088/`. Hosted browser access to the local companion depends on browser local-network permissions; the cloud room is the fallback. Changing native settings requires a local companion connection.
+The local dashboard is also available at `http://localhost:5088/dashboard`, with a local Browser Source at `http://localhost:5088/overlay`. Hosted access to the companion depends on browser local-network permissions; allow access when prompted or use these local URLs. Changing saved overlay settings requires a companion connection. After installing this update, refresh an already-open OBS source once to load the new script; subsequent setting changes need no refresh or URL replacement.
+
+The root website is the download homepage, with an animated chest welcome scene, automatic-counting explanation, setup guide, source links and download verification information. It supports the same 18 languages. The original dashboard remains at `/dashboard` and the native compact UI at `/app.html`. The homepage makes no antivirus or official Epic endorsement guarantee. The Windows executable is currently unsigned; inspect the public source, verify `SHA256SUMS.txt`, and review security prompts before running it.
+
+Prepared social material lives in [`advertisement/`](advertisement/README.md): a 16:9 poster, YouTube community-post draft, X draft, alt text and image-generation prompts. These files have not been posted to social accounts.
 
 ## Languages
 
@@ -56,13 +60,13 @@ dotnet run --project tests/Smoke/Smoke.csproj -c Release -m:1
 v3\build.bat
 ~~~
 
-The source of the shared UI is **`v3/public/`**. The C# project embeds those files in the standalone executable. `src/ChestCounter/` contains the original replay engine, profile store, local server and native shell. `v3/web-cloud/` owns the Cloudflare Worker and configuration. Root `public/` and the older web packages are compatibility copies; run `npm run sync:web` after editing v3 files. `scripts/create-locales.mjs` holds translation source; after changes run it, sync the packages, then run `node scripts/readme-locales.mjs` to regenerate translated guides.
+The source of the shared UI is **`v3/public/`**. The C# project embeds those files in the standalone executable. `src/ChestCounter/` contains the original replay engine, profile store, local server and native shell. `v3/web-cloud/wrangler.toml` configures static Cloudflare hosting. Root `public/` and the older web packages are compatibility copies; run `npm run sync:web` after editing v3 files. `scripts/create-locales.mjs` holds translation source; after changes run it, sync the packages, then run `node scripts/readme-locales.mjs` to regenerate translated guides.
 
 ~~~powershell
 npm run dev
 ~~~
 
-Wrangler serves the dashboard and a local Durable Object emulator. Open its printed local URL. For deterministic desktop checks the smoke harness uses port 15088, isolated fixture data in `dist/smoke-data`, and disables cloud uploads. No fixture statistics are published.
+Wrangler serves the static dashboard. Open its printed local URL and keep the companion running for live counts. For deterministic desktop checks the smoke harness uses port 15088 and isolated fixture data in `dist/smoke-data`. No fixture statistics are published.
 
 ## Cloudflare deployment
 
@@ -71,7 +75,7 @@ npx wrangler login
 v3\deploy.bat
 ~~~
 
-The pinned CLI deploys Worker `nbfct`, assets from `v3/public`, the SQLite-backed `TrackerRoom` binding, and the existing custom domain `nbfct.nimnabro.com`. Keep the Durable Object migration history. Configure another account/domain in `v3/web-cloud/wrangler.toml` if forking. Cloudflare usage limits and pricing apply.
+The pinned CLI deploys static assets from `v3/public` to project `nbfct` and the existing custom domain `nbfct.nimnabro.com`. There is no Worker script or Durable Object binding. Cloudflare documents static-asset requests as free and unlimited; platform limits such as upload size still apply. See [Cloudflare static-asset billing](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/). Configure another account/domain in `v3/web-cloud/wrangler.toml` if forking.
 
 GitHub Actions can deploy on changes to `main` after repository secrets `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` are configured. A missing secret skips deployment; it does not affect local builds.
 

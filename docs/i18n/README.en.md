@@ -4,7 +4,7 @@
 
 Your matches, your milestones, your next treasure. All in one place.
 
-[Dashboard](https://nbfct.nimnabro.com)  /  [Download for Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Dashboard](https://nbfct.nimnabro.com/dashboard)  /  [Download for Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Ready to find more?
 
@@ -16,15 +16,17 @@ Your matches, your milestones, your next treasure. All in one place.
 
 - **Starting chest count:** Set your current milestone for this profile. Future chests are added automatically. Clear to use replay totals.
 - **Replay folder:** Windows companion required. Leave the default unless your replays are elsewhere.
-- **Cloud room:** Enter the room from your companion overlay URL to view it on another device. Room links are public.
+- **App zoom:** 50%–150%.
 - **Language:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Stream overlay
 
 Add your counter as an OBS Browser Source. Size: 420 × 120.
 
+Save settings here. OBS updates automatically using the same URL. Keep the companion and OBS on the same PC.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=en
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Reads local replay files. No game memory access. Not affiliated with Epic Games.

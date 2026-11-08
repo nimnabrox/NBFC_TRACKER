@@ -104,5 +104,20 @@
   "overlayLabelText": "Texto do rótulo",
   "overlayShowLast": "Mostrar + última partida",
   "overlayDefaultLabel": "Baús abertos",
-  "overlayEditHint": "As mudanças atualizam a prévia e a URL copiada. Por padrão, apenas o total é exibido."
+  "overlayEditHint": "Salve as configurações aqui. O OBS atualiza automaticamente com a mesma URL. Execute o aplicativo e o OBS no mesmo PC.",
+  "homeTitle": "Cada baú. Continue contando.",
+  "homeIntro": "Contagem automática de baús do Fortnite pelos replays. Suas metas, histórico e overlay do OBS em um só lugar.",
+  "freeOpen": "Grátis e de código aberto",
+  "viewSource": "Ver código-fonte",
+  "howWorks": "Como funciona",
+  "localTitle": "Seus replays. Seu PC.",
+  "localBody": "Lê arquivos de replay salvos. Sem acessar a memória do jogo ou exigir login da Epic. Os dados ficam neste PC.",
+  "verifyTitle": "Confira antes de instalar",
+  "verifyBody": "Código público e checksums SHA-256. Este aplicativo Windows não é assinado: confira os avisos de segurança e verifique o download antes de executá-lo.",
+  "requirements": "Windows 10/11 · 64 bits · WebView2 Runtime",
+  "autoTitle": "Configure uma vez. Atualiza sozinho.",
+  "autoBody": "Novos baús são contados automaticamente. As configurações do overlay chegam ao OBS pela mesma URL. Execute OBS e o aplicativo no mesmo PC.",
+  "appZoom": "Zoom do aplicativo",
+  "zoomIn": "Ampliar",
+  "zoomOut": "Reduzir"
 }

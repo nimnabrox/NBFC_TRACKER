@@ -45,6 +45,8 @@ jobs:
             - 18 languages, readable language controls and Fortnite typography.
             - Subscribe and NIMNABRO creator-code controls.
             - Clean OBS URLs, remembered overlay totals and verified GitHub downloads.
+            - One stable overlay URL that follows saved settings, language and profile changes.
+            - Frontend-only Cloudflare hosting; live updates stay on the same PC with no cloud API polling.
             - Automated UI, version consistency, profile and download-integrity checks.
           generate_release_notes: true
           files: |

@@ -4,7 +4,7 @@
 
 Твои матчи, достижения и следующий клад. Всё в одном месте.
 
-[Обзор](https://nbfct.nimnabro.com)  /  [Скачать для Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
+[Обзор](https://nbfct.nimnabro.com/dashboard)  /  [Скачать для Windows](https://github.com/nimnabrox/NBFC_TRACKER/releases/latest)  /  [GitHub](https://github.com/nimnabrox/NBFC_TRACKER)
 
 ## Готов к новым находкам?
 
@@ -16,15 +16,17 @@
 
 - **Начальное число сундуков:** Укажи текущий итог для профиля. Новые сундуки добавляются автоматически. Очисти, чтобы использовать сумму из повторов.
 - **Папка повторов:** Нужно приложение Windows. Оставь папку по умолчанию, если повторы не хранятся в другом месте.
-- **Облачная комната:** Введи комнату из URL оверлея приложения для просмотра на другом устройстве. Ссылки общедоступны.
+- **Масштаб приложения:** 50%–150%.
 - **Язык:** Bahasa Indonesia, Deutsch, English, Español, Español (Latinoamérica), Français, Italiano, Polski, Português (Brasil), Tiếng Việt, Türkçe, Русский, العربية, ไทย, 日本語, 简体中文, 繁體中文, 한국어.
 
 ## Оверлей трансляции
 
 Добавь счётчик как источник «Браузер» в OBS. Размер: 420 × 120.
 
+Сохраните настройки здесь. OBS обновится автоматически по той же ссылке. Запускайте приложение и OBS на одном ПК.
+
 ~~~text
-https://nbfct.nimnabro.com/overlay?room=YOUR_ROOM&lang=ru
+https://nbfct.nimnabro.com/overlay
 ~~~
 
 Читает локальные повторы. Без доступа к памяти игры. Не связано с Epic Games.

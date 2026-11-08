@@ -104,5 +104,20 @@
   "overlayLabelText": "Teks label",
   "overlayShowLast": "Tampilkan + pertandingan terakhir",
   "overlayDefaultLabel": "Peti dibuka",
-  "overlayEditHint": "Perubahan memperbarui pratinjau dan URL yang disalin. Tampilan bawaan hanya menunjukkan total."
+  "overlayEditHint": "Simpan pengaturan di sini. OBS diperbarui otomatis dengan URL yang sama. Jalankan aplikasi pendamping dan OBS di PC yang sama.",
+  "homeTitle": "Setiap peti. Terus hitung.",
+  "homeIntro": "Hitung peti Fortnite otomatis dari replay. Milestone, riwayat pertandingan, dan overlay OBS dalam satu aplikasi.",
+  "freeOpen": "Gratis & sumber terbuka",
+  "viewSource": "Lihat kode sumber",
+  "howWorks": "Cara kerja",
+  "localTitle": "Replay Anda. PC Anda.",
+  "localBody": "Membaca file replay tersimpan. Tanpa akses memori game atau login Epic. Data replay tetap di PC ini.",
+  "verifyTitle": "Periksa sebelum menginstal",
+  "verifyBody": "Kode sumber dan checksum SHA-256 tersedia publik. Aplikasi Windows ini belum ditandatangani: periksa peringatan keamanan dan verifikasi unduhan sebelum menjalankannya.",
+  "requirements": "Windows 10/11 · 64-bit · WebView2 Runtime",
+  "autoTitle": "Atur sekali. Diperbarui otomatis.",
+  "autoBody": "Peti baru dihitung otomatis. Pengaturan overlay tersimpan diterapkan di OBS melalui URL yang sama. Jalankan OBS dan aplikasi di PC yang sama.",
+  "appZoom": "Zoom aplikasi",
+  "zoomIn": "Perbesar",
+  "zoomOut": "Perkecil"
 }

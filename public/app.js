@@ -2,19 +2,19 @@ import { languages, resolveLanguage, setLanguage, t, number, locale } from './i1
 import { summarize, activityDays, parseCount, matchesCsv } from './stats.js';
 import { mountLanguagePicker, mountMiniTabs } from './controls.js';
 import { getOverlayOptions, setOverlayOptions, mountOverlayEditor } from './overlay-options.js';
+import { mountZoom, setZoomValue } from './zoom.js';
 import { version, displayVersion, releaseUrl, compareVersions } from './version.js';
 
 const $ = id => document.getElementById(id);
 const local = ['localhost', '127.0.0.1'].includes(location.hostname) && location.port === '5088';
 const companion = local ? location.origin : 'http://localhost:5088';
 const cloud = local ? 'https://nbfct.nimnabro.com' : location.origin;
-let room = new URLSearchParams(location.search).get('room')?.trim().toLowerCase() || '';
 let snapshot = { total: 0, matches: [], accounts: [] };
 let connection = 'waiting', nativeConnected = false, polling = false, page = 1, timer, toastTimer, update;
 let settingsLoaded = false;
 let companionVersion = '', installing = false, installStartVersion = '';
 let updateNotice = null;
-let overlaySaveTimer, overlaySaveQueue = Promise.resolve();
+let overlaySaveTimer, overlaySaving = false, overlayDirty = false, overlayRevision = 0;
 function notice(key, values = {}) { updateNotice = { key, values }; $('updateMessage').textContent = t(key, values); }
 const updateErrorKey = code => ({ private_access: 'updateAccess', rate_limited: 'updateRateLimited', release_missing: 'updateMissing' }[code] || 'updateOffline');
 
@@ -43,13 +43,16 @@ async function copy(text) {
     toast('copied');
   } catch { toast('error'); }
 }
-function overlayUrl() {
-  const name = room || snapshot.room || snapshot.player || '';
-  const options = getOverlayOptions();
-  const query = new URLSearchParams({ room: name.toLowerCase(), lang: locale });
-  if (options.showLabel) query.set('label', options.label.trim() || t('overlayDefaultLabel'));
-  if (options.showLastMatch) query.set('last', '1');
-  return `${cloud}/overlay?${query}`;
+function overlayUrl() { return cloud + '/overlay'; }
+async function saveOverlayOptions() {
+  if (!nativeConnected || !overlayDirty || overlaySaving) return;
+  overlaySaving = true;
+  const revision = overlayRevision;
+  try {
+    await native('/api/set-overlay-options', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(getOverlayOptions()) });
+    if (revision === overlayRevision) overlayDirty = false;
+  } catch { toast('error'); }
+  finally { overlaySaving = false; }
 }
 function render() {
   const values = summarize(snapshot);
@@ -95,15 +98,15 @@ function render() {
   if (!snapshot.player && !snapshot.accounts?.length) $('profile').options[0].textContent = t('noProfile');
   $('previewOverlay').href = overlayUrl();
   $('previewEditedOverlay').href = overlayUrl();
-  $('copyEditedOverlay').disabled = !(room || snapshot.player);
-  $('copyOverlay').disabled = !(room || snapshot.player);
-  $('previewOverlay').setAttribute('aria-disabled', String(!(room || snapshot.player)));
-  if (!(room || snapshot.player)) $('previewOverlay').removeAttribute('href');
+  $('copyEditedOverlay').disabled = !snapshot.player;
+  $('copyOverlay').disabled = !snapshot.player;
+  $('previewOverlay').setAttribute('aria-disabled', String(!snapshot.player));
+  if (!snapshot.player) $('previewOverlay').removeAttribute('href');
   if ($('obsUrl')) $('obsUrl').textContent = overlayUrl();
   if ($('obsUrlAlt')) $('obsUrlAlt').textContent = overlayUrl();
   if ($('activeAccountName')) $('activeAccountName').textContent = snapshot.player || t('noProfile');
   if ($('matchesCount')) $('matchesCount').textContent = number(snapshot.matches?.length || 0);
-  if ($('openWeb')) $('openWeb').href = `${cloud}/?${new URLSearchParams({ room: room || snapshot.room || '', lang: locale, layout: 'classic' })}`;
+  if ($('openWeb')) $('openWeb').href = cloud + '/dashboard';
   if (document.activeElement !== $('base')) $('base').value = snapshot.base ?? '';
   ['base', 'resetBase', 'folder', 'startup'].forEach(id => { $(id).disabled = !nativeConnected; });
   $('baseForm').querySelector('button').disabled = !nativeConnected;
@@ -167,9 +170,9 @@ async function poll() {
   try {
     const data = await request(companion + '/api/live', { signal: AbortSignal.timeout(1200) });
     if (typeof data.total !== 'number') throw new Error('Invalid snapshot');
-    // Explicit remote rooms must never display an unrelated local player's stats.
-    if (room && room !== (data.room || '').toLowerCase()) throw new Error('Different room');
     snapshot = data; nativeConnected = true; connection = 'connected';
+    if (data.overlayOptions && !overlayDirty && !overlaySaving) setOverlayOptions(data.overlayOptions);
+    if (overlayDirty) await saveOverlayOptions();
     if (!settingsLoaded) { settingsLoaded = true; await loadSettings(); }
     if (installing) {
       const state = await native('/api/update-status');
@@ -181,21 +184,16 @@ async function poll() {
       }
     }
   } catch {
-    nativeConnected = false; settingsLoaded = false;
-    if (room) {
-      try {
-        const data = await request(`${cloud}/api/sync?room=${encodeURIComponent(room)}`);
-        if (data.updatedAt) { snapshot = data; connection = Date.now() - data.updatedAt > 90000 ? 'offline' : 'cloud'; }
-        else connection = 'waiting';
-      } catch { connection = 'offline'; }
-    } else connection = snapshot.player ? 'offline' : 'waiting';
+    nativeConnected = false; settingsLoaded = false; setZoomValue(undefined, false);
+    connection = snapshot.player ? 'offline' : 'waiting';
   } finally { polling = false; render(); }
 }
 async function loadSettings() {
   try {
     const data = await native('/api/settings');
+    setZoomValue(data.uiZoomPercent, nativeConnected);
     $('folder').value = data.demosFolder || ''; $('startup').checked = !!data.startWithWindows;
-    if (data.overlayOptions) setOverlayOptions(data.overlayOptions);
+    if (data.overlayOptions && !overlayDirty) setOverlayOptions(data.overlayOptions);
     companionVersion = data.version || '';
     if (companionVersion && companionVersion !== displayVersion) {
       notice('versionMismatch', { app: companionVersion, web: displayVersion });
@@ -217,12 +215,13 @@ async function saveBase(value) {
 for (const [code, label] of languages) { const option = document.createElement('option'); option.value = code; option.textContent = label; $('language').append(option); }
 mountLanguagePicker();
 mountMiniTabs();
-mountOverlayEditor(options => {
-  render(); clearTimeout(overlaySaveTimer);
-  overlaySaveTimer = setTimeout(() => {
-    if (!nativeConnected) return;
-    overlaySaveQueue = overlaySaveQueue.catch(() => {}).then(() => native('/api/set-overlay-options', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(options) })).catch(() => toast('error'));
-  }, 250);
+mountZoom(async percent => {
+  try { const saved = await native('/api/set-zoom?percent=' + percent); setZoomValue(saved.uiZoomPercent, true); }
+  catch { toast('error'); }
+});
+mountOverlayEditor(() => {
+  overlayDirty = true; overlayRevision++; render(); clearTimeout(overlaySaveTimer);
+  overlaySaveTimer = setTimeout(saveOverlayOptions, 250);
 });
 document.addEventListener('languagechange', render);
 $('language').addEventListener('change', async event => {
@@ -232,7 +231,7 @@ $('language').addEventListener('change', async event => {
     if (nativeConnected) await native('/api/set-language?code=' + encodeURIComponent(locale));
   } catch { toast('error'); }
 });
-$('openSettings').onclick = () => { $('room').value = room || snapshot.room || ''; $('settings').showModal(); };
+$('openSettings').onclick = () => $('settings').showModal();
 $('closeSettings').onclick = () => $('settings').close();
 $('settings').addEventListener('click', event => { if (event.target === $('settings')) { const r = event.target.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) event.target.close(); } });
 $('copyOverlay').onclick = () => copy(overlayUrl());
@@ -248,16 +247,9 @@ $('export').onclick = () => {
 $('profile').onchange = async event => {
   try {
     await native('/api/set-profile?key=' + encodeURIComponent(event.target.value));
-    room = ''; const url = new URL(location.href); url.searchParams.delete('room'); history.replaceState(null, '', url);
+    const url = new URL(location.href); url.searchParams.delete('room'); history.replaceState(null, '', url);
     page = 1; await poll();
   } catch { toast('error'); }
-};
-$('roomForm').onsubmit = async event => {
-  event.preventDefault(); const value = $('room').value.trim().toLowerCase();
-  if (!value || value.length > 128 || /[\u0000-\u001f\u007f]/.test(value)) return toast('invalidRoom');
-  room = value; page = 1; snapshot = { total: 0, matches: [], accounts: [] }; connection = 'waiting';
-  const url = new URL(location.href); url.searchParams.set('room', room); history.replaceState(null, '', url);
-  await poll(); $('settings').close();
 };
 $('baseForm').onsubmit = event => { event.preventDefault(); return saveBase($('base').value); };
 $('resetBase').onclick = () => saveBase('');

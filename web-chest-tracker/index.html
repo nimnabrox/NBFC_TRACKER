@@ -1,100 +1,31 @@
 <!doctype html>
-<html lang="en"><head>
+<html lang="en">
+<head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#111419">
-  <meta name="description" content="Your Fortnite matches, chest milestones and stream overlay. An open-source companion by NimnaBro.">
-  <title>NBFC Tracker · Every chest counts</title>
-  <link rel="icon" href="assets/chest_fnv1.png"><link rel="stylesheet" href="classic.css">
-<link rel="stylesheet" href="ui.css"></head>
-<body data-layout="classic">
-  <div class="app-layout">
-    <!-- ==============================================================
-         LEFT COLUMN (1 PART): SIDEBAR, PROFILES & SETTINGS
-    ============================================================== -->
-    <aside class="sidebar"><div class="brand-card"><div class="brand-title"><img src="assets/chest_fnv1.png" alt="" width="32" height="32"><span>NBFC TRACKER</span><small class="version">v0.1.0</small></div><div class="brand-sub" data-i18n="tagline"></div><div class="status" id="status"><i></i><span id="statusText" data-i18n="waiting"></span></div></div><div class="side-card language-card"><label class="side-card-title" data-i18n="language"></label><div class="language-picker"><button type="button" id="languageButton" class="language-button" aria-haspopup="listbox" aria-expanded="false" aria-controls="languageMenu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2v3m5 17 5-10 5 10m-8-4h6"></path></svg><span id="languageName">English</span><span aria-hidden="true">⌄</span></button><div id="languageMenu" class="language-menu" role="listbox" hidden=""></div><select id="language" hidden="" aria-hidden="true" tabindex="-1"></select></div></div><section class="side-card"><label for="profile" class="side-card-title" data-i18n="profile"></label><select id="profile" class="text-input"></select><div id="accountList" class="account-list"></div></section><section class="side-card quick-settings"><h2 class="side-card-title" data-i18n="settings"></h2><form id="baseForm"><label for="base" data-i18n="base">Starting chest count</label><div class="history-note" role="note"><strong data-i18n="importantNote">Important</strong><p data-i18n="historyNotice"></p></div><div class="form-row"><input id="base" type="number" min="0" max="2147483647" step="1" inputmode="numeric"><button class="button primary" data-i18n="save">Save</button><button type="button" class="button secondary" id="resetBase" data-i18n="reset">Reset</button></div></form><form id="folderForm"><label for="folder" data-i18n="folder">Replay folder</label><p data-i18n="folderHint"></p><div class="form-row"><input id="folder" dir="ltr" autocomplete="off"><button class="button secondary" data-i18n="save">Save</button></div></form><label class="checkbox-row"><input type="checkbox" id="startup"><span data-i18n="startup">Start with Windows</span></label></section><section class="side-card classic-obs" id="overlayCard"><h2 class="side-card-title" data-i18n="overlay"></h2><div class="obs-preview-box"><div class="classic-overlay-preview"><span class="chest-halo"></span><img src="assets/chest_fnv1.png" alt="" width="42" height="42"><span class="overlay-divider"></span><span class="overlay-values"><span data-overlay-label="" hidden=""></span><strong id="overlayTotal">0</strong><small data-overlay-last="" hidden="">+0</small></span></div></div><div id="obsUrl" class="obs-url-display"></div><p class="muted" data-i18n="overlayHint">Add your counter as an OBS Browser Source. Size: 420 × 120.</p><div class="overlay-actions"><button id="copyOverlay" class="button primary" data-i18n="copy">Copy URL</button><a id="previewOverlay" class="button secondary" target="_blank" rel="noopener" data-i18n="preview">Preview</a></div></section><div class="side-card"><span class="side-card-title" data-i18n="creator"></span><button class="button secondary" id="creatorCode"><span data-i18n="useCode">Use code</span> <strong>NIMNABRO</strong></button></div></aside>
-
-    <!-- ==============================================================
-         RIGHT COLUMN (2 PARTS): STATISTICS, CHARTS & MATCH HISTORY
-    ============================================================== -->
-    <main class="content" id="dashboard"><div class="content-header"><div class="profile-headline"><span data-i18n="profile"></span><span id="activeAccountName" class="player-tag">—</span></div><div class="content-actions"><button id="openSettings" class="button secondary" data-i18n="settings"></button><a class="button primary" href="https://github.com/nimnabrox/NBFC_TRACKER/releases/latest" target="_blank" rel="noopener" data-i18n="download"></a></div></div><nav class="web-nav-tabs"><a class="web-tab-btn active" href="#dashboard" data-i18n="dashboard"></a><a class="web-tab-btn" href="#history" data-i18n="history"></a><a class="web-tab-btn" href="#overlayCard" data-i18n="overlay"></a><a class="web-tab-btn" id="openGuide" href="#guide" data-i18n="setup"></a></nav><section class="stat-grid">
-        <!-- Hero Total Chests Tile -->
-        <div class="stat-tile hero">
-          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="total"></div>
-          <div class="stat-val" id="total">0</div>
-          <div class="stat-sub" id="totalHint" data-i18n="fromReplays"></div>
-        </div>
-
-        <!-- Last Match Tile -->
-        <div class="stat-tile">
-          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="lastMatch"></div>
-          <div class="stat-val" id="lastMatch">0</div>
-
-        </div>
-
-        <!-- This Session Tile -->
-        <div class="stat-tile">
-          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="session"></div>
-          <div class="stat-val" id="session">0</div>
-
-        </div>
-
-        <!-- Matches Analyzed Tile -->
-        <div class="stat-tile">
-          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="matchesTotal"></div>
-          <div class="stat-val" id="matchesCount">0</div>
-
-        </div>
-
-        <!-- Average Chests Tile -->
-        <div class="stat-tile">
-          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="average"></div>
-          <div class="stat-val" id="average">0.0</div>
-
-        </div>
-
-        <!-- Victory Royales Tile -->
-        <div class="stat-tile">
-          <div class="stat-lbl" style="display:flex;align-items:center;gap:6px;" data-i18n="victories"></div>
-          <div class="stat-val" id="victories">0</div>
-
-        </div>
-      </section><div class="classic-match-status"><span class="live-dot"></span><span id="matchStatus"></span></div><section class="creator-support" aria-label="NimnaBro"><div class="creator-identity"><img src="assets/nimnabrologo.png" alt="" width="46" height="46"><div><strong>Nimna Bro</strong><span>@nimna_bro_</span></div></div><div class="creator-actions"><button type="button" class="button secondary creator-use-code" data-copy-creator=""><span data-i18n="useCode">Use code</span><strong>NIMNABRO</strong></button><a class="button subscribe-button" href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" rel="noopener" data-i18n="subscribe">Subscribe</a></div></section><section class="chart-card">
-        <div class="chart-title" style="display:flex;align-items:center;gap:8px;"><span data-i18n="activity"></span><span class="muted" data-i18n="last30"></span></div>
-        <div class="bars-container" id="chart">
-          <!-- Injected dynamically by app.js -->
-        </div>
-        <div class="chart-axis"><span id="chartStart"></span><span id="chartEmpty" data-i18n="noActivity"></span><span id="chartEnd"></span></div>
-      </section><section class="table-card" id="history">
-        <div class="table-header-row">
-          <div class="table-title" style="display:flex;align-items:center;gap:8px;"><span data-i18n="history"></span></div>
-          <button class="button secondary small" id="export" data-i18n="export">Export CSV</button>
-        </div>
-        <div class="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th data-i18n="date"></th>
-                <th data-i18n="mode"></th>
-                <th data-i18n="placement"></th>
-                <th style="text-align:right;" data-i18n="chests"></th>
-                <th style="text-align:right;" data-i18n="eliminations"></th>
-
-              </tr>
-            </thead>
-            <tbody id="matchRows">
-              <!-- Injected dynamically by app.js -->
-            </tbody>
-          </table>
-        </div>
-        <!-- Matches Pagination (10 per page) -->
-        <div class="pagination" id="pagination"><span id="pageLabel"></span><div><button class="button secondary small" id="previous" data-i18n="previous">Previous</button><button class="button secondary small" id="next" data-i18n="next">Next</button></div></div>
-      </section><details class="guide" id="guide"><summary data-i18n="setup">Setup guide</summary><div class="steps"><article><span class="step-number">01</span><h3 data-i18n="step1">Enable replays</h3><p data-i18n="step1Body"></p></article><article><span class="step-number">02</span><h3 data-i18n="step2">Open the companion</h3><p data-i18n="step2Body"></p></article><article><span class="step-number">03</span><h3 data-i18n="step3">Bring it to your stream</h3><p data-i18n="step3Body"></p></article></div></details></main>
-  </div>
-
-  <!-- Browser AppData Guidance Modal -->
-
-
-
-
-
-<dialog id="settings"><section class="overlay-editor"><h3 data-i18n="overlayEdit">Edit overlay</h3><label class="checkbox-row"><input type="checkbox" id="showOverlayLabel"><span data-i18n="overlayShowLabel">Show a label</span></label><label for="overlayLabel" class="overlay-input-label" data-i18n="overlayLabelText">Label text</label><input id="overlayLabel" type="text" maxlength="64" autocomplete="off" dir="auto"><label class="checkbox-row"><input type="checkbox" id="showOverlayLast"><span data-i18n="overlayShowLast">Show + last match</span></label><div class="overlay-editor-preview"><div class="classic-overlay-preview"><img src="assets/chest_fnv1.png" width="42" height="42" alt=""><span class="overlay-divider"></span><span class="overlay-values"><span data-overlay-label="" hidden=""></span><strong id="overlayEditorTotal">0</strong><small data-overlay-last="" hidden="">+0</small></span></div></div><p class="muted" data-i18n="overlayEditHint">Changes update the preview and copied URL.</p><div class="overlay-actions"><button type="button" id="copyEditedOverlay" class="button primary" data-i18n="copy">Copy URL</button><a id="previewEditedOverlay" class="button secondary" target="_blank" rel="noopener" data-i18n="preview">Preview</a></div></section><div class="dialog-heading"><h2 data-i18n="settings">Settings</h2><button id="closeSettings" class="icon-button" data-i18n-label="close" aria-label="Close">×</button></div><form id="roomForm"><label for="room" data-i18n="room">Cloud room</label><p data-i18n="roomHint"></p><div class="form-row"><input id="room" maxlength="128" autocomplete="off" dir="auto"><button class="button secondary" data-i18n="connect">Connect</button></div></form><div class="update-row"><span><span data-i18n="version">Version</span> <b class="version">v0.1.0</b></span><button id="checkUpdate" class="button secondary small" data-i18n="checkUpdate">Check for updates</button></div><p id="updateMessage" role="status"></p><button id="installUpdate" class="button primary" data-i18n="installUpdate" hidden="">Install update</button><a id="updateRelease" class="button secondary" hidden="" target="_blank" rel="noopener" href="https://github.com/nimnabrox/NBFC_TRACKER/releases/latest" data-i18n="download"></a></dialog><div class="toast" id="toast" role="status" aria-live="polite" hidden=""></div><script type="module" src="app.js"></script></body></html>
+  <title>NBFC TRACKER — Automatic Fortnite Chest Counter</title>
+  <meta name="description" content="Free, open-source Fortnite chest tracking for Windows. Automatically count chests from saved replays, track your milestones and add an OBS overlay.">
+  <meta name="theme-color" content="#0d0f14">
+  <meta property="og:type" content="website"><meta property="og:title" content="NBFC TRACKER — Every chest. Keep the count."><meta property="og:description" content="Free, open-source automatic Fortnite chest counting and an OBS overlay. Download for Windows."><meta property="og:url" content="https://nbfct.nimnabro.com"><meta property="og:image" content="https://nbfct.nimnabro.com/assets/nbfc-launch.png"><meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="assets/chest_fnv1.png"><link rel="stylesheet" href="ui.css"><link rel="stylesheet" href="home.css">
+</head>
+<body class="download-home">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="home-nav wrap">
+    <a class="home-brand" href="/" aria-label="NBFC TRACKER home"><img src="assets/chest_fnv1.png" width="38" height="38" alt=""><span>NBFC TRACKER</span><small class="version">v0.1.0</small></a>
+    <nav aria-label="Main"><a href="#setup" data-i18n="howWorks">How it works</a><a href="dashboard" data-i18n="dashboard">Dashboard</a></nav>
+    <div class="language-picker"><button type="button" id="languageButton" class="language-button" aria-haspopup="listbox" aria-expanded="false" aria-controls="languageMenu"><span aria-hidden="true">文 / A</span><span id="languageName">English</span><span aria-hidden="true">⌄</span></button><div id="languageMenu" class="language-menu" role="listbox" hidden></div><select id="language" hidden aria-hidden="true" tabindex="-1"></select></div>
+  </header>
+  <main id="main">
+    <section class="home-hero wrap" aria-labelledby="homeTitle">
+      <div class="hero-copy"><p class="eyebrow"><span class="welcome-mark" aria-hidden="true"></span><span data-i18n="freeOpen">Free &amp; open source</span></p><h1 id="homeTitle" data-i18n="homeTitle">Every chest. Keep the count.</h1><p class="hero-intro" data-i18n="homeIntro">Automatic Fortnite chest counting from your replays. Your milestones, match history and OBS overlay, together.</p><div class="hero-actions"><a class="button primary download-link" href="https://github.com/nimnabrox/NBFC_TRACKER/releases/latest/download/NBFC.TRACKER.exe"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/></svg><span data-i18n="download">Download for Windows</span></a><a class="button secondary" href="https://github.com/nimnabrox/NBFC_TRACKER" target="_blank" rel="noopener" data-i18n="viewSource">View source</a></div><p class="requirements" data-i18n="requirements">Windows 10/11 · 64-bit · WebView2 Runtime</p><a class="text-link" href="dashboard"><span data-i18n="openWeb">Open web dashboard</span> <span aria-hidden="true">↗</span></a></div>
+      <div class="hero-scene" aria-label="Overlay preview"><div class="scene-ring" aria-hidden="true"></div><span class="scene-index" aria-hidden="true">01 / NBFC</span><img class="scene-chest" src="assets/chest_fnv1.png" width="400" height="400" alt="Fortnite treasure chest"><div class="scene-counter"><img src="assets/chest_fnv1.png" width="52" height="52" alt=""><span class="counter-divider"></span><strong data-example-count="4084">4,084</strong><span class="preview-tag" data-i18n="preview">Preview</span></div></div>
+    </section>
+    <section class="feature-strip wrap" aria-label="Features"><div><strong>01</strong><span data-i18n="total">Chests tracked</span></div><div><strong>02</strong><span data-i18n="history">Match history</span></div><div><strong>03</strong><span data-i18n="overlay">Stream overlay</span></div><div><strong>18</strong><span data-i18n="language">Language</span></div></section>
+    <section class="home-section wrap split" aria-labelledby="autoTitle"><div><p class="eyebrow">OBS + NBFC</p><h2 id="autoTitle" data-i18n="autoTitle">Set once. Updates automatically.</h2><p data-i18n="autoBody">New chests count automatically. Saved overlay settings reach OBS through the same URL. Run OBS and the companion on the same PC.</p><a class="text-link" href="dashboard" data-i18n="dashboard">Dashboard</a></div><div class="dashboard-preview"><div class="preview-heading"><span>NBFC TRACKER</span><span class="preview-tag" data-i18n="preview">Preview</span></div><div class="preview-total"><span data-i18n="total">Chests tracked</span><strong data-example-count="4084">4,084</strong></div><div class="preview-stats"><div><b data-example-count="151">151</b><span data-i18n="session">This session</span></div><div><b data-example-count="12">12</b><span data-i18n="lastMatch">Last match</span></div></div><div class="preview-chart" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></section>
+    <section class="home-section wrap" id="setup" aria-labelledby="setupTitle"><div class="section-heading"><p class="eyebrow">01 → 02 → 03</p><h2 id="setupTitle" data-i18n="howWorks">How it works</h2></div><div class="setup-grid"><article><span class="step-number">01</span><h3 data-i18n="step1">Enable replays</h3><p data-i18n="step1Body">In Fortnite: Settings → Game → Replays → Record Replays → On.</p></article><article><span class="step-number">02</span><h3 data-i18n="step2">Open the companion</h3><p data-i18n="step2Body">Run NBFC TRACKER on Windows. It reads your saved replays and keeps profiles separate.</p></article><article><span class="step-number">03</span><h3 data-i18n="step3">Bring it to your stream</h3><p data-i18n="step3Body">Copy the overlay URL into an OBS Browser Source. Keep the companion running.</p></article></div><details class="history-disclosure"><summary data-i18n="importantNote">Important</summary><p data-i18n="historyNotice"></p></details></section>
+    <section class="home-section wrap trust-grid" aria-label="About and safety"><article class="trust-card"><span class="trust-symbol" aria-hidden="true">⌂</span><h2 data-i18n="localTitle">Your replays. Your PC.</h2><p data-i18n="localBody">Reads saved replay files. No game memory access or Epic login required. Your replay data stays on this PC.</p><a class="text-link" href="https://github.com/nimnabrox/NBFC_TRACKER#readme" target="_blank" rel="noopener" data-i18n="howWorks">How it works</a></article><article class="trust-card"><span class="trust-symbol" aria-hidden="true">{ }</span><h2 data-i18n="verifyTitle">Inspect before you install</h2><p data-i18n="verifyBody">Public source and SHA-256 checksums. This Windows app is unsigned: review security warnings and verify your download before running it.</p><div class="source-links"><a href="https://github.com/nimnabrox/NBFC_TRACKER/tree/main/src" target="_blank" rel="noopener" data-i18n="viewSource">View source</a><a href="https://github.com/nimnabrox/NBFC_TRACKER/releases/latest/download/SHA256SUMS.txt">SHA-256 ↗</a><a href="https://github.com/nimnabrox/NBFC_TRACKER/blob/main/LICENSE" target="_blank" rel="noopener">MIT ↗</a></div></article></section>
+    <section class="home-cta wrap"><div><p class="eyebrow" data-i18n="freeOpen">Free &amp; open source</p><h2 data-i18n="step2">Open the companion</h2><span class="version">v0.1.0</span></div><a class="button primary download-link" href="https://github.com/nimnabrox/NBFC_TRACKER/releases/latest/download/NBFC.TRACKER.exe" data-i18n="download">Download for Windows</a></section>
+  </main>
+  <footer class="home-footer wrap"><div class="creator-line"><img src="assets/nimnabrologo.png" width="38" height="38" alt=""><div><strong>NimnaBro</strong><p>NBFC TRACKER · <span class="version">v0.1.0</span></p></div></div><div class="footer-actions"><button type="button" id="creatorCode" class="button secondary"><span data-i18n="useCode">Use code</span> NIMNABRO</button><a class="button secondary" href="https://www.youtube.com/@nimna_bro_?sub_confirmation=1" target="_blank" rel="noopener" data-i18n="subscribe">Subscribe</a></div><p class="footer-note" data-i18n="privacy">Reads local replay files. No game memory access. Not affiliated with Epic Games.</p></footer>
+  <div id="toast" class="home-toast" role="status" aria-live="polite" hidden></div><script type="module" src="home.js"></script>
+</body></html>

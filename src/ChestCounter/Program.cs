@@ -427,7 +427,6 @@ if (backlog > 0)
     tracker.Scan();
     ReportWriter.Progress = null;
     ReportWriter.WriteAll(store, config, data);
-    WebDashboardServer.SyncToCloudAsync();
 }
 if (tracker.NewProfilesFound)
 {
@@ -879,7 +878,7 @@ void PrintStatus()
     var demosNote = Directory.Exists(config.DemosFolder) ? "" : L.T("  (introuvable pour l'instant)", "  (not found yet)");
     ConsoleUi.Text($"Tracked  : {profile?.Name ?? "nimnabro"}");
     ConsoleUi.Text($"Base Count: {(config.BaseChestCount.HasValue ? config.BaseChestCount.Value.ToString() : "None (showing replay amount)")}");
-    ConsoleUi.Text($"Web Dash : https://nbfct.nimnabro.com");
+    ConsoleUi.Text($"Web Dash : https://nbfct.nimnabro.com/dashboard");
     ConsoleUi.Text($"OBS URL  : {WebDashboardServer.CurrentCloudOverlayUrl}");
     ConsoleUi.Text($"Replays  : {config.DemosFolder}{demosNote}");
     ConsoleUi.Text(L.T($"Données  : {store.Folder}", $"Data     : {store.Folder}"));
@@ -946,7 +945,6 @@ static void UpdateOverlay(Store store, Config config, TrackerData d, MatchRecord
     {
         NativeOverlay.Update(view);
     }
-    WebDashboardServer.SyncToCloudAsync();
 }
 
 // Below-normal priority + Windows 11 "efficiency mode" (EcoQoS): the game always comes first.
@@ -962,7 +960,7 @@ static void LowerPriority()
 
 static void Open(string path)
 {
-    var target = "https://nbfct.nimnabro.com";
+    var target = "https://nbfct.nimnabro.com/dashboard";
     try
     {
         Process.Start(new ProcessStartInfo(target) { UseShellExecute = true });
