@@ -169,7 +169,7 @@ async function loadSettings() {
   try {
     const data = await native('/api/settings');
     $('folder').value = data.demosFolder || ''; $('startup').checked = !!data.startWithWindows;
-    document.querySelectorAll('.version').forEach(el => { el.textContent = data.version || 'v0.2.2'; });
+    document.querySelectorAll('.version').forEach(el => { el.textContent = data.version || 'v0.2.3'; });
     if (!initialLanguage && data.uiLanguage) {
       await setLanguage(data.uiLanguage); $('language').value = locale;
     }

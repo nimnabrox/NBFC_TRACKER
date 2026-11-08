@@ -55,7 +55,8 @@ export function mountAppearance(onOverlayChange) {
       url.searchParams.set('layout', layout.value);
       url.searchParams.set('lang', locale);
       const local = location.port === '5088' && ['localhost', '127.0.0.1'].includes(location.hostname);
-      url.pathname = url.pathname.replace(/[^/]*$/, layout.value === 'modern' ? 'modern.html' : local ? 'app.html' : 'index.html');
+      const base = url.pathname.replace(/(?:index|app|modern)(?:\.html)?\/?$/, '').replace(/[^/]*$/, '');
+      url.pathname = base + (layout.value === 'modern' ? 'modern.html' : local ? 'app.html' : 'index.html');
       location.assign(url.href);
     });
   }

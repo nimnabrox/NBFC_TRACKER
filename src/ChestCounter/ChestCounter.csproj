@@ -9,9 +9,9 @@
     <Product>NBFC TRACKER</Product>
     <Company>NimnaBro</Company>
     <Authors>NimnaBro</Authors>
-    <Version>0.2.2</Version>
-    <AssemblyVersion>0.2.2.0</AssemblyVersion>
-    <FileVersion>0.2.2.0</FileVersion>
+    <Version>0.2.3</Version>
+    <AssemblyVersion>0.2.3.0</AssemblyVersion>
+    <FileVersion>0.2.3.0</FileVersion>
     <Description>NBFC TRACKER - Open Source Fortnite Chest Counter &amp; Live OBS Overlay - Created by NimnaBro</Description>
     <Copyright>Copyright © 2026 NimnaBro. All rights reserved.</Copyright>
     <ApplicationIcon>app.ico</ApplicationIcon>
