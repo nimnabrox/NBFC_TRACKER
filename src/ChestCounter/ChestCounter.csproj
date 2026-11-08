@@ -9,15 +9,15 @@
     <Product>NBFC TRACKER</Product>
     <Company>NimnaBro</Company>
     <Authors>NimnaBro</Authors>
-    <Version>0.1.0</Version>
-    <AssemblyVersion>0.1.0.0</AssemblyVersion>
-    <FileVersion>0.1.0.0</FileVersion>
+    <Version>0.2.0</Version>
+    <AssemblyVersion>0.2.0.0</AssemblyVersion>
+    <FileVersion>0.2.0.0</FileVersion>
     <Description>NBFC TRACKER - Open Source Fortnite Chest Counter &amp; Live OBS Overlay - Created by NimnaBro</Description>
     <Copyright>Copyright © 2026 NimnaBro. All rights reserved.</Copyright>
     <ApplicationIcon>app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <InvariantGlobalization>false</InvariantGlobalization>
-    <!-- Single-file publish settings without compression to ensure 100% VirusTotal / AV clean status -->
+    <!-- Uncompressed single-file publishing; antivirus results depend on the scanner. -->
     <PublishTrimmed>false</PublishTrimmed>
     <EnableCompressionInSingleFile>false</EnableCompressionInSingleFile>
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
@@ -30,6 +30,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\lib\FortniteReplayReader\FortniteReplayReader.csproj" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
-    <EmbeddedResource Include="..\..\public\**\*" LinkBase="public" />
+    <EmbeddedResource Include="..\..\v3\public\**\*" LinkBase="public" />
   </ItemGroup>
 </Project>

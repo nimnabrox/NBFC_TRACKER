@@ -36,6 +36,12 @@ export default {
       }
       if (data.matches !== undefined && (!Array.isArray(data.matches) || data.matches.length > 150)) return json({ error: 'Invalid matches' }, 400);
       if (data.accounts !== undefined && !Array.isArray(data.accounts)) return json({ error: 'Invalid accounts' }, 400);
+      const record = value => value && typeof value === 'object' && !Array.isArray(value);
+      if (data.player !== undefined && typeof data.player !== 'string') return json({ error: 'Invalid player' }, 400);
+      if (data.base != null && (!Number.isSafeInteger(data.base) || data.base < 0)) return json({ error: 'Invalid base' }, 400);
+      if (data.matches?.some(m => !record(m) || ['playlist', 'playerName', 'matchStart'].some(k => m[k] != null && typeof m[k] !== 'string')
+        || ['chestsOpened', 'placement', 'eliminations'].some(k => m[k] != null && (!Number.isSafeInteger(m[k]) || m[k] < 0)))) return json({ error: 'Invalid match record' }, 400);
+      if (data.accounts?.some(a => !record(a) || ['name', 'key'].some(k => a[k] != null && typeof a[k] !== 'string'))) return json({ error: 'Invalid profile' }, 400);
     }
     const room = roomName(data?.room ?? url.searchParams.get('room'));
     if (!room && request.method === 'GET') return json(emptyState(''));

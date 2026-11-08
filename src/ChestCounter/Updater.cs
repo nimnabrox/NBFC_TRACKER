@@ -12,6 +12,7 @@ public sealed record UpdateInfo(Version Version, string Tag, string AssetUrl, lo
 /// </summary>
 public static class Updater
 {
+    public static string? LastCheckError { get; private set; }
     private static string ApiUrl => Environment.GetEnvironmentVariable("CHESTCOUNTER_UPDATE_API")
         ?? $"https://api.github.com/repos/{AppInfo.Repo}/releases/latest";
 
@@ -26,12 +27,14 @@ public static class Updater
     /// <summary>The newer release, or null (up to date, offline, repository not reachable…).</summary>
     public static async Task<UpdateInfo?> CheckAsync()
     {
+        LastCheckError = null;
         try
         {
             using var http = NewClient(TimeSpan.FromSeconds(10));
             using var response = await http.GetAsync(ApiUrl);
             if (!response.IsSuccessStatusCode)
             {
+                LastCheckError = $"GitHub release lookup returned HTTP {(int)response.StatusCode}.";
                 return null;
             }
             using var doc = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -51,8 +54,8 @@ public static class Updater
             {
                 var assetName = asset.GetProperty("name").GetString() ?? "";
                 if (!assetName.Equals("NBFC TRACKER.exe", StringComparison.OrdinalIgnoreCase) &&
-                    !assetName.Equals("ChestCounter.exe", StringComparison.OrdinalIgnoreCase) &&
-                    !assetName.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+                    !assetName.Equals("NBFC.TRACKER.exe", StringComparison.OrdinalIgnoreCase) &&
+                    !assetName.Equals("ChestCounter.exe", StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -66,8 +69,9 @@ public static class Updater
             }
             return null;
         }
-        catch
+        catch (Exception ex)
         {
+            LastCheckError = ex.Message;
             return null;
         }
     }
@@ -80,6 +84,7 @@ public static class Updater
         var exe = AppInfo.ExePath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "NBFC TRACKER.exe");
         var download = exe + ".download";
         var old = exe + ".old";
+        var replaced = false;
         try
         {
             using (var http = NewClient(TimeSpan.FromMinutes(5)))
@@ -96,6 +101,13 @@ public static class Updater
             }
             using (var fs = File.OpenRead(download))
             {
+                if (!string.IsNullOrWhiteSpace(update.Sha256))
+                {
+                    var hash = Convert.ToHexString(SHA256.HashData(fs));
+                    if (!hash.Equals(update.Sha256, StringComparison.OrdinalIgnoreCase))
+                        throw new IOException("The update checksum does not match the GitHub release.");
+                    fs.Position = 0;
+                }
                 if (fs.ReadByte() != 'M' || fs.ReadByte() != 'Z')
                 {
                     throw new IOException(L.T("le fichier téléchargé n'est pas un exécutable Windows valide", "downloaded file is not a valid Windows executable"));
@@ -108,19 +120,24 @@ public static class Updater
             }
             File.Move(exe, old);
             File.Move(download, exe);
+            replaced = true;
 
             try
             {
-                Process.Start(new ProcessStartInfo(exe) { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(exe, "--after-update") { UseShellExecute = true });
                 Environment.Exit(0);
             }
-            catch { }
+            catch (Exception ex) { throw new IOException("The updated app could not be started.", ex); }
 
             return null;
         }
         catch (Exception ex)
         {
             try { File.Delete(download); } catch { }
+            if (replaced && File.Exists(old))
+            {
+                try { File.Delete(exe); File.Move(old, exe); } catch { }
+            }
             if (!File.Exists(exe) && File.Exists(old))
             {
                 try { File.Move(old, exe); } catch { }

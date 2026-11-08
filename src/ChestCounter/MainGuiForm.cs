@@ -131,7 +131,7 @@ public class MainGuiForm : Form
         _onExit = onExit;
 
         Text = "NBFC TRACKER";
-        Size = new Size(540, 720);
+        Size = new Size(1120, 860);
         MinimumSize = new Size(460, 560);
         MaximumSize = Size.Empty;
         StartPosition = FormStartPosition.CenterScreen;
@@ -184,36 +184,36 @@ public class MainGuiForm : Form
         };
 
         var trayMenu = new ContextMenuStrip();
-        var openItem = new ToolStripMenuItem("Open Desktop Companion", null, (_, _) => RestoreWindow())
+        var openItem = new ToolStripMenuItem(DashboardLanguage.Text("openApp"), null, (_, _) => RestoreWindow())
         {
             Font = new Font(Font, FontStyle.Bold)
         };
-        var openWebItem = new ToolStripMenuItem("Open Web Dashboard (nbfct.nimnabro.com)", null, (_, _) =>
+        var openWebItem = new ToolStripMenuItem(DashboardLanguage.Text("openWeb"), null, (_, _) =>
         {
             try
             {
-                Process.Start(new ProcessStartInfo("https://nbfct.nimnabro.com") { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo("https://nbfct.nimnabro.com/?room=" + Uri.EscapeDataString(WebDashboardServer.CurrentCloudRoom)) { UseShellExecute = true });
             }
             catch { }
         });
-        var copyOverlayItem = new ToolStripMenuItem("Copy OBS Overlay URL", null, (_, _) =>
+        var copyOverlayItem = new ToolStripMenuItem(DashboardLanguage.Text("copy"), null, (_, _) =>
         {
             try
             {
-                Clipboard.SetText("https://nbfct.nimnabro.com/overlay.html?room=nimnabro");
-                _trayIcon.ShowBalloonTip(1500, "NBFC TRACKER", "OBS Overlay URL copied to clipboard!", ToolTipIcon.Info);
+                Clipboard.SetText(WebDashboardServer.CurrentCloudOverlayUrl);
+                _trayIcon.ShowBalloonTip(1500, "NBFC TRACKER", DashboardLanguage.Text("copied"), ToolTipIcon.Info);
             }
             catch { }
         });
-        var openOverlayItem = new ToolStripMenuItem("Open Live Overlay", null, (_, _) =>
+        var openOverlayItem = new ToolStripMenuItem(DashboardLanguage.Text("preview"), null, (_, _) =>
         {
             try
             {
-                Process.Start(new ProcessStartInfo("https://nbfct.nimnabro.com/overlay.html?room=nimnabro") { UseShellExecute = true });
+                Process.Start(new ProcessStartInfo(WebDashboardServer.CurrentCloudOverlayUrl) { UseShellExecute = true });
             }
             catch { }
         });
-        var exitItem = new ToolStripMenuItem("Exit NBFC TRACKER", null, (_, _) =>
+        var exitItem = new ToolStripMenuItem(DashboardLanguage.Text("exit"), null, (_, _) =>
         {
             _allowExit = true;
             Close();
@@ -249,6 +249,15 @@ public class MainGuiForm : Form
         WindowState = FormWindowState.Normal;
         BringToFront();
         Activate();
+    }
+
+    public void RefreshLanguage()
+    {
+        if (InvokeRequired) { BeginInvoke(RefreshLanguage); return; }
+        if (_trayIcon.ContextMenuStrip is not { } menu) return;
+        var keys = new[] { "openApp", "openWeb", "", "copy", "preview", "", "exit" };
+        for (var i = 0; i < keys.Length; i++) if (keys[i].Length > 0) menu.Items[i].Text = DashboardLanguage.Text(keys[i]);
+        menu.RightToLeft = DashboardLanguage.Code == "ar" ? RightToLeft.Yes : RightToLeft.No;
     }
 
     private async void InitWebView()
@@ -324,7 +333,7 @@ public class MainGuiForm : Form
             if (!_hasShownTrayNotice)
             {
                 _hasShownTrayNotice = true;
-                _trayIcon.ShowBalloonTip(2500, "NBFC TRACKER", "Running in background! Double-click tray icon or right-click to restore.", ToolTipIcon.Info);
+                _trayIcon.ShowBalloonTip(2500, "NBFC TRACKER", DashboardLanguage.Text("openApp"), ToolTipIcon.Info);
             }
             return;
         }

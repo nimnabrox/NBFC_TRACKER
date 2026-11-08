@@ -1,0 +1,11 @@
+import { cp, mkdir, rm, readFile, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+const output = resolve('dist/web');
+await rm(output, { recursive: true, force: true });
+await mkdir(output, { recursive: true });
+await cp('v3/public', output, { recursive: true });
+await cp('v3/web-cloud/_worker.js', resolve(output, '_worker.js'));
+const config = await readFile('v3/web-cloud/wrangler.toml', 'utf8');
+await writeFile(resolve(output, 'wrangler.toml'), config.replace('directory = "../public"', 'directory = "."'));
+await writeFile(resolve(output, '.assetsignore'), '_worker.js\nwrangler.toml\n.assetsignore\n');
+console.log('Web package ready: dist/web');

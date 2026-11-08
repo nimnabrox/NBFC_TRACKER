@@ -6,7 +6,7 @@ public static class AppInfo
     public static Version Version { get; } = typeof(AppInfo).Assembly.GetName().Version ?? new Version(0, 1, 0);
 
     public static string VersionText => $"{Version.Major}.{Version.Minor}.{Math.Max(0, Version.Build)}";
-    public const string DisplayVersion = "v0.1.0";
+    public static string DisplayVersion => "v" + VersionText;
 
     public const string AppName = "NBFC TRACKER";
     public const string Author = "NimnaBro";

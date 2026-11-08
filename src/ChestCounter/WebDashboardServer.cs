@@ -12,7 +12,7 @@ public static class WebDashboardServer
 {
     private static HttpListener? _listener;
     private static Thread? _thread;
-    public const int Port = 5088;
+    public static int Port { get; } = int.TryParse(Environment.GetEnvironmentVariable("NBFC_PORT"), out var port) && port is > 1024 and < 65536 ? port : 5088;
     public static string Url => $"http://localhost:{Port}/";
     public static string OverlayUrl => $"http://localhost:{Port}/overlay";
     public static bool IsListening => _listener != null && _listener.IsListening;
@@ -30,12 +30,13 @@ public static class WebDashboardServer
         _store = store;
         _config = config;
         _data = data;
+        DashboardLanguage.Set(config.UiLanguage ?? config.Language ?? "en");
         _isLiveInProgress = isLiveInProgress;
         _getLiveMatch = getLiveMatch;
 
         try
         {
-            var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ChestCounter", "trace.log");
+            var logPath = Path.Combine(store.Folder, "trace.log");
             File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss.fff}] [WebDashboardServer] Starting on http://localhost:{Port}/ and http://127.0.0.1:{Port}/ ...\r\n");
 
             _listener = new HttpListener();
@@ -72,12 +73,13 @@ public static class WebDashboardServer
 
             // Sync initial state once on startup (no periodic spam timer!)
             SyncToCloudAsync();
+            _cloudSyncTimer = new System.Threading.Timer(_ => SyncToCloudAsync(), null, TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
         }
         catch (Exception ex)
         {
             try
             {
-                var logPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "ChestCounter", "trace.log");
+                var logPath = Path.Combine(store.Folder, "trace.log");
                 File.AppendAllText(logPath, $"[{DateTime.Now:HH:mm:ss.fff}] [WebDashboardServer] ERROR: {ex}\r\n");
             }
             catch { }
@@ -108,6 +110,17 @@ public static class WebDashboardServer
 
             var path = req.Url?.AbsolutePath ?? "/";
 
+            if (path.Equals("/api/set-language", StringComparison.OrdinalIgnoreCase))
+            {
+                var code = req.QueryString["code"];
+                if (!DashboardLanguage.Set(code)) { res.StatusCode = 400; res.Close(); return; }
+                if (_config != null && _store != null) { _config.UiLanguage = DashboardLanguage.Code; _store.SaveConfig(_config); }
+                MainGuiForm.CurrentInstance?.RefreshLanguage();
+                res.ContentType = "application/json; charset=utf-8";
+                var bytes = Encoding.UTF8.GetBytes("{\"ok\":true}");
+                res.OutputStream.Write(bytes); res.Close(); return;
+            }
+
             // 1. Live Stats API (for OBS overlay and live updates)
             if (path.Equals("/api/live", StringComparison.OrdinalIgnoreCase))
             {
@@ -136,6 +149,9 @@ public static class WebDashboardServer
             if (path.Equals("/api/set-base", StringComparison.OrdinalIgnoreCase))
             {
                 var countStr = req.QueryString["count"];
+                if (!string.IsNullOrWhiteSpace(countStr) && countStr != "clear" && countStr != "reset" && countStr != "null"
+                    && (!int.TryParse(countStr, out var validCount) || validCount < 0))
+                { res.StatusCode = 400; res.Close(); return; }
                 var targetProfile = req.QueryString["profile"] ?? req.QueryString["key"];
                 if (_config != null && _store != null && _data != null)
                 {
@@ -172,6 +188,9 @@ public static class WebDashboardServer
                         {
                             if (!string.IsNullOrWhiteSpace(pKey)) _config.SetBaseChestForProfile(pKey, count);
                             if (!string.IsNullOrWhiteSpace(pName)) _config.SetBaseChestForProfile(pName, count);
+                            var replayTotal = _data.Matches.Where(m => Profiles.Key(m).Equals(pKey, StringComparison.OrdinalIgnoreCase)).Sum(m => m.ChestsOpened);
+                            if (!string.IsNullOrWhiteSpace(pKey)) _config.ProfileBaseReplayTotals[pKey] = replayTotal;
+                            if (!string.IsNullOrWhiteSpace(pName)) _config.ProfileBaseReplayTotals[pName] = replayTotal;
                             _store.SaveConfig(_config);
                             ReportWriter.WriteAll(_store, _config, _data);
                             Console.ForegroundColor = ConsoleColor.Cyan;
@@ -255,7 +274,7 @@ public static class WebDashboardServer
                 var baseStr = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value.ToString() : "null";
                 var startWithFn = _config?.StartWithFortnite ?? false;
 
-                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"version\":\"{AppInfo.DisplayVersion}\"}}";
+                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"uiLanguage\":\"{EscapeJson(_config?.UiLanguage ?? _config?.Language ?? "en")}\",\"version\":\"{AppInfo.DisplayVersion}\"}}";
                 var bytes = Encoding.UTF8.GetBytes(json);
                 res.ContentLength64 = bytes.Length;
                 res.OutputStream.Write(bytes, 0, bytes.Length);
@@ -280,7 +299,7 @@ public static class WebDashboardServer
                     }
                     else
                     {
-                        var json = $"{{\"hasUpdate\":false,\"currentVersion\":\"{AppInfo.DisplayVersion}\"}}";
+                        var json = $"{{\"hasUpdate\":false,\"available\":{(Updater.LastCheckError == null ? "true" : "false")},\"currentVersion\":\"{AppInfo.DisplayVersion}\"}}";
                         var bytes = Encoding.UTF8.GetBytes(json);
                         res.ContentLength64 = bytes.Length;
                         res.OutputStream.Write(bytes, 0, bytes.Length);
@@ -344,7 +363,7 @@ public static class WebDashboardServer
                 {
                     try
                     {
-                        using var rk = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+                        using var rk = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
                         if (rk != null)
                         {
                             if (enabled && AppInfo.ExePath != null)
@@ -357,7 +376,7 @@ public static class WebDashboardServer
                             }
                         }
                     }
-                    catch { }
+                    catch { res.StatusCode = 500; res.Close(); return; }
                 }
 
                 res.ContentType = "application/json; charset=utf-8";
@@ -372,6 +391,8 @@ public static class WebDashboardServer
             if (path.Equals("/api/set-demos-folder", StringComparison.OrdinalIgnoreCase))
             {
                 var folder = req.QueryString["folder"];
+                if (string.IsNullOrWhiteSpace(folder) || !Directory.Exists(folder))
+                { res.StatusCode = 400; res.Close(); return; }
                 if (_config != null && _store != null && !string.IsNullOrWhiteSpace(folder) && Directory.Exists(folder))
                 {
                     _config.DemosFolder = folder;
@@ -497,6 +518,8 @@ public static class WebDashboardServer
 
             // 7. Static Asset & Modern 1:2 Dashboard Router
             var cleanPath = path.TrimStart('/');
+            if (cleanPath.Contains("..") || cleanPath.Contains('\\') || cleanPath.Contains(':'))
+            { res.StatusCode = 400; res.Close(); return; }
             if (string.IsNullOrEmpty(cleanPath) || cleanPath.Equals("index.html", StringComparison.OrdinalIgnoreCase))
             {
                 cleanPath = "index.html";
@@ -599,61 +622,32 @@ public static class WebDashboardServer
     }
 
     private static readonly HttpClient _syncClient = new() { Timeout = TimeSpan.FromSeconds(5) };
-    private static string _lastSyncedPayloadMain = "";
-    private static string _lastSyncedPayloadPlayer = "";
-    private static readonly object _syncLock = new();
+    private static readonly SemaphoreSlim _syncGate = new(1, 1);
+    private static string _lastSyncedPayload = "";
+    private static DateTime _lastSyncUtc;
 
     public static void SyncToCloudAsync()
     {
+        if (Environment.GetEnvironmentVariable("NBFC_DISABLE_CLOUD_SYNC") == "1") return;
         Task.Run(async () =>
         {
+            if (!await _syncGate.WaitAsync(0)) return;
             try
             {
-                string activePlayer = "nimnabro";
-                if (_data != null && _config != null)
-                {
-                    lock (_data)
-                    {
-                        var cur = Profiles.Current(_data, _config);
-                        if (cur != null && !string.IsNullOrWhiteSpace(cur.Name))
-                            activePlayer = cur.Name.Trim();
-                    }
-                }
-
-                // 1. Sync to main room "nimnabro" (the global live endpoint for nbfct.nimnabro.com)
-                var mainPayload = GetCloudSyncPayload("nimnabro");
-                bool mainChanged;
-                lock (_syncLock)
-                {
-                    mainChanged = (mainPayload != _lastSyncedPayloadMain);
-                    if (mainChanged) _lastSyncedPayloadMain = mainPayload;
-                }
-
-                if (mainChanged)
-                {
-                    using var c1 = new StringContent(mainPayload, Encoding.UTF8, "application/json");
-                    await _syncClient.PostAsync("https://nbfct.nimnabro.com/api/sync", c1);
-                }
-
-                // 2. If active player name is distinct, also sync to that player's room
-                if (!activePlayer.Equals("nimnabro", StringComparison.OrdinalIgnoreCase) && !activePlayer.Equals("All Accounts", StringComparison.OrdinalIgnoreCase))
-                {
-                    var playerPayload = GetCloudSyncPayload(activePlayer.ToLowerInvariant());
-                    bool playerChanged;
-                    lock (_syncLock)
-                    {
-                        playerChanged = (playerPayload != _lastSyncedPayloadPlayer);
-                        if (playerChanged) _lastSyncedPayloadPlayer = playerPayload;
-                    }
-
-                    if (playerChanged)
-                    {
-                        using var c2 = new StringContent(playerPayload, Encoding.UTF8, "application/json");
-                        await _syncClient.PostAsync("https://nbfct.nimnabro.com/api/sync", c2);
-                    }
-                }
+                // Each player publishes only their own room. Never overwrite a global creator room.
+                var room = CurrentCloudRoom;
+                if (string.IsNullOrWhiteSpace(room)) return;
+                var payload = GetCloudSyncPayload(room);
+                if (payload == _lastSyncedPayload && DateTime.UtcNow - _lastSyncUtc < TimeSpan.FromSeconds(25)) return;
+                using var content = new StringContent(payload, Encoding.UTF8, "application/json");
+                using var response = await _syncClient.PostAsync("https://nbfct.nimnabro.com/api/sync", content);
+                response.EnsureSuccessStatusCode();
+                // A failed upload must be retried, even when the counts have not changed.
+                _lastSyncedPayload = payload;
+                _lastSyncUtc = DateTime.UtcNow;
             }
-            catch { }
+            catch { /* Retry on the next heartbeat or replay change. */ }
+            finally { _syncGate.Release(); }
         });
     }
 
@@ -691,10 +685,18 @@ public static class WebDashboardServer
             var baseCount = _config.GetBaseChestForProfile(profileKey) ?? _config.GetBaseChestForProfile(playerName);
             var matches = matchArray.OrderByDescending(ReportWriter.When).ToList();
             var inProgress = _isLiveInProgress?.Invoke() ?? false;
-            var liveChests = _getLiveMatch?.Invoke()?.ChestsOpened ?? 0;
+            var liveMatch = _getLiveMatch?.Invoke();
+            var liveChests = liveMatch != null && (Profiles.Key(liveMatch).Equals(profileKey, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(liveMatch.PlayerName, playerName, StringComparison.OrdinalIgnoreCase)) ? liveMatch.ChestsOpened : 0;
             var sessionChests = matches.Where(ReportWriter.IsThisSession).Sum(m => m.ChestsOpened) + liveChests;
             var totalChests = matches.Sum(m => m.ChestsOpened) + liveChests;
-            var displayedTotal = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value + liveChests : totalChests;
+            int displayedTotal;
+            lock (_data)
+            {
+                var baselinesBefore = _config.ProfileBaseReplayTotals.Count;
+                displayedTotal = _config.DisplayedChestTotal(profileKey, playerName, totalChests - liveChests, liveChests);
+                if (_config.ProfileBaseReplayTotals.Count != baselinesBefore) _store?.SaveConfig(_config);
+            }
             var lastMatch = matches.Count > 0 ? matches[0].ChestsOpened : 0;
             var baseJson = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value.ToString() : "null";
 
@@ -757,14 +759,24 @@ public static class WebDashboardServer
                 var place = m.Placement.HasValue ? m.Placement.Value.ToString() : "null";
                 var elim = m.Eliminations.HasValue ? m.Eliminations.Value.ToString() : "0";
                 var player = EscapeJson(!string.IsNullOrEmpty(m.PlayerName) ? m.PlayerName : curProfileName);
-                return $"{{\"fileName\":\"{EscapeJson(fn)}\",\"matchStart\":\"{start}\",\"durationSeconds\":{m.DurationSeconds},\"playlist\":\"{EscapeJson(pl)}\",\"placement\":{place},\"chestsOpened\":{m.ChestsOpened},\"eliminations\":{elim},\"playerName\":\"{player}\"}}";
+                return $"{{\"fileName\":\"{EscapeJson(fn)}\",\"matchStart\":\"{start}\",\"durationSeconds\":{m.DurationSeconds ?? 0},\"playlist\":\"{EscapeJson(pl)}\",\"placement\":{place},\"chestsOpened\":{m.ChestsOpened},\"eliminations\":{elim},\"playerName\":\"{player}\"}}";
             });
             return "[" + string.Join(",", items) + "]";
         }
         catch { return "[]"; }
     }
 
-    private static string EscapeJson(string s) => (s ?? "").Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\r", "").Replace("\n", " ");
+    private static string EscapeJson(string s) => System.Text.Json.JsonSerializer.Serialize(s ?? "")[1..^1];
+
+    public static string CurrentCloudRoom
+    {
+        get
+        {
+            if (_data == null || _config == null) return "";
+            lock (_data) return Profiles.Current(_data, _config)?.Name.ToLowerInvariant() ?? "";
+        }
+    }
+    public static string CurrentCloudOverlayUrl => "https://nbfct.nimnabro.com/overlay.html?room=" + Uri.EscapeDataString(CurrentCloudRoom) + "&lang=" + DashboardLanguage.Code;
 
     private static string GetObsOverlayHtml()
     {

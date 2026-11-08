@@ -1,48 +1,42 @@
 name: Release NBFC TRACKER
-
 on:
   push:
-    tags:
-      - 'v*'
-
+    tags: ['v*']
 permissions:
   contents: write
-
 jobs:
   build-and-release:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Setup .NET 8.0 SDK
-        uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-
-      - name: Publish Single-File Executable
+      - run: npm ci
+      - run: npm run check
+      - name: Verify desktop behavior
+        run: dotnet run --project tests/Smoke/Smoke.csproj -c Release -m:1
+      - name: Build release assets
+        shell: pwsh
         run: |
-          dotnet publish src/ChestCounter/ChestCounter.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=false -o dist
-
-      - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+          $releaseVersion = '${{ github.ref_name }}'.TrimStart('v')
+          if ($releaseVersion -notmatch '^\d+\.\d+\.\d+$') { throw 'Tag must be vX.Y.Z' }
+          dotnet publish src/ChestCounter/ChestCounter.csproj -c Release -r win-x64 --self-contained true -m:1 -p:Version=$releaseVersion -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=false -p:DebugType=none -o dist/release
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run package:web
+          Copy-Item 'dist/release/NBFC TRACKER.exe' 'dist/release/NBFC.TRACKER.exe'
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          Compress-Archive -Path dist/web/* -DestinationPath dist/release/NBFC-Tracker-Web.zip
+          Get-FileHash 'dist/release/NBFC.TRACKER.exe', 'dist/release/NBFC-Tracker-Web.zip' -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } | Set-Content dist/release/SHA256SUMS.txt
+      - uses: softprops/action-gh-release@v2
         with:
-          files: dist/NBFC TRACKER.exe
           name: NBFC TRACKER ${{ github.ref_name }}
-          body: |
-            ### ⚡ NBFC TRACKER ${{ github.ref_name }} Release
-
-            **What's New in this Release:**
-            - **Per-Account Starting Chest Milestone Isolation**: Fixed chest offset leakage across accounts. Each Fortnite account now maintains its own independent starting offset or raw replay count.
-            - **Default to Active Match Account**: The app and web dashboard automatically select the player account from the most recent match by default.
-            - **Native Windows Dark Mode Title Bar**: Styled the native desktop companion title bar in dark mode to seamlessly match the UI.
-            - **Built-in 1-Click Update System**: Automatic update detection directly via GitHub Releases.
-            - **Unlimited Real-Time Live Sync & OBS Overlay**: Ultra-fast updates with zero quotas or limits.
-            - **Nimna Bro YouTube Live Hub**: Built-in channel & livestream promoter for @nimna_bro_.
-
-            **Installation:**
-            - Download `NBFC TRACKER.exe` below.
-            - Run directly on Windows 10 / 11 (zero installation required).
-          draft: false
-          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/release/NBFC.TRACKER.exe
+            dist/release/NBFC-Tracker-Web.zip
+            dist/release/SHA256SUMS.txt

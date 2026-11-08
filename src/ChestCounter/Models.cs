@@ -77,6 +77,8 @@ public sealed class Config
 {
     /// <summary>"fr" or "en" (default English).</summary>
     public string? Language { get; set; } = "en";
+    // Dashboard/tray supports 18 languages independently of the legacy CLI language.
+    public string? UiLanguage { get; set; }
 
     /// <summary>Selected profile (Epic id or name of the account the player plays on). Default null so it defaults to the latest match player.</summary>
     public string? Profile { get; set; }
@@ -107,6 +109,7 @@ public sealed class Config
 
     /// <summary>Per-profile user-configured base chest count (e.g. "nimnabro" -> 4084). Keyed by profile name or Epic ID.</summary>
     public Dictionary<string, int> ProfileBaseChests { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    public Dictionary<string, int> ProfileBaseReplayTotals { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     public int? GetBaseChestForProfile(string? profile)
     {
@@ -144,7 +147,18 @@ public sealed class Config
         else
         {
             ProfileBaseChests.Remove(p);
+            ProfileBaseReplayTotals.Remove(p);
         }
+    }
+
+    public int DisplayedChestTotal(string profileKey, string profileName, int replayTotal, int liveChests)
+    {
+        var baseCount = GetBaseChestForProfile(profileKey) ?? GetBaseChestForProfile(profileName);
+        if (!baseCount.HasValue) return replayTotal + liveChests;
+        var key = ProfileBaseChests.ContainsKey(profileKey) ? profileKey : profileName;
+        if (!ProfileBaseReplayTotals.TryGetValue(key, out var baseline))
+            ProfileBaseReplayTotals[key] = baseline = replayTotal;
+        return (int)Math.Min(int.MaxValue, (long)baseCount.Value + Math.Max(0, replayTotal - baseline) + liveChests);
     }
 }
 

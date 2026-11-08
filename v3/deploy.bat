@@ -1,16 +1,10 @@
 @echo off
-chcp 65001 >nul
-title Deploying NimnaBro's Fortnite Chest Tracker v3 to Cloudflare
-cd /d "%~dp0\web-cloud"
-
-echo =======================================================================
-echo   Deploying v3 to https://nbfct.nimnabro.com
-echo   Created by NimnaBro
-echo =======================================================================
-echo.
-
-call npx wrangler deploy
-
-echo.
-echo Deploy finished!
-pause
+setlocal
+cd /d "%~dp0.."
+if not exist node_modules\wrangler call npm ci
+if errorlevel 1 exit /b 1
+call npm run check
+if errorlevel 1 exit /b 1
+call npm run deploy
+if errorlevel 1 exit /b 1
+echo Deployed v3 to https://nbfct.nimnabro.com
