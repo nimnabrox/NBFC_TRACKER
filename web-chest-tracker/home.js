@@ -9,7 +9,7 @@ mountLanguagePicker();
 function render(){
   renderScanReport();
   document.querySelectorAll('.version').forEach(el=>{el.textContent=displayVersion;});
-  document.querySelectorAll('[data-example-count]').forEach(el=>{el.textContent=new Intl.NumberFormat(locale).format(previewValues()[el.dataset.previewMetric]);});
+  document.querySelectorAll('[data-example-count]').forEach(el=>{el.textContent=(el.dataset.previewPrefix||'')+new Intl.NumberFormat(locale).format(previewValues()[el.dataset.previewMetric]);if(el.classList.contains('preview-last'))el.title=t('lastMatch');});
 }
 document.addEventListener('languagechange',render);
 $('language').onchange=async event=>{await setLanguage(event.target.value);const url=new URL(location.href);url.searchParams.set('lang',locale);history.replaceState(null,'',url);};

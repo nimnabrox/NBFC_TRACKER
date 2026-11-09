@@ -60,6 +60,7 @@ function render() {
   const values = summarize(snapshot);
   for (const [key, value] of Object.entries(values)) $(key).textContent = number(value);
   $('total').style.setProperty('--count-chars', Math.max(6, number(values.total).length));
+  document.querySelectorAll('[data-total-last]').forEach(el => { el.textContent = '+' + number(values.lastMatch); el.title = t('lastMatch'); });
   $('overlayTotal').textContent = number(values.total);
   $('overlayEditorTotal').textContent = number(values.total);
   const options = getOverlayOptions();
