@@ -125,5 +125,6 @@
   "runtimeHelp": "ตัวนับกำลังทำงาน แต่ Microsoft WebView2 ไม่พร้อมใช้งาน ใช้แดชบอร์ดในเบราว์เซอร์หรือติดตั้งรันไทม์แล้วลองใหม่",
   "installWebView": "ติดตั้ง Microsoft WebView2",
   "retry": "ลองอีกครั้ง",
-  "scanReport": "รายงาน VirusTotal"
+  "scanReport": "รายงาน VirusTotal",
+  "scanSummary": "อันตราย {malicious} · น่าสงสัย {suspicious} · ไม่พบภัย {undetected} · หมดเวลา {timeout} · ไม่รองรับ {unsupported}"
 }

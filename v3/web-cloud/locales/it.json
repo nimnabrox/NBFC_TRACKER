@@ -125,5 +125,6 @@
   "runtimeHelp": "Il contatore è attivo. Microsoft WebView2 non è disponibile. Usa il pannello nel browser oppure installa il runtime e riprova.",
   "installWebView": "Installa Microsoft WebView2",
   "retry": "Riprova",
-  "scanReport": "Rapporto VirusTotal"
+  "scanReport": "Rapporto VirusTotal",
+  "scanSummary": "{malicious} dannosi · {suspicious} sospetti · {undetected} senza rilevamenti · {timeout} timeout · {unsupported} non supportati"
 }

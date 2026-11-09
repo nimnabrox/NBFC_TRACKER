@@ -19,4 +19,24 @@ ja:'このPCにWindowsアプリをインストールして起動してくださ�
 'zh-Hant':'請在本機安裝並開啟 Windows 配套應用程式。如有提示，請允許網站連接本機裝置。|正在自動連線。應用程式就緒後會自動開啟頁面，無須重新整理。|計數器正在執行，但 Microsoft WebView2 無法使用。請使用瀏覽器面板，或安裝執行階段後重試。|安裝 Microsoft WebView2|重試|VirusTotal 報告',
 ko:'이 PC에 Windows 연동 앱을 설치하고 실행하세요. 요청이 표시되면 사이트의 로컬 기기 연결을 허용하세요.|자동 연결 중입니다. 앱이 준비되면 새로고침 없이 페이지가 열립니다.|집계는 실행 중이지만 Microsoft WebView2를 사용할 수 없습니다. 브라우저 대시보드를 사용하거나 런타임 설치 후 다시 시도하세요.|Microsoft WebView2 설치|다시 시도|VirusTotal 보고서'
 };
-export function connectionLabels(code){const values=rows[code]?.split('|');if(values?.length!==keys.length)throw new Error('Incomplete connection labels: '+code);return Object.fromEntries(keys.map((key,i)=>[key,values[i]]));}
+const summaries={
+en:'{malicious} malicious · {suspicious} suspicious · {undetected} undetected · {timeout} timed out · {unsupported} unsupported',
+id:'{malicious} berbahaya · {suspicious} mencurigakan · {undetected} tidak terdeteksi · {timeout} batas waktu · {unsupported} tidak didukung',
+de:'{malicious} schädlich · {suspicious} verdächtig · {undetected} ohne Erkennung · {timeout} Zeitüberschreitung · {unsupported} nicht unterstützt',
+es:'{malicious} maliciosos · {suspicious} sospechosos · {undetected} sin detección · {timeout} fuera de tiempo · {unsupported} no compatibles',
+'es-419':'{malicious} maliciosos · {suspicious} sospechosos · {undetected} sin detección · {timeout} fuera de tiempo · {unsupported} no compatibles',
+fr:'{malicious} malveillant · {suspicious} suspect · {undetected} sans détection · {timeout} délai dépassé · {unsupported} non pris en charge',
+it:'{malicious} dannosi · {suspicious} sospetti · {undetected} senza rilevamenti · {timeout} timeout · {unsupported} non supportati',
+pl:'{malicious} złośliwych · {suspicious} podejrzanych · {undetected} bez wykrycia · {timeout} przekroczony czas · {unsupported} nieobsługiwanych',
+'pt-BR':'{malicious} maliciosos · {suspicious} suspeitos · {undetected} sem detecção · {timeout} tempo esgotado · {unsupported} não compatíveis',
+vi:'{malicious} độc hại · {suspicious} đáng ngờ · {undetected} không phát hiện · {timeout} hết thời gian · {unsupported} không hỗ trợ',
+tr:'{malicious} zararlı · {suspicious} şüpheli · {undetected} tespit yok · {timeout} zaman aşımı · {unsupported} desteklenmiyor',
+ru:'{malicious} вредоносных · {suspicious} подозрительных · {undetected} без обнаружения · {timeout} тайм-аут · {unsupported} не поддерживают',
+ar:'{malicious} ضار · {suspicious} مشتبه · {undetected} دون اكتشاف · {timeout} انتهت المهلة · {unsupported} غير مدعوم',
+th:'อันตราย {malicious} · น่าสงสัย {suspicious} · ไม่พบภัย {undetected} · หมดเวลา {timeout} · ไม่รองรับ {unsupported}',
+ja:'悪意あり {malicious} · 疑わしい {suspicious} · 検出なし {undetected} · タイムアウト {timeout} · 非対応 {unsupported}',
+'zh-Hans':'恶意 {malicious} · 可疑 {suspicious} · 未检出 {undetected} · 超时 {timeout} · 不支持 {unsupported}',
+'zh-Hant':'惡意 {malicious} · 可疑 {suspicious} · 未檢出 {undetected} · 逾時 {timeout} · 不支援 {unsupported}',
+ko:'악성 {malicious} · 의심 {suspicious} · 미탐지 {undetected} · 시간 초과 {timeout} · 미지원 {unsupported}'
+};
+export function connectionLabels(code){const values=rows[code]?.split('|');if(values?.length!==keys.length||!summaries[code])throw new Error('Incomplete connection labels: '+code);return {...Object.fromEntries(keys.map((key,i)=>[key,values[i]])),scanSummary:summaries[code]};}

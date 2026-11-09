@@ -23,7 +23,8 @@ let lastRequest=0;
 async function api(path,options={}){
   const delay=16000-(Date.now()-lastRequest);if(delay>0)await new Promise(resolve=>setTimeout(resolve,delay));
   const url=new URL(path,'https://www.virustotal.com/api/v3/');
-  if(url.protocol!=='https:'||!['www.virustotal.com','virustotal.com'].includes(url.hostname))throw new Error('Unexpected scan API host');
+  if(url.protocol==='http:'&&['www.virustotal.com','virustotal.com'].includes(url.hostname))url.protocol='https:';
+  if(url.protocol!=='https:'||!['www.virustotal.com','virustotal.com','bigfiles.virustotal.com'].includes(url.hostname))throw new Error('Unexpected scan API host: '+url.hostname+' ('+url.protocol+')');
   lastRequest=Date.now();
   const response=await fetch(url,{...options,redirect:'error',headers:{'x-apikey':key,...options.headers},signal:AbortSignal.timeout(180000)});
   if(response.status===404)return null;
@@ -36,7 +37,7 @@ async function save(attributes,status){
   const stats=attributes.last_analysis_stats||attributes.stats||{};
   const results=attributes.last_analysis_results||attributes.results||{};
   const result={schemaVersion:1,fileName:'NBFC.TRACKER.exe',version:(await readFile('VERSION','utf8')).trim(),sha256,size:(await stat(path)).size,
-    status,checkedAt:new Date().toISOString(),analysisDate:attributes.last_analysis_date?new Date(attributes.last_analysis_date*1000).toISOString():null,
+    status,checkedAt:new Date().toISOString(),analysisDate:(attributes.last_analysis_date||attributes.date)?new Date((attributes.last_analysis_date||attributes.date)*1000).toISOString():null,
     reportUrl,stats,detections:Object.entries(results).filter(([,r])=>['malicious','suspicious'].includes(r.category)).map(([engine,r])=>({engine,category:r.category,result:r.result})),
     notice:'Results apply only to this SHA-256 and scan date. They are not a guarantee of safety.'};
   await writeFile(out,JSON.stringify(result,null,2)+'\n');
@@ -44,22 +45,26 @@ async function save(attributes,status){
   return result;
 }
 const known=await api('files/'+sha256);
-if(known?.data?.attributes?.last_analysis_stats){await save(known.data.attributes,'completed');return;}
+if(known?.data?.attributes?.last_analysis_date&&Object.values(known.data.attributes.last_analysis_stats||{}).some(n=>n>0)){await save(known.data.attributes,'completed');return;}
 if(!args.includes('--upload')){console.log(JSON.stringify({sha256,status:'not_found',reportUrl}));process.exitCode=2;return;}
+let id;
+try{const pending=JSON.parse(await readFile(out+'.pending','utf8'));if(pending.sha256===sha256)id=pending.id;}catch{}
+if(!id){
 const destination=bytes.length>32*1024*1024?(await api('files/upload_url'))?.data:'https://www.virustotal.com/api/v3/files';
 if(!destination)throw new Error('No large-file upload endpoint returned');
 const body=new FormData();body.append('file',new Blob([bytes]),'NBFC.TRACKER.exe');
 const submitted=await api(destination,{method:'POST',body});
-const id=submitted?.data?.id;if(!id)throw new Error('No analysis ID returned');
+id=submitted?.data?.id;if(!id)throw new Error('No analysis ID returned');
 await writeFile(out+'.pending',JSON.stringify({sha256,id,reportUrl})+'\n');
 console.log(JSON.stringify({sha256,status:'submitted',reportUrl}));
+}
 const deadline=Date.now()+15*60*1000;
 while(Date.now()<deadline){
   await new Promise(resolve=>setTimeout(resolve,20000));
   const analysis=await api('analyses/'+encodeURIComponent(id));
   const attributes=analysis?.data?.attributes||{};
   if(attributes.status==='completed'){
-    const final=await api('files/'+sha256);await save(final?.data?.attributes||attributes,'completed');return;
+    const final=await api('files/'+sha256);await save(final?.data?.attributes?.last_analysis_date?final.data.attributes:attributes,'completed');return;
   }
   console.log('VirusTotal analysis '+(attributes.status||'queued'));
 }

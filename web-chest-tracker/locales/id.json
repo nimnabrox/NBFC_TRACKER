@@ -125,5 +125,6 @@
   "runtimeHelp": "Pelacak sedang berjalan. Microsoft WebView2 tidak tersedia. Gunakan dasbor browser atau instal runtime lalu coba lagi.",
   "installWebView": "Instal Microsoft WebView2",
   "retry": "Coba lagi",
-  "scanReport": "Laporan VirusTotal"
+  "scanReport": "Laporan VirusTotal",
+  "scanSummary": "{malicious} berbahaya · {suspicious} mencurigakan · {undetected} tidak terdeteksi · {timeout} batas waktu · {unsupported} tidak didukung"
 }

@@ -125,5 +125,6 @@
   "runtimeHelp": "計數器正在執行，但 Microsoft WebView2 無法使用。請使用瀏覽器面板，或安裝執行階段後重試。",
   "installWebView": "安裝 Microsoft WebView2",
   "retry": "重試",
-  "scanReport": "VirusTotal 報告"
+  "scanReport": "VirusTotal 報告",
+  "scanSummary": "惡意 {malicious} · 可疑 {suspicious} · 未檢出 {undetected} · 逾時 {timeout} · 不支援 {unsupported}"
 }

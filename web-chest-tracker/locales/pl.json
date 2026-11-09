@@ -125,5 +125,6 @@
   "runtimeHelp": "Licznik działa. Microsoft WebView2 jest niedostępny. Użyj panelu w przeglądarce albo zainstaluj środowisko i spróbuj ponownie.",
   "installWebView": "Zainstaluj Microsoft WebView2",
   "retry": "Spróbuj ponownie",
-  "scanReport": "Raport VirusTotal"
+  "scanReport": "Raport VirusTotal",
+  "scanSummary": "{malicious} złośliwych · {suspicious} podejrzanych · {undetected} bez wykrycia · {timeout} przekroczony czas · {unsupported} nieobsługiwanych"
 }

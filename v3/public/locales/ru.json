@@ -125,5 +125,6 @@
   "runtimeHelp": "Счётчик работает. Microsoft WebView2 недоступен. Открой панель в браузере или установи среду и повтори попытку.",
   "installWebView": "Установить Microsoft WebView2",
   "retry": "Повторить",
-  "scanReport": "Отчёт VirusTotal"
+  "scanReport": "Отчёт VirusTotal",
+  "scanSummary": "{malicious} вредоносных · {suspicious} подозрительных · {undetected} без обнаружения · {timeout} тайм-аут · {unsupported} не поддерживают"
 }

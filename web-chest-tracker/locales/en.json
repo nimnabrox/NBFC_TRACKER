@@ -125,5 +125,6 @@
   "runtimeHelp": "The tracker is running. Microsoft WebView2 is unavailable, so use the browser dashboard or install the runtime and retry.",
   "installWebView": "Install Microsoft WebView2",
   "retry": "Try again",
-  "scanReport": "VirusTotal report"
+  "scanReport": "VirusTotal report",
+  "scanSummary": "{malicious} malicious · {suspicious} suspicious · {undetected} undetected · {timeout} timed out · {unsupported} unsupported"
 }

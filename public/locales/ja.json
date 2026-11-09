@@ -125,5 +125,6 @@
   "runtimeHelp": "集計は動作中です。Microsoft WebView2を利用できません。ブラウザー版を使うか、ランタイムをインストールして再試行してください。",
   "installWebView": "Microsoft WebView2をインストール",
   "retry": "再試行",
-  "scanReport": "VirusTotalレポート"
+  "scanReport": "VirusTotalレポート",
+  "scanSummary": "悪意あり {malicious} · 疑わしい {suspicious} · 検出なし {undetected} · タイムアウト {timeout} · 非対応 {unsupported}"
 }

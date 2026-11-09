@@ -125,5 +125,6 @@
   "runtimeHelp": "Trình đếm đang chạy. Microsoft WebView2 không khả dụng. Dùng bảng điều khiển trong trình duyệt hoặc cài runtime rồi thử lại.",
   "installWebView": "Cài Microsoft WebView2",
   "retry": "Thử lại",
-  "scanReport": "Báo cáo VirusTotal"
+  "scanReport": "Báo cáo VirusTotal",
+  "scanSummary": "{malicious} độc hại · {suspicious} đáng ngờ · {undetected} không phát hiện · {timeout} hết thời gian · {unsupported} không hỗ trợ"
 }

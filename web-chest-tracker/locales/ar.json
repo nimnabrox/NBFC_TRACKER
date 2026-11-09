@@ -125,5 +125,6 @@
   "runtimeHelp": "العداد يعمل. Microsoft WebView2 غير متاح. استخدم لوحة المتصفح أو ثبّت بيئة التشغيل وحاول مجددًا.",
   "installWebView": "تثبيت Microsoft WebView2",
   "retry": "حاول مجددًا",
-  "scanReport": "تقرير VirusTotal"
+  "scanReport": "تقرير VirusTotal",
+  "scanSummary": "{malicious} ضار · {suspicious} مشتبه · {undetected} دون اكتشاف · {timeout} انتهت المهلة · {unsupported} غير مدعوم"
 }

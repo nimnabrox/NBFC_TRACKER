@@ -125,5 +125,6 @@
   "runtimeHelp": "O contador está funcionando. Microsoft WebView2 não está disponível. Use o painel no navegador ou instale o runtime e tente novamente.",
   "installWebView": "Instalar Microsoft WebView2",
   "retry": "Tentar novamente",
-  "scanReport": "Relatório do VirusTotal"
+  "scanReport": "Relatório do VirusTotal",
+  "scanSummary": "{malicious} maliciosos · {suspicious} suspeitos · {undetected} sem detecção · {timeout} tempo esgotado · {unsupported} não compatíveis"
 }

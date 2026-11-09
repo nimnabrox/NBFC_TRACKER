@@ -125,5 +125,6 @@
   "runtimeHelp": "Sayaç çalışıyor. Microsoft WebView2 kullanılamıyor. Tarayıcı panelini kullanın veya çalışma zamanını yükleyip yeniden deneyin.",
   "installWebView": "Microsoft WebView2 yükle",
   "retry": "Yeniden dene",
-  "scanReport": "VirusTotal raporu"
+  "scanReport": "VirusTotal raporu",
+  "scanSummary": "{malicious} zararlı · {suspicious} şüpheli · {undetected} tespit yok · {timeout} zaman aşımı · {unsupported} desteklenmiyor"
 }

@@ -125,5 +125,6 @@
   "runtimeHelp": "집계는 실행 중이지만 Microsoft WebView2를 사용할 수 없습니다. 브라우저 대시보드를 사용하거나 런타임 설치 후 다시 시도하세요.",
   "installWebView": "Microsoft WebView2 설치",
   "retry": "다시 시도",
-  "scanReport": "VirusTotal 보고서"
+  "scanReport": "VirusTotal 보고서",
+  "scanSummary": "악성 {malicious} · 의심 {suspicious} · 미탐지 {undetected} · 시간 초과 {timeout} · 미지원 {unsupported}"
 }

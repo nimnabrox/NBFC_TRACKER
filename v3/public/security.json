@@ -1,5 +1,23 @@
 {
-  "status": "pending",
+  "schemaVersion": 1,
+  "fileName": "NBFC.TRACKER.exe",
   "version": "0.1.0",
-  "notice": "A VirusTotal report will be linked only after the final release executable has been scanned. No safety guarantee is made."
+  "sha256": "40e5d7f8d67f934acfaac2410e5663dcc306529cf1aa0f2d492cee60876d0b51",
+  "size": 175761248,
+  "status": "completed",
+  "checkedAt": "2026-11-09T06:30:52.616Z",
+  "analysisDate": "2026-11-09T06:28:31.000Z",
+  "reportUrl": "https://www.virustotal.com/gui/file/40e5d7f8d67f934acfaac2410e5663dcc306529cf1aa0f2d492cee60876d0b51",
+  "stats": {
+    "malicious": 0,
+    "suspicious": 0,
+    "undetected": 69,
+    "harmless": 0,
+    "timeout": 1,
+    "confirmed-timeout": 0,
+    "failure": 0,
+    "type-unsupported": 5
+  },
+  "detections": [],
+  "notice": "Results apply only to this SHA-256 and scan date. They are not a guarantee of safety."
 }
