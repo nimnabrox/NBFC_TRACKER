@@ -14,3 +14,6 @@ _backup_desktop_app/
 *.pdb
 Microsoft.Web.WebView2.*.xml
 node_modules/
+/advertisement/
+.env
+.env.*

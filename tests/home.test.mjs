@@ -33,12 +33,7 @@ test('download homepage supports every language, honest verification copy, worki
   }finally{win.dispatchEvent(new win.Event('pagehide'));await win.happyDOM.close();for(const[name,descriptor]of originals){if(descriptor)Object.defineProperty(globalThis,name,descriptor);else delete globalThis[name];}}
 });
 
-test('launch artwork is 16:9 and the X draft fits a standard post',async()=>{
-  const png=await readFile('advertisement/nbfc-launch-16x9.png');
-  const width=png.readUInt32BE(16),height=png.readUInt32BE(20);
-  assert.ok(Math.abs(width/height-16/9)<0.002,`${width}x${height}`);
-  const source=(await readFile('advertisement/x-post.md','utf8')).replace(/\r\n/g,'\n');
-  const post=source.split('## Ready-to-copy post\n\n')[1].split('\n\n## Optional')[0].replace(/https?:\/\/\S+/g,'x'.repeat(23));
-  assert.ok(Array.from(post).length<=280,Array.from(post).length+' characters');
-  assert.ok(post.includes('Automatic counting'));assert.ok(source.includes('#Fortnite'));
+test('published preview artwork has a landscape 16:9 ratio',async()=>{
+  const png=await readFile('v3/public/assets/nbfc-launch.png');
+  assert.ok(Math.abs(png.readUInt32BE(16)/png.readUInt32BE(20)-16/9)<0.002);
 });

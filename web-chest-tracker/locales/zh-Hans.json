@@ -111,7 +111,7 @@
   "viewSource": "查看源代码",
   "howWorks": "使用方法",
   "localTitle": "你的回放。你的电脑。",
-  "localBody": "读取已保存的回放文件，不访问游戏内存，也不要求登录 Epic。数据保存在本机。",
+  "localBody": "从已保存的回放读取游戏数据。不注入代码、不访问游戏内存、不修改游戏文件。无需登录 Epic。数据保存在本机。",
   "verifyTitle": "安装前先检查",
   "verifyBody": "源代码和 SHA-256 校验值公开可查。此 Windows 应用未签名：运行前请阅读安全警告并验证下载文件。",
   "requirements": "Windows 10/11 · 64 位 · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "新开的宝箱自动计数，叠加层设置通过同一链接同步到 OBS。请在同一台电脑上运行应用和 OBS。",
   "appZoom": "应用缩放",
   "zoomIn": "放大",
-  "zoomOut": "缩小"
+  "zoomOut": "缩小",
+  "connectionHelp": "请在本机安装并打开 Windows 配套应用。如有提示，请允许网站连接本地设备。",
+  "connectionAuto": "正在自动连接。应用就绪后会自动打开页面，无需刷新。",
+  "runtimeHelp": "计数器正在运行，但 Microsoft WebView2 不可用。请使用浏览器面板，或安装运行时后重试。",
+  "installWebView": "安装 Microsoft WebView2",
+  "retry": "重试",
+  "scanReport": "VirusTotal 报告"
 }

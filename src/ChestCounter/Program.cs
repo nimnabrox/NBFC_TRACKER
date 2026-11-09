@@ -3,6 +3,8 @@ using System.Diagnostics;
 using System.Text;
 using ChestCounter;
 
+if (args.Contains("--diagnose")) return InstallDiagnostics.Run(args);
+
 // --standby: the invisible process that waits for Fortnite to start ("open with Fortnite"). No console, nothing else.
 if (args.Contains("--standby"))
 {

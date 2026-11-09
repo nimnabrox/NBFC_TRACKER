@@ -111,7 +111,7 @@
   "viewSource": "Visualizza il codice",
   "howWorks": "Come funziona",
   "localTitle": "I tuoi replay. Il tuo PC.",
-  "localBody": "Legge i file replay salvati. Nessun accesso alla memoria del gioco o login Epic. I dati restano su questo PC.",
+  "localBody": "Legge i dati dai replay salvati. Nessuna iniezione, accesso alla memoria del gioco o modifica dei suoi file. Nessun login Epic. I dati restano su questo PC.",
   "verifyTitle": "Controlla prima di installare",
   "verifyBody": "Codice pubblico e checksum SHA-256. Questa app Windows non è firmata: controlla gli avvisi di sicurezza e verifica il download prima di eseguirlo.",
   "requirements": "Windows 10/11 · 64 bit · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "I nuovi forzieri vengono contati automaticamente. Le impostazioni dell’overlay raggiungono OBS con lo stesso URL. Esegui OBS e l’app sullo stesso PC.",
   "appZoom": "Zoom dell’app",
   "zoomIn": "Ingrandisci",
-  "zoomOut": "Riduci"
+  "zoomOut": "Riduci",
+  "connectionHelp": "Installa e apri l’app Windows su questo PC. Se richiesto, consenti al sito di collegarsi ai dispositivi locali.",
+  "connectionAuto": "Connessione automatica. La pagina si apre quando l’app è pronta, senza ricaricarla.",
+  "runtimeHelp": "Il contatore è attivo. Microsoft WebView2 non è disponibile. Usa il pannello nel browser oppure installa il runtime e riprova.",
+  "installWebView": "Installa Microsoft WebView2",
+  "retry": "Riprova",
+  "scanReport": "Rapporto VirusTotal"
 }

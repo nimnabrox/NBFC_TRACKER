@@ -25,7 +25,7 @@ for (const page of ['dashboard.html', 'app.html', 'modern.html']) {
     function install(name, value) { originals.set(name, Object.getOwnPropertyDescriptor(globalThis, name)); Object.defineProperty(globalThis, name, { value, configurable: true, writable: true }); }
     for (const name of ['window', 'document', 'navigator', 'location', 'history', 'localStorage', 'CustomEvent']) install(name, name === 'window' ? win : win[name]);
     const calls = [], overlaySaves = [];
-    let pollTick, nativeAvailable = true;
+    let pollTick, nativeAvailable = false;
     let checkResult = { available: true, hasUpdate: false, currentVersion: displayVersion, latestVersion: displayVersion };
     let state = { room: 'alice', player: 'Alice CamelCase', total: 4084, session: 6, lastMatch: 6, base: 4084,
       accounts: [{ key: 'alice', name: 'Alice CamelCase', active: true }, { key: 'bob', name: '<img src=x onerror=alert(1)>' }],
@@ -50,6 +50,12 @@ for (const page of ['dashboard.html', 'app.html', 'modern.html']) {
     try {
       await import('../v3/public/app.js?test=' + page);
       const $ = id => win.document.getElementById(id);
+      const shell=win.document.querySelector('.mini-shell,.app-layout');
+      assert.equal($('companionGate').hidden,false,'Disconnected dashboard shows connection screen');
+      assert.equal(shell.hidden,true,'Statistics stay hidden until the companion is connected');
+      nativeAvailable=true;await pollTick();
+      assert.equal($('companionGate').hidden,true,'Companion startup automatically removes the connection screen');
+      assert.equal(shell.hidden,false,'No reload is required to reveal the dashboard');
       assert.equal($('total').textContent, '4,084');
       assert.equal($('statusText').textContent, 'Companion connected');
       for (const element of win.document.querySelectorAll('.version')) assert.equal(element.textContent, displayVersion);
@@ -109,13 +115,21 @@ for (const page of ['dashboard.html', 'app.html', 'modern.html']) {
       assert.ok(calls.some(path => path.startsWith('/api/set-base?'))); assert.equal($('total').textContent, '0');
       $('openGuide').click(); assert.ok($('guide').open);
       if (page === 'app.html') {
+        assert.ok($('baseForm').closest('#tabSettings'),'Starting-count editing belongs in Settings');
+        assert.ok(!win.document.querySelector('.hero-stat-card form'),'The total card contains only stats');
+        const pane=win.document.querySelector('.tab-pane.active'),card=win.document.querySelector('.hero-stat-card');
+        assert.equal(win.getComputedStyle(pane).flexShrink,'0','Tab pane keeps its content height');
+        assert.equal(win.getComputedStyle(card).flexShrink,'0','Total card cannot be compressed');
+        assert.equal(win.getComputedStyle(pane).overflow,'visible','An inner scroll area cannot clip cards');
         win.document.querySelector('[data-tab=tabSettings]').click(); assert.ok($('tabSettings').classList.contains('active'));
         win.document.querySelector('[data-tab=tabObs]').click(); assert.ok($('tabObs').classList.contains('active'));
       }
       await setLanguage('en'); nativeAvailable = false; await pollTick();
+      assert.equal($('companionGate').hidden,false);assert.equal(shell.hidden,true);
       await $('checkUpdate').onclick(); assert.equal($('updateMessage').textContent, 'You are up to date.');
       assert.equal($('installUpdate').hidden, true, 'Website without companion offers a download, not an install command');
       assert.ok(!calls.some(path => path.startsWith('/api/sync')), 'Offline frontend never polls a cloud API');
+      nativeAvailable=true;await pollTick();assert.equal(shell.hidden,false,'Companion restart reconnects automatically');
     } finally {
       win.dispatchEvent(new win.Event('pagehide')); await win.happyDOM.close();
       for (const [name, descriptor] of originals) { if (descriptor) Object.defineProperty(globalThis, name, descriptor); else delete globalThis[name]; }

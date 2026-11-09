@@ -111,7 +111,7 @@
   "viewSource": "Voir le code",
   "howWorks": "Comment ça marche",
   "localTitle": "Vos replays. Votre PC.",
-  "localBody": "Lit les fichiers de replay enregistrés. Aucun accès à la mémoire du jeu ni connexion Epic. Les données restent sur ce PC.",
+  "localBody": "Lit les données des replays enregistrés. Aucune injection, lecture de la mémoire du jeu ou modification de ses fichiers. Aucune connexion Epic. Les données restent sur ce PC.",
   "verifyTitle": "Vérifiez avant d’installer",
   "verifyBody": "Code public et sommes SHA-256. Cette application Windows n’est pas signée : examinez les alertes de sécurité et vérifiez le téléchargement avant de l’exécuter.",
   "requirements": "Windows 10/11 · 64 bits · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "Les nouveaux coffres sont comptés automatiquement. Les réglages de l’overlay arrivent dans OBS avec la même URL. Lancez OBS et l’application sur le même PC.",
   "appZoom": "Zoom de l’application",
   "zoomIn": "Agrandir",
-  "zoomOut": "Réduire"
+  "zoomOut": "Réduire",
+  "connectionHelp": "Installez et ouvrez l’application Windows sur ce PC. Si demandé, autorisez le site à accéder aux appareils locaux.",
+  "connectionAuto": "Connexion automatique. La page s’ouvre dès que l’application est prête, sans actualisation.",
+  "runtimeHelp": "Le compteur fonctionne. Microsoft WebView2 est indisponible. Utilisez le tableau de bord du navigateur ou installez le runtime et réessayez.",
+  "installWebView": "Installer Microsoft WebView2",
+  "retry": "Réessayer",
+  "scanReport": "Rapport VirusTotal"
 }

@@ -111,7 +111,7 @@
   "viewSource": "Kaynak kodunu gör",
   "howWorks": "Nasıl çalışır",
   "localTitle": "Tekrarların. Bilgisayarın.",
-  "localBody": "Kayıtlı tekrar dosyalarını okur. Oyun belleğine erişmez, Epic girişi istemez. Veriler bu bilgisayarda kalır.",
+  "localBody": "Oyun verilerini kayıtlı tekrar dosyalarından okur. Oyuna kod enjekte etmez, oyun belleğine erişmez ve oyun dosyalarını değiştirmez. Epic girişi gerekmez. Veriler bu bilgisayarda kalır.",
   "verifyTitle": "Yüklemeden önce incele",
   "verifyBody": "Açık kaynak kodu ve SHA-256 sağlama toplamları. Bu Windows uygulaması imzasızdır: çalıştırmadan önce güvenlik uyarılarını ve indirmeyi doğrula.",
   "requirements": "Windows 10/11 · 64 bit · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "Yeni sandıklar otomatik sayılır. Kaydedilen katman ayarları aynı URL ile OBS’ye ulaşır. OBS ve uygulamayı aynı bilgisayarda çalıştır.",
   "appZoom": "Uygulama yakınlaştırması",
   "zoomIn": "Yakınlaştır",
-  "zoomOut": "Uzaklaştır"
+  "zoomOut": "Uzaklaştır",
+  "connectionHelp": "Windows uygulamasını bu bilgisayara yükleyip açın. Sorulursa sitenin yerel cihazlara bağlanmasına izin verin.",
+  "connectionAuto": "Otomatik bağlanılıyor. Uygulama hazır olduğunda sayfa yenilenmeden açılır.",
+  "runtimeHelp": "Sayaç çalışıyor. Microsoft WebView2 kullanılamıyor. Tarayıcı panelini kullanın veya çalışma zamanını yükleyip yeniden deneyin.",
+  "installWebView": "Microsoft WebView2 yükle",
+  "retry": "Yeniden dene",
+  "scanReport": "VirusTotal raporu"
 }

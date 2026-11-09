@@ -111,7 +111,7 @@
   "viewSource": "Quellcode ansehen",
   "howWorks": "So funktioniert es",
   "localTitle": "Deine Replays. Dein PC.",
-  "localBody": "Liest gespeicherte Replay-Dateien. Kein Zugriff auf den Spielspeicher und keine Epic-Anmeldung. Replay-Daten bleiben auf diesem PC.",
+  "localBody": "Liest Spieldaten aus gespeicherten Replays. Keine Injektion, kein Zugriff auf den Spielspeicher und keine Änderung von Spieldateien. Keine Epic-Anmeldung. Replay-Daten bleiben auf diesem PC.",
   "verifyTitle": "Vor der Installation prüfen",
   "verifyBody": "Öffentlicher Quellcode und SHA-256-Prüfsummen. Diese Windows-App ist nicht signiert: Sicherheitswarnungen beachten und den Download vor dem Start prüfen.",
   "requirements": "Windows 10/11 · 64 Bit · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "Neue Truhen werden automatisch gezählt. Gespeicherte Overlay-Einstellungen erreichen OBS über dieselbe URL. OBS und App müssen auf demselben PC laufen.",
   "appZoom": "App-Zoom",
   "zoomIn": "Vergrößern",
-  "zoomOut": "Verkleinern"
+  "zoomOut": "Verkleinern",
+  "connectionHelp": "Installiere und öffne die Windows-App auf diesem PC. Erlaube bei Nachfrage den Zugriff auf lokale Geräte.",
+  "connectionAuto": "Die Verbindung wird automatisch hergestellt. Sobald die App bereit ist, öffnet sich die Seite ohne Neuladen.",
+  "runtimeHelp": "Der Tracker läuft. Microsoft WebView2 ist nicht verfügbar. Nutze das Browser-Dashboard oder installiere die Laufzeit und versuche es erneut.",
+  "installWebView": "Microsoft WebView2 installieren",
+  "retry": "Erneut versuchen",
+  "scanReport": "VirusTotal-Bericht"
 }

@@ -3,6 +3,7 @@ import { summarize, activityDays, parseCount, matchesCsv } from './stats.js';
 import { mountLanguagePicker, mountMiniTabs } from './controls.js';
 import { getOverlayOptions, setOverlayOptions, mountOverlayEditor } from './overlay-options.js';
 import { mountZoom, setZoomValue } from './zoom.js';
+import { renderConnectionGate } from './connection.js';
 import { version, displayVersion, releaseUrl, compareVersions } from './version.js';
 
 const $ = id => document.getElementById(id);
@@ -55,8 +56,10 @@ async function saveOverlayOptions() {
   finally { overlaySaving = false; }
 }
 function render() {
+  renderConnectionGate(nativeConnected);
   const values = summarize(snapshot);
   for (const [key, value] of Object.entries(values)) $(key).textContent = number(value);
+  $('total').style.setProperty('--count-chars', Math.max(6, number(values.total).length));
   $('overlayTotal').textContent = number(values.total);
   $('overlayEditorTotal').textContent = number(values.total);
   const options = getOverlayOptions();
@@ -234,6 +237,7 @@ $('language').addEventListener('change', async event => {
 $('openSettings').onclick = () => $('settings').showModal();
 $('closeSettings').onclick = () => $('settings').close();
 $('settings').addEventListener('click', event => { if (event.target === $('settings')) { const r = event.target.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) event.target.close(); } });
+$('retryConnection').onclick = () => poll();
 $('copyOverlay').onclick = () => copy(overlayUrl());
 $('copyEditedOverlay').onclick = () => copy(overlayUrl());
 $('creatorCode').onclick = () => copy('NIMNABRO');

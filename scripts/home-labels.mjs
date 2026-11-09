@@ -19,4 +19,24 @@ ja:'すべての宝箱を、記録に。|リプレイからFortniteの宝箱を�
 'zh-Hant':'每個寶箱，都有紀錄。|從重播自動統計 Fortnite 寶箱。目標、比賽紀錄和 OBS 圖層，一應俱全。|免費開源|查看原始碼|使用方式|你的重播。你的電腦。|讀取已儲存的重播檔案，不存取遊戲記憶體，也不要求登入 Epic。資料保存在本機。|安裝前先檢查|原始碼和 SHA-256 校驗值公開可查。此 Windows 應用程式未簽署：執行前請閱讀安全警告並驗證下載檔案。|Windows 10/11 · 64 位元 · WebView2 Runtime|一次設定，自動更新。|新開啟的寶箱自動計數，圖層設定透過同一連結同步到 OBS。請在同一台電腦上執行應用程式和 OBS。|應用程式縮放|放大|縮小',
 ko:'모든 상자를 기록하세요.|리플레이에서 Fortnite 상자를 자동 집계합니다. 목표, 매치 기록, OBS 오버레이를 한곳에서 확인하세요.|무료 오픈 소스|소스 보기|사용 방법|내 리플레이. 내 PC.|저장된 리플레이 파일을 읽습니다. 게임 메모리 접근이나 Epic 로그인이 필요하지 않습니다. 데이터는 이 PC에 저장됩니다.|설치 전 확인하세요|소스와 SHA-256 체크섬을 공개합니다. 서명되지 않은 Windows 앱입니다. 실행 전 보안 경고를 읽고 다운로드한 파일을 확인하세요.|Windows 10/11 · 64비트 · WebView2 Runtime|한 번 설정하면 자동 업데이트.|새 상자는 자동으로 집계됩니다. 같은 URL로 오버레이 설정이 OBS에 반영됩니다. 앱과 OBS를 같은 PC에서 실행하세요.|앱 확대/축소|확대|축소'
 };
-export function homeLabels(code){const values=rows[code]?.split('|');if(values?.length!==keys.length)throw new Error('Incomplete home labels: '+code);return Object.fromEntries(keys.map((key,i)=>[key,values[i]]));}
+const replayBodies={
+en:'Reads gameplay data from saved replay files. No game injection, game-memory access or game-file modification. No Epic login. Replay data stays on this PC.',
+id:'Membaca data permainan dari file replay tersimpan. Tanpa injeksi, akses memori game, atau perubahan file game. Tanpa login Epic. Data replay tetap di PC ini.',
+de:'Liest Spieldaten aus gespeicherten Replays. Keine Injektion, kein Zugriff auf den Spielspeicher und keine Änderung von Spieldateien. Keine Epic-Anmeldung. Replay-Daten bleiben auf diesem PC.',
+es:'Lee los datos de juego de las repeticiones guardadas. Sin inyección, acceso a la memoria del juego ni cambios en sus archivos. Sin login de Epic. Los datos permanecen en este PC.',
+'es-419':'Lee los datos de juego de las repeticiones guardadas. Sin inyección, acceso a la memoria del juego ni cambios en sus archivos. Sin login de Epic. Los datos permanecen en esta PC.',
+fr:'Lit les données des replays enregistrés. Aucune injection, lecture de la mémoire du jeu ou modification de ses fichiers. Aucune connexion Epic. Les données restent sur ce PC.',
+it:'Legge i dati dai replay salvati. Nessuna iniezione, accesso alla memoria del gioco o modifica dei suoi file. Nessun login Epic. I dati restano su questo PC.',
+pl:'Odczytuje dane z zapisanych powtórek. Bez wstrzykiwania kodu, dostępu do pamięci gry lub zmian jej plików. Bez logowania do Epic. Dane pozostają na tym komputerze.',
+'pt-BR':'Lê os dados dos replays salvos. Sem injeção, acesso à memória do jogo ou alteração de seus arquivos. Sem login da Epic. Os dados ficam neste PC.',
+vi:'Đọc dữ liệu từ tệp phát lại đã lưu. Không chèn mã, truy cập bộ nhớ hay sửa tệp trò chơi. Không đăng nhập Epic. Dữ liệu ở lại máy tính này.',
+tr:'Oyun verilerini kayıtlı tekrar dosyalarından okur. Oyuna kod enjekte etmez, oyun belleğine erişmez ve oyun dosyalarını değiştirmez. Epic girişi gerekmez. Veriler bu bilgisayarda kalır.',
+ru:'Читает игровые данные из сохранённых повторов. Без внедрения кода, доступа к памяти игры и изменения её файлов. Без входа в Epic. Данные остаются на этом ПК.',
+ar:'يقرأ بيانات اللعب من ملفات الإعادة المحفوظة. دون حقن برمجي أو وصول لذاكرة اللعبة أو تعديل ملفاتها. لا يتطلب تسجيل دخول Epic. تبقى البيانات على هذا الكمبيوتر.',
+th:'อ่านข้อมูลจากไฟล์รีเพลย์ที่บันทึกไว้ ไม่ฉีดโค้ด ไม่เข้าถึงหน่วยความจำเกม และไม่แก้ไขไฟล์เกม ไม่ต้องเข้าสู่ระบบ Epic ข้อมูลอยู่บนพีซีเครื่องนี้',
+ja:'保存済みリプレイからゲームデータを読み取ります。ゲームへのコード注入、メモリアクセス、ゲームファイルの変更は行いません。Epicへのログインは不要です。データはこのPCに保存されます。',
+'zh-Hans':'从已保存的回放读取游戏数据。不注入代码、不访问游戏内存、不修改游戏文件。无需登录 Epic。数据保存在本机。',
+'zh-Hant':'從已儲存的重播讀取遊戲資料。不注入程式碼、不存取遊戲記憶體、不修改遊戲檔案。無須登入 Epic。資料保存在本機。',
+ko:'저장된 리플레이에서 게임 데이터를 읽습니다. 코드 주입, 게임 메모리 접근, 게임 파일 수정을 하지 않습니다. Epic 로그인이 필요하지 않으며 데이터는 이 PC에 저장됩니다.'
+};
+export function homeLabels(code){const values=rows[code]?.split('|');if(values?.length!==keys.length||!replayBodies[code])throw new Error('Incomplete home labels: '+code);return {...Object.fromEntries(keys.map((key,i)=>[key,values[i]])),localBody:replayBodies[code]};}

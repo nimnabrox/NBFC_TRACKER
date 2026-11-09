@@ -35,6 +35,9 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           Compress-Archive -Path dist/web/* -DestinationPath dist/release/NBFC-Tracker-Web.zip
           Get-FileHash 'dist/release/NBFC.TRACKER.exe', 'dist/release/NBFC-Tracker-Web.zip' -Algorithm SHA256 | ForEach-Object { "$($_.Hash.ToLower())  $(Split-Path $_.Path -Leaf)" } | Set-Content dist/release/SHA256SUMS.txt
+      - name: Verify standalone executable dependencies
+        shell: pwsh
+        run: ./scripts/test-portable-build.ps1
       - uses: softprops/action-gh-release@v2
         with:
           name: NBFC TRACKER ${{ github.ref_name }}
@@ -49,7 +52,8 @@ jobs:
             - Frontend-only Cloudflare hosting; live updates stay on the same PC with no cloud API polling.
             - Download homepage with setup instructions, source links and download-verification information.
             - Saved app zoom from 50% to 150%, with a 100% reset.
-            - Ready-to-copy YouTube and X drafts and a 16:9 poster in the repository's advertisement folder.
+            - Non-shrinking app cards, automatic dashboard reconnect and changing homepage demo counters.
+            - Self-contained Windows executable with embedded UI/languages and a browser fallback when WebView2 is missing.
             - Automated UI, version consistency, profile and download-integrity checks.
           generate_release_notes: true
           files: |

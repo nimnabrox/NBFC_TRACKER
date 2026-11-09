@@ -111,7 +111,7 @@
   "viewSource": "Zobacz kod",
   "howWorks": "Jak to działa",
   "localTitle": "Twoje powtórki. Twój komputer.",
-  "localBody": "Odczytuje zapisane pliki powtórek. Bez dostępu do pamięci gry i logowania do Epic. Dane pozostają na tym komputerze.",
+  "localBody": "Odczytuje dane z zapisanych powtórek. Bez wstrzykiwania kodu, dostępu do pamięci gry lub zmian jej plików. Bez logowania do Epic. Dane pozostają na tym komputerze.",
   "verifyTitle": "Sprawdź przed instalacją",
   "verifyBody": "Publiczny kod i sumy SHA-256. Ta aplikacja Windows nie jest podpisana: sprawdź ostrzeżenia bezpieczeństwa i pobrany plik przed uruchomieniem.",
   "requirements": "Windows 10/11 · 64 bity · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "Nowe skrzynie są liczone automatycznie. Ustawienia nakładki trafiają do OBS przez ten sam adres URL. Uruchom OBS i aplikację na tym samym komputerze.",
   "appZoom": "Powiększenie aplikacji",
   "zoomIn": "Powiększ",
-  "zoomOut": "Pomniejsz"
+  "zoomOut": "Pomniejsz",
+  "connectionHelp": "Zainstaluj i otwórz aplikację Windows na tym komputerze. Zezwól stronie na dostęp do urządzeń lokalnych, jeśli pojawi się pytanie.",
+  "connectionAuto": "Łączenie automatyczne. Strona otworzy się, gdy aplikacja będzie gotowa, bez odświeżania.",
+  "runtimeHelp": "Licznik działa. Microsoft WebView2 jest niedostępny. Użyj panelu w przeglądarce albo zainstaluj środowisko i spróbuj ponownie.",
+  "installWebView": "Zainstaluj Microsoft WebView2",
+  "retry": "Spróbuj ponownie",
+  "scanReport": "Raport VirusTotal"
 }

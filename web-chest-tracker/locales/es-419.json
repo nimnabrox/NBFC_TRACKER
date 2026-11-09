@@ -111,7 +111,7 @@
   "viewSource": "Ver código fuente",
   "howWorks": "Cómo funciona",
   "localTitle": "Tus repeticiones. Tu PC.",
-  "localBody": "Lee archivos de repetición guardados. Sin acceder a la memoria del juego ni iniciar sesión en Epic. Los datos permanecen en esta PC.",
+  "localBody": "Lee los datos de juego de las repeticiones guardadas. Sin inyección, acceso a la memoria del juego ni cambios en sus archivos. Sin login de Epic. Los datos permanecen en esta PC.",
   "verifyTitle": "Revisa antes de instalar",
   "verifyBody": "Código público y sumas SHA-256. Esta aplicación de Windows no está firmada: revisa las alertas de seguridad y verifica la descarga antes de ejecutarla.",
   "requirements": "Windows 10/11 · 64 bits · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "Los cofres nuevos se cuentan automáticamente. Los ajustes del overlay llegan a OBS con la misma URL. Ejecuta OBS y la aplicación en la misma PC.",
   "appZoom": "Zoom de la aplicación",
   "zoomIn": "Acercar",
-  "zoomOut": "Alejar"
+  "zoomOut": "Alejar",
+  "connectionHelp": "Instala y abre la aplicación para Windows en esta PC. Si se solicita, permite que el sitio se conecte a dispositivos locales.",
+  "connectionAuto": "Conexión automática. La página se abre cuando la aplicación está lista, sin recargar.",
+  "runtimeHelp": "El contador está funcionando. Microsoft WebView2 no está disponible. Usa el panel del navegador o instala el entorno y vuelve a intentarlo.",
+  "installWebView": "Instalar Microsoft WebView2",
+  "retry": "Reintentar",
+  "scanReport": "Informe de VirusTotal"
 }

@@ -111,7 +111,7 @@
   "viewSource": "Lihat kode sumber",
   "howWorks": "Cara kerja",
   "localTitle": "Replay Anda. PC Anda.",
-  "localBody": "Membaca file replay tersimpan. Tanpa akses memori game atau login Epic. Data replay tetap di PC ini.",
+  "localBody": "Membaca data permainan dari file replay tersimpan. Tanpa injeksi, akses memori game, atau perubahan file game. Tanpa login Epic. Data replay tetap di PC ini.",
   "verifyTitle": "Periksa sebelum menginstal",
   "verifyBody": "Kode sumber dan checksum SHA-256 tersedia publik. Aplikasi Windows ini belum ditandatangani: periksa peringatan keamanan dan verifikasi unduhan sebelum menjalankannya.",
   "requirements": "Windows 10/11 · 64-bit · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "Peti baru dihitung otomatis. Pengaturan overlay tersimpan diterapkan di OBS melalui URL yang sama. Jalankan OBS dan aplikasi di PC yang sama.",
   "appZoom": "Zoom aplikasi",
   "zoomIn": "Perbesar",
-  "zoomOut": "Perkecil"
+  "zoomOut": "Perkecil",
+  "connectionHelp": "Instal dan buka aplikasi pendamping Windows di PC ini. Jika diminta, izinkan situs terhubung ke perangkat lokal.",
+  "connectionAuto": "Menghubungkan otomatis. Halaman terbuka saat aplikasi siap, tanpa memuat ulang.",
+  "runtimeHelp": "Pelacak sedang berjalan. Microsoft WebView2 tidak tersedia. Gunakan dasbor browser atau instal runtime lalu coba lagi.",
+  "installWebView": "Instal Microsoft WebView2",
+  "retry": "Coba lagi",
+  "scanReport": "Laporan VirusTotal"
 }

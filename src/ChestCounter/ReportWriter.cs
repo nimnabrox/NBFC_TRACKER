@@ -349,7 +349,7 @@ public static class ReportWriter
             <footer>
               <div style="margin-bottom:8px;font-weight:700;color:var(--accent);font-size:14px;">⚡ NBFC TRACKER · Created by NimnaBro</div>
               Counts the chests you opened or destroyed yourself, from your local replay files (analyzed after each match).
-              100% Anti-Cheat Safe (read-only replay parsing, zero memory injection).
+              Reads saved replay files; no game injection or game-memory access. Not endorsed by Epic Games; no ban or antivirus guarantee.
             </footer>
             </main></body></html>
             """
@@ -357,7 +357,7 @@ public static class ReportWriter
             <footer>
               <div style="margin-bottom:8px;font-weight:700;color:var(--accent);font-size:14px;">⚡ NBFC TRACKER · Created by NimnaBro</div>
               Compte les coffres que tu as ouverts ou détruits toi-même, d'après tes fichiers replay locaux (analysés après chaque partie).
-              100% Anti-Cheat Safe (lecture seule des replays, aucune injection en mémoire).
+              Lecture seule des replays enregistrés ; aucune injection ni lecture de la mémoire du jeu. Non approuvé par Epic Games ; aucune garantie contre les sanctions ou les détections antivirus.
             </footer>
             </main></body></html>
             """);

@@ -111,7 +111,7 @@
   "viewSource": "查看原始碼",
   "howWorks": "使用方式",
   "localTitle": "你的重播。你的電腦。",
-  "localBody": "讀取已儲存的重播檔案，不存取遊戲記憶體，也不要求登入 Epic。資料保存在本機。",
+  "localBody": "從已儲存的重播讀取遊戲資料。不注入程式碼、不存取遊戲記憶體、不修改遊戲檔案。無須登入 Epic。資料保存在本機。",
   "verifyTitle": "安裝前先檢查",
   "verifyBody": "原始碼和 SHA-256 校驗值公開可查。此 Windows 應用程式未簽署：執行前請閱讀安全警告並驗證下載檔案。",
   "requirements": "Windows 10/11 · 64 位元 · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "新開啟的寶箱自動計數，圖層設定透過同一連結同步到 OBS。請在同一台電腦上執行應用程式和 OBS。",
   "appZoom": "應用程式縮放",
   "zoomIn": "放大",
-  "zoomOut": "縮小"
+  "zoomOut": "縮小",
+  "connectionHelp": "請在本機安裝並開啟 Windows 配套應用程式。如有提示，請允許網站連接本機裝置。",
+  "connectionAuto": "正在自動連線。應用程式就緒後會自動開啟頁面，無須重新整理。",
+  "runtimeHelp": "計數器正在執行，但 Microsoft WebView2 無法使用。請使用瀏覽器面板，或安裝執行階段後重試。",
+  "installWebView": "安裝 Microsoft WebView2",
+  "retry": "重試",
+  "scanReport": "VirusTotal 報告"
 }

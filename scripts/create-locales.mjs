@@ -1,5 +1,6 @@
 // Explicit translations. Missing entries fail packaging instead of silently showing English.
 import { mkdir, writeFile } from 'node:fs/promises';
+import { connectionLabels } from './connection-labels.mjs';
 import { homeLabels } from './home-labels.mjs';
 import { uiLabels } from './ui-labels.mjs';
 import { updateLabels } from './update-labels.mjs';
@@ -56,6 +57,6 @@ for (const [name, text] of Object.entries(rows)) {
   const code = aliases[name] || name;
   const modeValues = modes[name].split('|');
   if (modeValues.length !== modeKeys.length) throw new Error(`Incomplete modes: ${name}`);
-  await writeFile(`v3/public/locales/${code}.json`, JSON.stringify({ ...Object.fromEntries(keys.map((key, i) => [key, values[i]])), ...Object.fromEntries(modeKeys.map((key, i) => [key, modeValues[i]])), setup: setup[name], ...uiLabels(code), ...updateLabels(code), ...historyLabels(code), ...overlayLabels(code), ...homeLabels(code) }, null, 2) + '\n');
+  await writeFile(`v3/public/locales/${code}.json`, JSON.stringify({ ...Object.fromEntries(keys.map((key, i) => [key, values[i]])), ...Object.fromEntries(modeKeys.map((key, i) => [key, modeValues[i]])), setup: setup[name], ...uiLabels(code), ...updateLabels(code), ...historyLabels(code), ...overlayLabels(code), ...homeLabels(code), ...connectionLabels(code) }, null, 2) + '\n');
 }
 console.log(`Validated and wrote ${Object.keys(rows).length} complete language files (${keys.length} keys each).`);

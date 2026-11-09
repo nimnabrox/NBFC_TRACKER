@@ -111,7 +111,7 @@
   "viewSource": "View source",
   "howWorks": "How it works",
   "localTitle": "Your replays. Your PC.",
-  "localBody": "Reads saved replay files. No game memory access or Epic login required. Your replay data stays on this PC.",
+  "localBody": "Reads gameplay data from saved replay files. No game injection, game-memory access or game-file modification. No Epic login. Replay data stays on this PC.",
   "verifyTitle": "Inspect before you install",
   "verifyBody": "Public source and SHA-256 checksums. This Windows app is unsigned: review security warnings and verify your download before running it.",
   "requirements": "Windows 10/11 · 64-bit · WebView2 Runtime",
@@ -119,5 +119,11 @@
   "autoBody": "New chests count automatically. Saved overlay settings reach OBS through the same URL. Run OBS and the companion on the same PC.",
   "appZoom": "App zoom",
   "zoomIn": "Zoom in",
-  "zoomOut": "Zoom out"
+  "zoomOut": "Zoom out",
+  "connectionHelp": "Install and open the Windows companion on this PC. If asked, allow this site to connect to local devices.",
+  "connectionAuto": "Connecting automatically. This page opens when the companion is ready; no refresh needed.",
+  "runtimeHelp": "The tracker is running. Microsoft WebView2 is unavailable, so use the browser dashboard or install the runtime and retry.",
+  "installWebView": "Install Microsoft WebView2",
+  "retry": "Try again",
+  "scanReport": "VirusTotal report"
 }

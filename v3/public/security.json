@@ -1,0 +1,5 @@
+{
+  "status": "pending",
+  "version": "0.1.0",
+  "notice": "A VirusTotal report will be linked only after the final release executable has been scanned. No safety guarantee is made."
+}

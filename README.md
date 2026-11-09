@@ -41,7 +41,13 @@ The local dashboard is also available at `http://localhost:5088/dashboard`, with
 
 The root website is the download homepage, with an animated chest welcome scene, automatic-counting explanation, setup guide, source links and download verification information. It supports the same 18 languages. The original dashboard remains at `/dashboard` and the native compact UI at `/app.html`. The homepage makes no antivirus or official Epic endorsement guarantee. The Windows executable is currently unsigned; inspect the public source, verify `SHA256SUMS.txt`, and review security prompts before running it.
 
-Prepared social material lives in [`advertisement/`](advertisement/README.md): a 16:9 poster, YouTube community-post draft, X draft, alt text and image-generation prompts. These files have not been posted to social accounts.
+The `advertisement/` folder stays local and is excluded from Git updates.
+
+The dashboard shows a connecting screen while the companion is unavailable. It retries automatically and reveals the real statistics when the app opens, without a browser refresh. The homepage's clearly labelled preview counters change together as sample match results; those numbers are never used by the real dashboard or overlay. In the compact app, cards retain their natural height, only the main content area scrolls, and starting-count editing is in Settings.
+
+The Windows x64 executable includes the .NET runtime, replay parser, UI files and all languages. No .NET SDK or separate DLL files are needed. The embedded native window uses Microsoft WebView2; if it is missing, the app opens its local browser dashboard and offers Microsoft's runtime download and a retry button. A completely offline PC without WebView2 and without a browser still needs a browser/runtime installed. Verify the published binary with `scripts/test-portable-build.ps1`; `--diagnose --diagnose-output report.json` checks its embedded dependencies without reading player files. `scripts/test-windows-sandbox.ps1` can also check it in an isolated Windows Sandbox with networking disabled.
+
+VirusTotal scanning is performed against the exact downloadable EXE, identified by SHA-256. The website links a completed report only after a scan result is available. Results describe that file at that time; they do not guarantee safety or ban immunity. The source reads gameplay data from saved replay files without injection, game-memory access or modification of game files. Scan using `node scripts/scan-virustotal.mjs --file PATH --env-file PRIVATE_ENV_FILE --upload`; keep the API credential outside the repository and never put it in browser code.
 
 ## Languages
 

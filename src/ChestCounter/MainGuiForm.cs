@@ -121,6 +121,7 @@ public class MainGuiForm : Form
     private readonly NotifyIcon _trayIcon;
     private bool _allowExit = false;
     private bool _hasShownTrayNotice = false;
+    private bool _browserFallbackOpened;
 
     public static MainGuiForm? CurrentInstance { get; private set; }
 
@@ -285,38 +286,35 @@ public class MainGuiForm : Form
             };
             _webView.Source = new Uri(_dashboardUrl);
         }
-        catch
+        catch (Exception ex)
         {
-            // Fallback screen if WebView2 runtime cannot initialize
-            Controls.Clear();
-            var pnl = new Panel { Dock = DockStyle.Fill, BackColor = Color.FromArgb(13, 15, 20) };
-            var lbl = new Label
-            {
-                Text = "NBFC TRACKER\n\nDashboard is running at:\n" + _dashboardUrl,
-                ForeColor = Color.White,
-                Font = new Font("Segoe UI", 13, FontStyle.Bold),
-                TextAlign = ContentAlignment.MiddleCenter,
-                Dock = DockStyle.Fill
-            };
-            var btn = new Button
-            {
-                Text = "Open in Web Browser",
-                Size = new Size(200, 44),
-                Location = new Point((Width - 200) / 2, Height - 140),
-                BackColor = Color.FromArgb(245, 166, 35),
-                ForeColor = Color.Black,
-                FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
-                Cursor = Cursors.Hand
-            };
-            btn.Click += (_, _) =>
-            {
-                try { Process.Start(new ProcessStartInfo(_dashboardUrl) { UseShellExecute = true }); } catch { }
-            };
-            pnl.Controls.Add(btn);
-            pnl.Controls.Add(lbl);
-            Controls.Add(pnl);
+            ErrorLog.Write("Native UI startup", ex);
+            ShowRuntimeFallback();
         }
+    }
+
+    private void ShowRuntimeFallback()
+    {
+        Controls.Clear();
+        var panel = new TableLayoutPanel { Dock = DockStyle.Fill, AutoScroll = true, Padding = new Padding(24), ColumnCount = 1, RowCount = 5 };
+        panel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        var heading = new Label { Text = AppInfo.AppName, AutoSize = true, ForeColor = Color.FromArgb(245,166,35), Font = new Font("Segoe UI", 20, FontStyle.Bold), Margin = new Padding(0,0,0,18) };
+        var message = new Label { Text = DashboardLanguage.Text("runtimeHelp"), AutoSize = true, ForeColor = Color.White, Font = new Font("Segoe UI", 11), MaximumSize = new Size(Math.Max(180, ClientSize.Width-80), 0), Margin = new Padding(0,0,0,18) };
+        var address = new TextBox { Text = _dashboardUrl, ReadOnly = true, Dock = DockStyle.Top, BackColor = Color.FromArgb(20,24,32), ForeColor = Color.White, Margin = new Padding(0,0,0,18) };
+        var actions = new FlowLayoutPanel { AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink, Dock = DockStyle.Top, WrapContents = true };
+        Button ActionButton(string label, Action action)
+        {
+            var button = new Button { Text = label, AutoSize = true, Padding = new Padding(12,8,12,8), BackColor = Color.FromArgb(35,42,54), ForeColor = Color.White, FlatStyle = FlatStyle.Flat, Margin = new Padding(0,0,10,10) };
+            button.Click += (_,_) => action(); actions.Controls.Add(button); return button;
+        }
+        void Open(string url) { try { Process.Start(new ProcessStartInfo(url) { UseShellExecute = true }); } catch { } }
+        ActionButton(DashboardLanguage.Text("openWeb"), () => Open(_dashboardUrl));
+        ActionButton(DashboardLanguage.Text("installWebView"), () => Open("https://developer.microsoft.com/microsoft-edge/webview2/"));
+        ActionButton(DashboardLanguage.Text("retry"), () => { Controls.Clear(); Controls.Add(_webView); InitWebView(); });
+        panel.Controls.Add(heading); panel.Controls.Add(message); panel.Controls.Add(address); panel.Controls.Add(actions);
+        panel.Resize += (_,_) => message.MaximumSize = new Size(Math.Max(180,panel.ClientSize.Width-20),0);
+        Controls.Add(panel);
+        if (!_browserFallbackOpened) { _browserFallbackOpened = true; Open(_dashboardUrl); }
     }
 
     public void SetZoomPercent(int percent)
