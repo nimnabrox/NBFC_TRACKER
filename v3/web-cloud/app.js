@@ -76,9 +76,12 @@ function render() {
   if (updateNotice) $('updateMessage').textContent = t(updateNotice.key, updateNotice.values);
   document.querySelectorAll('.version').forEach(el => { el.textContent = displayVersion; });
   $('status').classList.toggle('online', ['connected', 'cloud'].includes(connection));
-  const breakdown = `${number(values.opened)} ${t('opened')} · ${number(values.destroyed)} ${t('destroyed')}`;
-  $('totalHint').textContent = snapshot.base > 0 ? `${t('base')}: ${number(snapshot.base)} (${breakdown})` : breakdown;
+  $('totalHint').textContent = snapshot.base > 0 ? `${t('base')}: ${number(snapshot.base)}` : t('fromReplays');
   $('matchStatus').textContent = t(snapshot.inProgress ? 'matchLive' : connection === 'offline' ? 'stale' : 'fromReplays');
+  if ($('countTeam')) {
+    $('countTeam').checked = !!snapshot.countTeam;
+    $('countTeam').disabled = !nativeConnected;
+  }
   $('profile').disabled = !nativeConnected || !snapshot.accounts?.length;
   const profileSignature = JSON.stringify([locale, snapshot.player, snapshot.accounts]);
   if ($('profile').dataset.signature !== profileSignature) {
@@ -122,7 +125,30 @@ function render() {
   ['base', 'resetBase', 'folder', 'startup'].forEach(id => { $(id).disabled = !nativeConnected; });
   $('baseForm').querySelector('button').disabled = !nativeConnected;
   $('folderForm').querySelector('button').disabled = !nativeConnected;
-  renderMatches(); renderChart();
+  renderMatches(); renderChart(); renderTeammates();
+}
+function renderTeammates() {
+  if (!$('teammatesList')) return;
+  const teammates = Array.isArray(snapshot.teammates) ? snapshot.teammates : [];
+  $('teammatesList').replaceChildren();
+  if ($('teammatesSection')) $('teammatesSection').hidden = !teammates.length;
+  if (!teammates.length) return;
+  for (const mate of teammates) {
+    const card = document.createElement('div');
+    card.className = 'teammate-card';
+    const name = document.createElement('div');
+    name.className = 'teammate-name';
+    name.textContent = mate.name;
+    const stats = document.createElement('div');
+    stats.className = 'teammate-stats';
+    const count = document.createElement('strong');
+    count.textContent = number(mate.chests);
+    const label = document.createElement('span');
+    label.textContent = ` ${t('chests')} · ${mate.matches} ${t('history')}`;
+    stats.append(count, label);
+    card.append(name, stats);
+    $('teammatesList').append(card);
+  }
 }
 function renderMatches() {
   const matches = [...(snapshot.matches || [])].sort((a, b) => new Date(b.matchStart) - new Date(a.matchStart));
@@ -145,6 +171,11 @@ function renderMatches() {
         if (match.chestsDestroyed > 0) {
           const openedOnly = match.chestsSearched ?? Math.max(0, match.chestsOpened - match.chestsDestroyed);
           cell.title = `${number(openedOnly)} ${t('opened')} + ${number(match.chestsDestroyed)} ${t('destroyed')}`;
+        }
+        if (match.teammates && match.teammates.length > 0) {
+          const matesText = match.teammates.map(m => `${m.name}: ${number(m.chests)}`).join(', ');
+          const teamTotal = match.teamChests ?? (match.chestsOpened + match.teammates.reduce((s, m) => s + m.chests, 0));
+          cell.title = (cell.title ? cell.title + '\n' : '') + `${t('teamChests')}: ${number(teamTotal)} (${t('teammates')}: ${matesText})`;
         }
       }
       if (index === 2 && match.placement === 1) cell.className = 'win';
@@ -279,6 +310,12 @@ $('startup').onchange = async event => {
   try { await native('/api/set-startup?enabled=' + event.target.checked); toast('saved'); }
   catch { event.target.checked = !event.target.checked; toast('error'); }
 };
+if ($('countTeam')) {
+  $('countTeam').onchange = async event => {
+    try { await native('/api/set-count-team?enabled=' + event.target.checked); await poll(); toast('saved'); }
+    catch { event.target.checked = !event.target.checked; toast('error'); }
+  };
+}
 $('checkUpdate').onclick = async () => {
   $('checkUpdate').disabled = true; notice('loading');
   $('updateRelease').href = releaseUrl;

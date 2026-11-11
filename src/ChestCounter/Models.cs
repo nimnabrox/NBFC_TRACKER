@@ -14,6 +14,15 @@ public sealed class ChestRecord
     public List<string> TreasureItems { get; set; } = new();
 }
 
+public sealed class TeammateRecord
+{
+    public string Name { get; set; } = "";
+    public string? EpicId { get; set; }
+    /// <summary>Chests this teammate was seen opening or destroying.</summary>
+    public int ChestsSeen { get; set; }
+    public Dictionary<string, int> Kinds { get; set; } = new();
+}
+
 public sealed class TreasureFind
 {
     /// <summary>Name to display (re-resolved from treasures.json so renaming updates old matches).</summary>
@@ -75,6 +84,13 @@ public sealed class MatchRecord
     public bool IsBattleRoyale { get; set; } = true;
     public List<ChestRecord> Chests { get; set; } = new();
     public List<TreasureFind> TreasureFinds { get; set; } = new();
+    public List<TeammateRecord> Teammates { get; set; } = new();
+
+    [JsonIgnore]
+    public int TeammatesChests => Teammates?.Sum(t => t.ChestsSeen) ?? 0;
+
+    [JsonIgnore]
+    public int TeamTotalChests => ChestsOpened + TeammatesChests;
 }
 
 public sealed class OverlayPreferences
@@ -92,6 +108,9 @@ public sealed class Config
     public string? UiLanguage { get; set; }
     public OverlayPreferences OverlayOptions { get; set; } = new();
     public int UiZoomPercent { get; set; } = 100;
+
+    /// <summary>Whether to include teammate chests in totals and session (solo by default).</summary>
+    public bool CountTeamChests { get; set; } = false;
 
     /// <summary>Selected profile (Epic id or name of the account the player plays on). Default null so it defaults to the latest match player.</summary>
     public string? Profile { get; set; }

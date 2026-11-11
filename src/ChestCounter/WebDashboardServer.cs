@@ -277,11 +277,27 @@ public static class WebDashboardServer
                 var startWithFn = _config?.StartWithFortnite ?? false;
 
                 var overlayOptions = System.Text.Json.JsonSerializer.Serialize(_config?.OverlayOptions ?? new(), new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web));
-                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"uiLanguage\":\"{EscapeJson(_config?.UiLanguage ?? _config?.Language ?? "en")}\",\"version\":\"{AppInfo.DisplayVersion}\",\"overlayOptions\":{overlayOptions},\"uiZoomPercent\":{UiZoomPercent}}}";
+                var countTeamVal = _config?.CountTeamChests == true ? "true" : "false";
+                var json = $"{{\"demosFolder\":\"{EscapeJson(demosFolder)}\",\"startWithWindows\":{(isStartup ? "true" : "false")},\"startWithFortnite\":{(startWithFn ? "true" : "false")},\"countTeam\":{countTeamVal},\"baseChestCount\":{baseStr},\"activeProfile\":\"{EscapeJson(activePlayer)}\",\"uiLanguage\":\"{EscapeJson(_config?.UiLanguage ?? _config?.Language ?? "en")}\",\"version\":\"{AppInfo.DisplayVersion}\",\"overlayOptions\":{overlayOptions},\"uiZoomPercent\":{UiZoomPercent}}}";
                 var bytes = Encoding.UTF8.GetBytes(json);
                 res.ContentLength64 = bytes.Length;
                 res.OutputStream.Write(bytes, 0, bytes.Length);
                 res.Close();
+                return;
+            }
+
+            if (path.Equals("/api/set-count-team", StringComparison.OrdinalIgnoreCase))
+            {
+                if (_config != null && _store != null)
+                {
+                    var enabledParam = req.QueryString["enabled"];
+                    if (bool.TryParse(enabledParam, out var enabled))
+                    {
+                        _config.CountTeamChests = enabled;
+                        _store.SaveConfig(_config);
+                    }
+                }
+                WriteJson(res, new { ok = true, countTeam = _config?.CountTeamChests ?? false });
                 return;
             }
 
@@ -675,12 +691,17 @@ public static class WebDashboardServer
             var liveDestroyed = liveMatch != null && (Profiles.Key(liveMatch).Equals(profileKey, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(liveMatch.PlayerName, playerName, StringComparison.OrdinalIgnoreCase)) ? liveMatch.ChestsDestroyed : 0;
 
+            var countTeam = _config?.CountTeamChests ?? false;
             var sessionMatches = matches.Where(ReportWriter.IsThisSession).ToList();
-            var sessionChests = sessionMatches.Sum(m => m.ChestsOpened) + liveChests;
+            var sessionSolo = sessionMatches.Sum(m => m.ChestsOpened) + liveChests;
+            var sessionTeam = sessionMatches.Sum(m => m.TeamTotalChests) + liveChests;
+            var sessionChests = countTeam ? sessionTeam : sessionSolo;
             var sessionDestroyed = sessionMatches.Sum(m => m.ChestsDestroyed) + liveDestroyed;
             var sessionOpened = Math.Max(0, sessionChests - sessionDestroyed);
 
-            var totalChests = matches.Sum(m => m.ChestsOpened) + liveChests;
+            var soloTotalChests = matches.Sum(m => m.ChestsOpened) + liveChests;
+            var teamTotalChests = matches.Sum(m => m.TeamTotalChests) + liveChests;
+            var totalChests = countTeam ? teamTotalChests : soloTotalChests;
             var totalDestroyed = matches.Sum(m => m.ChestsDestroyed) + liveDestroyed;
 
             int displayedTotal;
@@ -692,7 +713,9 @@ public static class WebDashboardServer
             }
             var displayedOpened = Math.Max(0, displayedTotal - totalDestroyed);
 
-            var lastMatch = matches.Count > 0 ? matches[0].ChestsOpened : 0;
+            var lastMatch = matches.Count > 0 ? (countTeam ? matches[0].TeamTotalChests : matches[0].ChestsOpened) : 0;
+            var lastMatchSolo = matches.Count > 0 ? matches[0].ChestsOpened : 0;
+            var lastMatchTeam = matches.Count > 0 ? matches[0].TeamTotalChests : 0;
             var lastMatchDestroyed = matches.Count > 0 ? matches[0].ChestsDestroyed : 0;
             var lastMatchOpened = Math.Max(0, lastMatch - lastMatchDestroyed);
             var baseJson = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value.ToString() : "null";
@@ -704,13 +727,38 @@ public static class WebDashboardServer
                 return $"{{\"key\":\"{EscapeJson(p.Key)}\",\"name\":\"{EscapeJson(p.Name)}\",\"matches\":{p.Matches},\"chests\":{p.Chests},\"active\":{(isActive ? "true" : "false")}}}";
             });
             var accountsJson = "[" + string.Join(",", profileItems) + "]";
+
+            // Aggregate teammates stats across all matches for this profile
+            var matesMap = new Dictionary<string, (int chests, int matches)>(StringComparer.OrdinalIgnoreCase);
+            foreach (var m in matches)
+            {
+                if (m.Teammates != null)
+                {
+                    foreach (var t in m.Teammates)
+                    {
+                        if (!string.IsNullOrWhiteSpace(t.Name))
+                        {
+                            var curMate = matesMap.GetValueOrDefault(t.Name);
+                            matesMap[t.Name] = (curMate.chests + t.ChestsSeen, curMate.matches + 1);
+                        }
+                    }
+                }
+            }
+            var teammatesJson = "[" + string.Join(",", matesMap.OrderByDescending(kv => kv.Value.chests).Select(kv =>
+                $"{{\"name\":\"{EscapeJson(kv.Key)}\",\"chests\":{kv.Value.chests},\"matches\":{kv.Value.matches}}}"
+            )) + "]";
+
             var matchesJson = GetMatchesJson();
 
-            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":{displayedTotal},\"opened\":{displayedOpened},\"destroyed\":{totalDestroyed},\"lastMatch\":{lastMatch},\"lastMatchOpened\":{lastMatchOpened},\"lastMatchDestroyed\":{lastMatchDestroyed},\"liveChests\":{liveChests},\"liveDestroyed\":{liveDestroyed},\"base\":{baseJson},\"session\":{sessionChests},\"sessionOpened\":{sessionOpened},\"sessionDestroyed\":{sessionDestroyed},\"player\":\"{EscapeJson(playerName)}\",\"accounts\":{accountsJson},\"matches\":{matchesJson},\"inProgress\":{(inProgress ? "true" : "false")}}}";
+            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":{displayedTotal},\"opened\":{displayedOpened},\"destroyed\":{totalDestroyed},\"soloTotal\":{soloTotalChests}," +
+                   $"\"teamTotal\":{teamTotalChests},\"countTeam\":{(countTeam ? "true" : "false")},\"lastMatch\":{lastMatch},\"lastMatchSolo\":{lastMatchSolo},\"lastMatchTeam\":{lastMatchTeam}," +
+                   $"\"lastMatchOpened\":{lastMatchOpened},\"lastMatchDestroyed\":{lastMatchDestroyed},\"liveChests\":{liveChests},\"liveDestroyed\":{liveDestroyed},\"base\":{baseJson}," +
+                   $"\"session\":{sessionChests},\"sessionSolo\":{sessionSolo},\"sessionTeam\":{sessionTeam},\"sessionOpened\":{sessionOpened},\"sessionDestroyed\":{sessionDestroyed}," +
+                   $"\"player\":\"{EscapeJson(playerName)}\",\"accounts\":{accountsJson},\"teammates\":{teammatesJson},\"matches\":{matchesJson},\"inProgress\":{(inProgress ? "true" : "false")}}}";
         }
         catch
         {
-            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":0,\"opened\":0,\"destroyed\":0,\"lastMatch\":0,\"lastMatchOpened\":0,\"lastMatchDestroyed\":0,\"liveChests\":0,\"liveDestroyed\":0,\"base\":null,\"session\":0,\"sessionOpened\":0,\"sessionDestroyed\":0,\"player\":\"\",\"accounts\":[],\"matches\":[],\"inProgress\":false}}";
+            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":0,\"opened\":0,\"destroyed\":0,\"soloTotal\":0,\"teamTotal\":0,\"countTeam\":false,\"lastMatch\":0,\"lastMatchSolo\":0,\"lastMatchTeam\":0,\"lastMatchOpened\":0,\"lastMatchDestroyed\":0,\"liveChests\":0,\"liveDestroyed\":0,\"base\":null,\"session\":0,\"sessionSolo\":0,\"sessionTeam\":0,\"sessionOpened\":0,\"sessionDestroyed\":0,\"player\":\"\",\"accounts\":[],\"teammates\":[],\"matches\":[],\"inProgress\":false}}";
         }
     }
 
@@ -758,7 +806,10 @@ public static class WebDashboardServer
                 var place = m.Placement.HasValue ? m.Placement.Value.ToString() : "null";
                 var elim = m.Eliminations.HasValue ? m.Eliminations.Value.ToString() : "0";
                 var player = EscapeJson(!string.IsNullOrEmpty(m.PlayerName) ? m.PlayerName : curProfileName);
-                return $"{{\"fileName\":\"{EscapeJson(fn)}\",\"matchStart\":\"{start}\",\"durationSeconds\":{m.DurationSeconds ?? 0},\"playlist\":\"{EscapeJson(pl)}\",\"placement\":{place},\"chestsOpened\":{m.ChestsOpened},\"chestsSearched\":{m.ChestsSearchedOnly},\"chestsDestroyed\":{m.ChestsDestroyed},\"eliminations\":{elim},\"playerName\":\"{player}\"}}";
+                var matesList = (m.Teammates != null && m.Teammates.Count > 0)
+                    ? "[" + string.Join(",", m.Teammates.Select(t => $"{{\"name\":\"{EscapeJson(t.Name)}\",\"chests\":{t.ChestsSeen}}}")) + "]"
+                    : "[]";
+                return $"{{\"fileName\":\"{EscapeJson(fn)}\",\"matchStart\":\"{start}\",\"durationSeconds\":{m.DurationSeconds ?? 0},\"playlist\":\"{EscapeJson(pl)}\",\"placement\":{place},\"chestsOpened\":{m.ChestsOpened},\"chestsSearched\":{m.ChestsSearchedOnly},\"chestsDestroyed\":{m.ChestsDestroyed},\"teamChests\":{m.TeamTotalChests},\"teammates\":{matesList},\"eliminations\":{elim},\"playerName\":\"{player}\"}}";
             });
             return "[" + string.Join(",", items) + "]";
         }

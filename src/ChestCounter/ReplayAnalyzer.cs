@@ -550,6 +550,34 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             });
         }
 
+        // --- Teammates: same team as target, with chests seen searching nearby ----------------
+        var teammates = new List<TeammateRecord>();
+        if (target?.TeamIndex is int team)
+        {
+            var mates = players
+                .Where(p => p.TeamIndex == team && p.Id != target.Id && p.IsBot != true)
+                .GroupBy(p => p.EpicId ?? p.PlayerName ?? $"pid{p.Id}")
+                .Select(g => g.First())
+                .ToList();
+            foreach (var mate in mates)
+            {
+                var states = _playerStateToPlayerId.Where(kv => kv.Value == mate.Id).Select(kv => kv.Key).ToHashSet();
+                var pawns = _pawnToPlayerState.Where(kv => states.Contains(kv.Value)).Select(kv => kv.Key).ToHashSet();
+                var kinds = _searches
+                    .Where(s => s.SearcherPawn is uint p && pawns.Contains(p))
+                    .GroupBy(s => ChestKinds.Classify(s.Label))
+                    .ToDictionary(g => g.Key, g => g.Count());
+                teammates.Add(new TeammateRecord
+                {
+                    Name = !string.IsNullOrWhiteSpace(mate.PlayerName) ? mate.PlayerName.Trim() : "Teammate",
+                    EpicId = mate.EpicId,
+                    ChestsSeen = kinds.Where(k => ChestKinds.IsChest(k.Key)).Sum(k => k.Value),
+                    Kinds = kinds,
+                });
+            }
+            teammates.Sort((a, b) => b.ChestsSeen.CompareTo(a.ChestsSeen));
+        }
+
         if (Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "1")
         {
             string NameOfPawn(uint pawn) =>
@@ -739,6 +767,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
             IsBattleRoyale = !string.IsNullOrEmpty(replay.GameData?.CurrentPlaylist) || chests.Count > 0,
             Chests = chests,
             TreasureFinds = finds,
+            Teammates = teammates,
         };
     }
 }
