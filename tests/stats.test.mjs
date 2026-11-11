@@ -6,7 +6,19 @@ import { languages, resolveLanguage } from '../v3/public/i18n.js';
 test('keeps authoritative total and does not invent placement or count', () => {
   assert.deepEqual(summarize({ total: 4084, session: 8, lastMatch: 8, matches: [
     { chestsOpened: 8, placement: null }, { chestsOpened: 4, placement: 1 }
-  ] }), { total: 4084, session: 8, lastMatch: 8, average: 6, victories: 1 });
+  ] }), {
+    total: 4084,
+    opened: 4084,
+    destroyed: 0,
+    session: 8,
+    sessionOpened: 8,
+    sessionDestroyed: 0,
+    lastMatch: 8,
+    lastMatchOpened: 8,
+    lastMatchDestroyed: 0,
+    average: 6,
+    victories: 1
+  });
   assert.equal(summarize({ total: 0, matches: [] }).total, 0);
 });
 test('validates whole counts without silently accepting fractions, signs, or trailing text', () => {

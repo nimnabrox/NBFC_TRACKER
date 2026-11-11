@@ -89,6 +89,8 @@
   "overlayStyle": "Katman stili",
   "matchesTotal": "Kaydedilen maçlar",
   "subscribe": "Abone ol",
+  "opened": "Açılan",
+  "destroyed": "Kırılan",
   "useCode": "Kodu kullan",
   "updateAccess": "Bu özel sürüm için GitHub erişimi gerekir. İndirmek için sürüm sayfasını aç.",
   "updateOffline": "Güncelleme sunucusuna ulaşılamadı. Lütfen tekrar dene.",

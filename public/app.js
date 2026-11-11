@@ -58,8 +58,14 @@ async function saveOverlayOptions() {
 function render() {
   renderConnectionGate(nativeConnected);
   const values = summarize(snapshot);
-  for (const [key, value] of Object.entries(values)) $(key).textContent = number(value);
+  for (const [key, value] of Object.entries(values)) {
+    const el = $(key);
+    if (el) el.textContent = number(value);
+  }
   $('total').style.setProperty('--count-chars', Math.max(6, number(values.total).length));
+  $('total').title = `${number(values.opened)} ${t('opened')} + ${number(values.destroyed)} ${t('destroyed')}`;
+  if ($('lastMatch')) $('lastMatch').title = `${number(values.lastMatchOpened)} ${t('opened')} + ${number(values.lastMatchDestroyed)} ${t('destroyed')}`;
+  if ($('session')) $('session').title = `${number(values.sessionOpened)} ${t('opened')} + ${number(values.sessionDestroyed)} ${t('destroyed')}`;
   document.querySelectorAll('[data-total-last]').forEach(el => { el.textContent = '+' + number(values.lastMatch); el.title = t('lastMatch'); });
   $('overlayTotal').textContent = number(values.total);
   $('overlayEditorTotal').textContent = number(values.total);
@@ -70,7 +76,8 @@ function render() {
   if (updateNotice) $('updateMessage').textContent = t(updateNotice.key, updateNotice.values);
   document.querySelectorAll('.version').forEach(el => { el.textContent = displayVersion; });
   $('status').classList.toggle('online', ['connected', 'cloud'].includes(connection));
-  $('totalHint').textContent = snapshot.base > 0 ? `${t('base')}: ${number(snapshot.base)}` : t('fromReplays');
+  const breakdown = `${number(values.opened)} ${t('opened')} · ${number(values.destroyed)} ${t('destroyed')}`;
+  $('totalHint').textContent = snapshot.base > 0 ? `${t('base')}: ${number(snapshot.base)} (${breakdown})` : breakdown;
   $('matchStatus').textContent = t(snapshot.inProgress ? 'matchLive' : connection === 'offline' ? 'stale' : 'fromReplays');
   $('profile').disabled = !nativeConnected || !snapshot.accounts?.length;
   const profileSignature = JSON.stringify([locale, snapshot.player, snapshot.accounts]);
@@ -133,7 +140,13 @@ function renderMatches() {
       match.placement ? `#${number(match.placement)}` : '—', number(match.chestsOpened), match.eliminations == null ? '—' : number(match.eliminations)];
     values.forEach((value, index) => {
       const cell = document.createElement('td'); cell.textContent = value;
-      if (index === 3) cell.className = 'count';
+      if (index === 3) {
+        cell.className = 'count';
+        if (match.chestsDestroyed > 0) {
+          const openedOnly = match.chestsSearched ?? Math.max(0, match.chestsOpened - match.chestsDestroyed);
+          cell.title = `${number(openedOnly)} ${t('opened')} + ${number(match.chestsDestroyed)} ${t('destroyed')}`;
+        }
+      }
       if (index === 2 && match.placement === 1) cell.className = 'win';
       row.append(cell);
     });

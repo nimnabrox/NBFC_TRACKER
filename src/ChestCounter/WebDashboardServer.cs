@@ -432,8 +432,10 @@ public static class WebDashboardServer
                 var candidatePaths = new[]
                 {
                     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "public", "assets", "chest_fnv1.png"),
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "v3", "public", "assets", "chest_fnv1.png"),
                     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "chest_fnv1.png"),
                     Path.Combine(Directory.GetCurrentDirectory(), "public", "assets", "chest_fnv1.png"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "v3", "public", "assets", "chest_fnv1.png"),
                     @"D:\Projects_Codes\Projects_Codes\NB FORTNITE CHEST TRACKER v2\public\assets\chest_fnv1.png"
                 };
 
@@ -447,6 +449,8 @@ public static class WebDashboardServer
                     res.Close();
                     return;
                 }
+
+                if (TryServeEmbedded(res, "chest_fnv1.png", "image/png")) return;
             }
 
             // 3b. Serve Nimna Bro Channel Logo
@@ -456,8 +460,10 @@ public static class WebDashboardServer
                 var candidatePaths = new[]
                 {
                     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "public", "assets", "nimnabrologo.png"),
+                    Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "v3", "public", "assets", "nimnabrologo.png"),
                     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "nimnabrologo.png"),
                     Path.Combine(Directory.GetCurrentDirectory(), "public", "assets", "nimnabrologo.png"),
+                    Path.Combine(Directory.GetCurrentDirectory(), "v3", "public", "assets", "nimnabrologo.png"),
                     Path.Combine(Directory.GetCurrentDirectory(), "nimnabrologo.png"),
                     @"D:\Projects_Codes\Projects_Codes\NB FORTNITE CHEST TRACKER v2\nimnabrologo.png",
                     @"D:\Projects_Codes\Projects_Codes\NB FORTNITE CHEST TRACKER v2\public\assets\nimnabrologo.png"
@@ -473,6 +479,8 @@ public static class WebDashboardServer
                     res.Close();
                     return;
                 }
+
+                if (TryServeEmbedded(res, "nimnabrologo.png", "image/png")) return;
             }
 
             // 5. Raw JSON Data API
@@ -664,8 +672,17 @@ public static class WebDashboardServer
             var liveMatch = inProgress ? _getLiveMatch?.Invoke() : null;
             var liveChests = liveMatch != null && (Profiles.Key(liveMatch).Equals(profileKey, StringComparison.OrdinalIgnoreCase)
                 || string.Equals(liveMatch.PlayerName, playerName, StringComparison.OrdinalIgnoreCase)) ? liveMatch.ChestsOpened : 0;
-            var sessionChests = matches.Where(ReportWriter.IsThisSession).Sum(m => m.ChestsOpened) + liveChests;
+            var liveDestroyed = liveMatch != null && (Profiles.Key(liveMatch).Equals(profileKey, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(liveMatch.PlayerName, playerName, StringComparison.OrdinalIgnoreCase)) ? liveMatch.ChestsDestroyed : 0;
+
+            var sessionMatches = matches.Where(ReportWriter.IsThisSession).ToList();
+            var sessionChests = sessionMatches.Sum(m => m.ChestsOpened) + liveChests;
+            var sessionDestroyed = sessionMatches.Sum(m => m.ChestsDestroyed) + liveDestroyed;
+            var sessionOpened = Math.Max(0, sessionChests - sessionDestroyed);
+
             var totalChests = matches.Sum(m => m.ChestsOpened) + liveChests;
+            var totalDestroyed = matches.Sum(m => m.ChestsDestroyed) + liveDestroyed;
+
             int displayedTotal;
             lock (_data)
             {
@@ -673,7 +690,11 @@ public static class WebDashboardServer
                 displayedTotal = _config.DisplayedChestTotal(profileKey, playerName, totalChests - liveChests, liveChests);
                 if (_config.ProfileBaseReplayTotals.Count != baselinesBefore) _store?.SaveConfig(_config);
             }
+            var displayedOpened = Math.Max(0, displayedTotal - totalDestroyed);
+
             var lastMatch = matches.Count > 0 ? matches[0].ChestsOpened : 0;
+            var lastMatchDestroyed = matches.Count > 0 ? matches[0].ChestsDestroyed : 0;
+            var lastMatchOpened = Math.Max(0, lastMatch - lastMatchDestroyed);
             var baseJson = (baseCount.HasValue && baseCount.Value > 0) ? baseCount.Value.ToString() : "null";
 
             // Format accounts list (ordered by last played descending)
@@ -685,11 +706,11 @@ public static class WebDashboardServer
             var accountsJson = "[" + string.Join(",", profileItems) + "]";
             var matchesJson = GetMatchesJson();
 
-            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":{displayedTotal},\"lastMatch\":{lastMatch},\"liveChests\":{liveChests},\"base\":{baseJson},\"session\":{sessionChests},\"player\":\"{EscapeJson(playerName)}\",\"accounts\":{accountsJson},\"matches\":{matchesJson},\"inProgress\":{(inProgress ? "true" : "false")}}}";
+            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":{displayedTotal},\"opened\":{displayedOpened},\"destroyed\":{totalDestroyed},\"lastMatch\":{lastMatch},\"lastMatchOpened\":{lastMatchOpened},\"lastMatchDestroyed\":{lastMatchDestroyed},\"liveChests\":{liveChests},\"liveDestroyed\":{liveDestroyed},\"base\":{baseJson},\"session\":{sessionChests},\"sessionOpened\":{sessionOpened},\"sessionDestroyed\":{sessionDestroyed},\"player\":\"{EscapeJson(playerName)}\",\"accounts\":{accountsJson},\"matches\":{matchesJson},\"inProgress\":{(inProgress ? "true" : "false")}}}";
         }
         catch
         {
-            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":0,\"lastMatch\":0,\"liveChests\":0,\"base\":null,\"session\":0,\"player\":\"\",\"accounts\":[],\"matches\":[],\"inProgress\":false}}";
+            return $"{{\"room\":\"{EscapeJson(targetRoom)}\",\"total\":0,\"opened\":0,\"destroyed\":0,\"lastMatch\":0,\"lastMatchOpened\":0,\"lastMatchDestroyed\":0,\"liveChests\":0,\"liveDestroyed\":0,\"base\":null,\"session\":0,\"sessionOpened\":0,\"sessionDestroyed\":0,\"player\":\"\",\"accounts\":[],\"matches\":[],\"inProgress\":false}}";
         }
     }
 
@@ -737,7 +758,7 @@ public static class WebDashboardServer
                 var place = m.Placement.HasValue ? m.Placement.Value.ToString() : "null";
                 var elim = m.Eliminations.HasValue ? m.Eliminations.Value.ToString() : "0";
                 var player = EscapeJson(!string.IsNullOrEmpty(m.PlayerName) ? m.PlayerName : curProfileName);
-                return $"{{\"fileName\":\"{EscapeJson(fn)}\",\"matchStart\":\"{start}\",\"durationSeconds\":{m.DurationSeconds ?? 0},\"playlist\":\"{EscapeJson(pl)}\",\"placement\":{place},\"chestsOpened\":{m.ChestsOpened},\"eliminations\":{elim},\"playerName\":\"{player}\"}}";
+                return $"{{\"fileName\":\"{EscapeJson(fn)}\",\"matchStart\":\"{start}\",\"durationSeconds\":{m.DurationSeconds ?? 0},\"playlist\":\"{EscapeJson(pl)}\",\"placement\":{place},\"chestsOpened\":{m.ChestsOpened},\"chestsSearched\":{m.ChestsSearchedOnly},\"chestsDestroyed\":{m.ChestsDestroyed},\"eliminations\":{elim},\"playerName\":\"{player}\"}}";
             });
             return "[" + string.Join(",", items) + "]";
         }
@@ -972,4 +993,24 @@ public static class WebDashboardServer
             return "{\"isLive\":false,\"videoId\":\"o5pBvr1jqm0\",\"title\":\"Nimna Bro - Fortnite Streams & Content\",\"channelUrl\":\"https://www.youtube.com/@nimna_bro_\",\"liveUrl\":\"https://www.youtube.com/@nimna_bro_/live\",\"subUrl\":\"https://www.youtube.com/@nimna_bro_?sub_confirmation=1\",\"thumbnail\":\"https://i.ytimg.com/vi/o5pBvr1jqm0/hqdefault.jpg\",\"creatorCode\":\"NIMNABRO\"}";
         }
     }
+    private static bool TryServeEmbedded(HttpListenerResponse res, string filename, string contentType)
+    {
+        var asm = typeof(AppInfo).Assembly;
+        var resNames = asm.GetManifestResourceNames();
+        var matched = resNames.FirstOrDefault(r => r.EndsWith(filename, StringComparison.OrdinalIgnoreCase));
+        if (matched != null)
+        {
+            using var stream = asm.GetManifestResourceStream(matched);
+            if (stream != null)
+            {
+                res.ContentType = contentType;
+                res.ContentLength64 = stream.Length;
+                stream.CopyTo(res.OutputStream);
+                res.Close();
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

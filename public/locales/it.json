@@ -89,6 +89,8 @@
   "overlayStyle": "Stile overlay",
   "matchesTotal": "Partite registrate",
   "subscribe": "Iscriviti",
+  "opened": "Aperti",
+  "destroyed": "Distrutti",
   "useCode": "Usa il codice",
   "updateAccess": "Questa versione privata richiede l’accesso a GitHub. Apri la pagina della versione per scaricarla.",
   "updateOffline": "Impossibile raggiungere il server degli aggiornamenti. Riprova.",

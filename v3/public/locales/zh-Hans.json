@@ -89,6 +89,8 @@
   "overlayStyle": "叠加层样式",
   "matchesTotal": "已记录对局",
   "subscribe": "订阅",
+  "opened": "已开启",
+  "destroyed": "已破坏",
   "useCode": "使用代码",
   "updateAccess": "此私有版本需要 GitHub 访问权限。请打开发布页面下载。",
   "updateOffline": "无法连接更新服务器，请重试。",

@@ -89,6 +89,8 @@
   "overlayStyle": "Style de l’overlay",
   "matchesTotal": "Parties enregistrées",
   "subscribe": "S’abonner",
+  "opened": "Ouverts",
+  "destroyed": "Détruits",
   "useCode": "Utilisez le code",
   "updateAccess": "Cette version privée nécessite un accès à GitHub. Ouvrez sa page pour la télécharger.",
   "updateOffline": "Le serveur de mise à jour est inaccessible. Réessayez.",

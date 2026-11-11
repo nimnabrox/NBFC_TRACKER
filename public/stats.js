@@ -9,9 +9,29 @@ export function summarize(snapshot) {
   // The C# analyzer remains the authority for totals and profile offsets.
   const matches = Array.isArray(snapshot.matches) ? snapshot.matches : [];
   const sum = matches.reduce((n, m) => n + (Number(m.chestsOpened) || 0), 0);
-  return { total: snapshot.total ?? 0, session: snapshot.session ?? 0, lastMatch: snapshot.lastMatch ?? 0,
+  const total = snapshot.total ?? 0;
+  const destroyed = snapshot.destroyed ?? matches.reduce((n, m) => n + (Number(m.chestsDestroyed) || 0), 0);
+  const opened = snapshot.opened ?? Math.max(0, total - destroyed);
+  const lastMatch = snapshot.lastMatch ?? 0;
+  const lastMatchDestroyed = snapshot.lastMatchDestroyed ?? (matches.length > 0 ? (Number(matches[0].chestsDestroyed) || 0) : 0);
+  const lastMatchOpened = snapshot.lastMatchOpened ?? Math.max(0, lastMatch - lastMatchDestroyed);
+  const session = snapshot.session ?? 0;
+  const sessionDestroyed = snapshot.sessionDestroyed ?? 0;
+  const sessionOpened = snapshot.sessionOpened ?? Math.max(0, session - sessionDestroyed);
+
+  return {
+    total,
+    opened,
+    destroyed,
+    session,
+    sessionOpened,
+    sessionDestroyed,
+    lastMatch,
+    lastMatchOpened,
+    lastMatchDestroyed,
     average: matches.length ? Math.round(sum / matches.length * 10) / 10 : 0,
-    victories: matches.filter(m => m.placement === 1).length };
+    victories: matches.filter(m => m.placement === 1).length
+  };
 }
 export function localDay(date) {
   return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
@@ -35,6 +55,6 @@ export function csvCell(value) {
   return '"' + text.replaceAll('"', '""') + '"';
 }
 export function matchesCsv(matches) {
-  const keys = ['matchStart', 'playlist', 'playerName', 'placement', 'chestsOpened', 'eliminations', 'fileName'];
+  const keys = ['matchStart', 'playlist', 'playerName', 'placement', 'chestsOpened', 'chestsSearched', 'chestsDestroyed', 'eliminations', 'fileName'];
   return '\uFEFF' + [keys.join(','), ...matches.map(m => keys.map(key => csvCell(m[key])).join(','))].join('\r\n');
 }

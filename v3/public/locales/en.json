@@ -89,6 +89,8 @@
   "overlayStyle": "Overlay style",
   "matchesTotal": "Matches recorded",
   "subscribe": "Subscribe",
+  "opened": "Opened",
+  "destroyed": "Destroyed",
   "useCode": "Use code",
   "updateAccess": "GitHub access is required for this private release. Open the release page to download.",
   "updateOffline": "Could not reach the update server. Please try again.",

@@ -89,6 +89,8 @@
   "overlayStyle": "Styl nakładki",
   "matchesTotal": "Zapisane mecze",
   "subscribe": "Subskrybuj",
+  "opened": "Otwarte",
+  "destroyed": "Zniszczone",
   "useCode": "Użyj kodu",
   "updateAccess": "Ta prywatna wersja wymaga dostępu do GitHub. Otwórz stronę wydania, aby ją pobrać.",
   "updateOffline": "Nie można połączyć się z serwerem aktualizacji. Spróbuj ponownie.",

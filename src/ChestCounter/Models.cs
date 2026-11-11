@@ -63,6 +63,10 @@ public sealed class MatchRecord
     public int? TotalPlayers { get; set; }
     public int? Eliminations { get; set; }
     public int ChestsOpened { get; set; }
+    [JsonIgnore]
+    public int ChestsDestroyed => Chests?.Count(c => c.Destroyed) ?? 0;
+    [JsonIgnore]
+    public int ChestsSearchedOnly => Chests?.Count(c => !c.Destroyed) ?? ChestsOpened;
     public int AmmoBoxesOpened { get; set; }
     public int OtherContainersOpened { get; set; }
     /// <summary>Non-chest interactions by kind (loot cannons, ammo boxes, food boxes...).</summary>

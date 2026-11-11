@@ -89,6 +89,8 @@
   "overlayStyle": "オーバーレイのスタイル",
   "matchesTotal": "記録したマッチ",
   "subscribe": "チャンネル登録",
+  "opened": "開封",
+  "destroyed": "破壊",
   "useCode": "コードを使用",
   "updateAccess": "この非公開リリースにはGitHubのアクセス権が必要です。リリースページからダウンロードしてください。",
   "updateOffline": "更新サーバーに接続できませんでした。もう一度お試しください。",

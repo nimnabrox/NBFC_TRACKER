@@ -1,18 +1,8 @@
 name = "nbfct"
-main = "_worker.js"
 compatibility_date = "2026-11-08"
 workers_dev = true
 routes = [{ pattern = "nbfct.nimnabro.com", custom_domain = true }]
 
 [assets]
 directory = "../public"
-binding = "ASSETS"
-run_worker_first = ["/api/*"]
-
-[[durable_objects.bindings]]
-name = "ROOMS"
-class_name = "TrackerRoom"
-
-[[migrations]]
-tag = "v1-rooms"
-new_sqlite_classes = ["TrackerRoom"]
+not_found_handling = "404-page"

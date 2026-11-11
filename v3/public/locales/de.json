@@ -89,6 +89,8 @@
   "overlayStyle": "Overlay-Stil",
   "matchesTotal": "Erfasste Spiele",
   "subscribe": "Abonnieren",
+  "opened": "Geöffnet",
+  "destroyed": "Zerstört",
   "useCode": "Code verwenden",
   "updateAccess": "Für diese private Version ist GitHub-Zugriff erforderlich. Öffne die Release-Seite zum Herunterladen.",
   "updateOffline": "Der Update-Server ist nicht erreichbar. Bitte versuche es erneut.",

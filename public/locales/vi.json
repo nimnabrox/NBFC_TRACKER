@@ -89,6 +89,8 @@
   "overlayStyle": "Kiểu lớp phủ",
   "matchesTotal": "Trận đã ghi",
   "subscribe": "Đăng ký",
+  "opened": "Đã mở",
+  "destroyed": "Bị phá",
   "useCode": "Dùng mã",
   "updateAccess": "Bản phát hành riêng tư này cần quyền truy cập GitHub. Mở trang phát hành để tải xuống.",
   "updateOffline": "Không thể kết nối máy chủ cập nhật. Vui lòng thử lại.",
