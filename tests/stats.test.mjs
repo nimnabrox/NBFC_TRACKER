@@ -60,7 +60,7 @@ test('all compatibility UIs match v3 source and HTML IDs are unique', async () =
     for (const name of files) assert.equal(await readFile(`${destination}/${name}`, 'utf8'), await readFile(`v3/public/${name}`, 'utf8'), `${destination}/${name}`);
   }
   const app = await readFile('v3/public/app.js', 'utf8');
-  const optional = new Set(['openWeb', 'obsUrl', 'obsUrlAlt', 'activeAccountName', 'matchesCount', 'accountList', 'countTeam', 'teammatesSection', 'teammatesList']);
+  const optional = new Set(['openWeb', 'obsUrl', 'obsUrlAlt', 'activeAccountName', 'matchesCount', 'accountList', 'countTeam', 'teammatesSection', 'teammatesList', 'matchDetails', 'closeMatchDetails', 'matchDetailsTitle', 'matchDetailsBody']);
   for (const name of ['dashboard.html', 'app.html', 'modern.html']) {
     const html = await readFile('v3/public/' + name, 'utf8');
     const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(m => m[1]);

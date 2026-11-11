@@ -160,6 +160,11 @@ function renderMatches() {
   }
   for (const match of matches.slice((page - 1) * 10, page * 10)) {
     const row = document.createElement('tr');
+    row.className = 'match-row-clickable';
+    row.tabIndex = 0;
+    row.setAttribute('role', 'button');
+    row.onclick = () => showMatchDetails(match);
+    row.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showMatchDetails(match); } };
     const date = new Date(match.matchStart);
     const values = [Number.isNaN(date.getTime()) ? '—' : new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).format(date),
       displayMode(match.playlist),
@@ -186,6 +191,117 @@ function renderMatches() {
   $('pagination').hidden = !matches.length; $('export').disabled = !matches.length;
   $('pageLabel').textContent = t('page', { current: number(page), total: number(pages) });
   $('previous').disabled = page <= 1; $('next').disabled = page >= pages;
+}
+function showMatchDetails(match) {
+  const dlg = $('matchDetails');
+  if (!dlg) return;
+  const body = $('matchDetailsBody');
+  if (!body) return;
+  body.replaceChildren();
+
+  const date = new Date(match.matchStart);
+  const dateStr = Number.isNaN(date.getTime()) ? '—' : new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(date);
+  const modeStr = displayMode(match.playlist);
+  const placeStr = match.placement ? `#${number(match.placement)}` : '—';
+  const isWin = match.placement === 1;
+
+  const headerCard = document.createElement('div');
+  headerCard.className = 'match-detail-header' + (isWin ? ' win-banner' : '');
+  const modeDiv = document.createElement('div');
+  modeDiv.className = 'match-detail-mode';
+  modeDiv.textContent = modeStr;
+  const metaDiv = document.createElement('div');
+  metaDiv.className = 'match-detail-meta';
+  const placeSpan = document.createElement('strong');
+  if (isWin) placeSpan.className = 'win-text';
+  placeSpan.textContent = placeStr;
+  metaDiv.append(document.createTextNode(dateStr + ' · '), placeSpan, document.createTextNode(` · ${number(match.eliminations || 0)} ${t('eliminations')}`));
+  headerCard.append(modeDiv, metaDiv);
+  body.append(headerCard);
+
+  const playerCard = document.createElement('div');
+  playerCard.className = 'match-player-card';
+  const playerRow = document.createElement('div');
+  playerRow.className = 'match-player-row';
+  const nameCol = document.createElement('div');
+  nameCol.className = 'match-player-name';
+  const badge = document.createElement('span');
+  badge.className = 'player-badge';
+  badge.textContent = 'YOU';
+  const nameText = document.createElement('strong');
+  nameText.textContent = match.playerName || snapshot.player || t('profile');
+  nameCol.append(badge, nameText);
+
+  const chestCol = document.createElement('div');
+  chestCol.className = 'match-player-chests';
+  const chestVal = document.createElement('strong');
+  chestVal.textContent = number(match.chestsOpened);
+  chestCol.append(chestVal, document.createTextNode(' ' + t('chests')));
+  playerRow.append(nameCol, chestCol);
+
+  const breakdownRow = document.createElement('div');
+  breakdownRow.className = 'match-player-breakdown';
+  const openedOnly = match.chestsSearched ?? Math.max(0, match.chestsOpened - (match.chestsDestroyed || 0));
+  const openedSpan = document.createElement('span');
+  openedSpan.textContent = `${number(openedOnly)} ${t('opened')}`;
+  breakdownRow.append(openedSpan);
+  if (match.chestsDestroyed > 0) {
+    const destroyedSpan = document.createElement('span');
+    destroyedSpan.textContent = `· ${number(match.chestsDestroyed)} ${t('destroyed')}`;
+    breakdownRow.append(destroyedSpan);
+  }
+
+  playerCard.append(playerRow, breakdownRow);
+  body.append(playerCard);
+
+  if (match.teammates && match.teammates.length > 0) {
+    const teamSec = document.createElement('div');
+    teamSec.className = 'match-team-section';
+
+    const teamTitle = document.createElement('div');
+    teamTitle.className = 'match-team-title';
+    const teamTitleText = document.createElement('span');
+    teamTitleText.textContent = t('teammates');
+    const teamTotalVal = match.teamChests ?? (match.chestsOpened + match.teammates.reduce((s, m) => s + m.chests, 0));
+    const teamTotalSmall = document.createElement('small');
+    teamTotalSmall.textContent = `${t('teamChests')}: `;
+    const teamTotalStrong = document.createElement('strong');
+    teamTotalStrong.textContent = number(teamTotal);
+    teamTotalSmall.append(teamTotalStrong);
+    teamTitle.append(teamTitleText, teamTotalSmall);
+    teamSec.append(teamTitle);
+
+    for (const mate of match.teammates) {
+      const mateRow = document.createElement('div');
+      mateRow.className = 'match-mate-row';
+      const mateNameCol = document.createElement('div');
+      mateNameCol.className = 'match-mate-name';
+      const dot = document.createElement('span');
+      dot.className = 'mate-dot';
+      const mateName = document.createElement('span');
+      mateName.textContent = mate.name;
+      mateNameCol.append(dot, mateName);
+
+      const mateChestCol = document.createElement('div');
+      mateChestCol.className = 'match-mate-chests';
+      const mateChestVal = document.createElement('strong');
+      mateChestVal.textContent = number(mate.chests);
+      mateChestCol.append(mateChestVal, document.createTextNode(' ' + t('chests')));
+
+      mateRow.append(mateNameCol, mateChestCol);
+      teamSec.append(mateRow);
+    }
+    body.append(teamSec);
+  }
+
+  if (match.fileName) {
+    const fileRow = document.createElement('div');
+    fileRow.className = 'match-detail-file';
+    fileRow.textContent = match.fileName;
+    body.append(fileRow);
+  }
+
+  dlg.showModal();
 }
 function displayMode(playlist) {
   if (!playlist) return '—';
@@ -282,6 +398,8 @@ $('language').addEventListener('change', async event => {
 $('openSettings').onclick = () => $('settings').showModal();
 $('closeSettings').onclick = () => $('settings').close();
 $('settings').addEventListener('click', event => { if (event.target === $('settings')) { const r = event.target.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) event.target.close(); } });
+if ($('closeMatchDetails')) $('closeMatchDetails').onclick = () => $('matchDetails').close();
+if ($('matchDetails')) $('matchDetails').addEventListener('click', event => { if (event.target === $('matchDetails')) { const r = event.target.getBoundingClientRect(); if (event.clientX < r.left || event.clientX > r.right || event.clientY < r.top || event.clientY > r.bottom) event.target.close(); } });
 $('retryConnection').onclick = () => poll();
 $('copyOverlay').onclick = () => copy(overlayUrl());
 $('copyEditedOverlay').onclick = () => copy(overlayUrl());
