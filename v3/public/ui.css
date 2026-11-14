@@ -72,3 +72,5 @@ body .intro h1,body .panel h2,body .dialog-heading h2{font-family:"Fort Display"
 .match-mate-chests{font-size:13px;color:var(--muted)}
 .match-mate-chests strong{color:var(--accent);font-size:17px;font-family:"Fort Display","Segoe UI",Tahoma,sans-serif}
 .match-detail-file{font-size:11px;color:#6b768c;font-family:monospace;word-break:break-all;margin-top:10px;text-align:center}
+.team-chest-sub{display:block;font-size:11px;color:#f5a623;font-weight:700;margin-top:2px;opacity:.9}
+.match-mate-empty{font-size:13px;color:var(--muted);padding:8px 0;font-style:italic}

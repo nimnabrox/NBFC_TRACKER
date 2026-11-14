@@ -89,7 +89,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly List<GrantEvent> _grants = new();
 
     /// <summary>Bump when the analysis changes so that existing replays are re-analyzed.</summary>
-    public const int CurrentVersion = 9;
+    public const int CurrentVersion = 10;
 
     private static readonly bool ProbeDebug = Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "4";
 
@@ -552,10 +552,23 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
 
         // --- Teammates: same team as target, with chests seen searching nearby ----------------
         var teammates = new List<TeammateRecord>();
-        if (target?.TeamIndex is int team)
+        int? team = target?.TeamIndex;
+        if (team == null && target?.Id != null && replay.TeamData != null)
+        {
+            var matchedTeam = replay.TeamData.FirstOrDefault(t => t.PlayerIds.Contains(target.Id));
+            if (matchedTeam != null) team = matchedTeam.TeamIndex;
+        }
+        if (team == null && !string.IsNullOrWhiteSpace(target?.PlayerName) && replay.TeamData != null)
+        {
+            var matchedTeam = replay.TeamData.FirstOrDefault(t => t.PlayerNames.Any(n => string.Equals(n, target.PlayerName, StringComparison.OrdinalIgnoreCase)));
+            if (matchedTeam != null) team = matchedTeam.TeamIndex;
+        }
+        team ??= recorderPlayer?.TeamIndex;
+
+        if (team is int teamIdx)
         {
             var mates = players
-                .Where(p => p.TeamIndex == team && p.Id != target.Id && p.IsBot != true)
+                .Where(p => p.TeamIndex == teamIdx && p.Id != target?.Id && !string.Equals(p.PlayerName?.Trim(), target?.PlayerName?.Trim(), StringComparison.OrdinalIgnoreCase) && p.IsBot != true)
                 .GroupBy(p => p.EpicId ?? p.PlayerName ?? $"pid{p.Id}")
                 .Select(g => g.First())
                 .ToList();
