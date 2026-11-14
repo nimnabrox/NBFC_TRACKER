@@ -125,30 +125,11 @@ function render() {
   ['base', 'resetBase', 'folder', 'startup'].forEach(id => { $(id).disabled = !nativeConnected; });
   $('baseForm').querySelector('button').disabled = !nativeConnected;
   $('folderForm').querySelector('button').disabled = !nativeConnected;
-  renderMatches(); renderChart(); renderTeammates();
+  renderMatches(); renderChart();
 }
 function renderTeammates() {
-  if (!$('teammatesList')) return;
-  const teammates = Array.isArray(snapshot.teammates) ? snapshot.teammates : [];
-  $('teammatesList').replaceChildren();
-  if ($('teammatesSection')) $('teammatesSection').hidden = !teammates.length;
-  if (!teammates.length) return;
-  for (const mate of teammates) {
-    const card = document.createElement('div');
-    card.className = 'teammate-card';
-    const name = document.createElement('div');
-    name.className = 'teammate-name';
-    name.textContent = mate.name;
-    const stats = document.createElement('div');
-    stats.className = 'teammate-stats';
-    const count = document.createElement('strong');
-    count.textContent = number(mate.chests);
-    const label = document.createElement('span');
-    label.textContent = ` ${t('chests')} · ${mate.matches} ${t('history')}`;
-    stats.append(count, label);
-    card.append(name, stats);
-    $('teammatesList').append(card);
-  }
+  if ($('teammatesSection')) $('teammatesSection').hidden = true;
+  if ($('teammatesList')) $('teammatesList').replaceChildren();
 }
 function renderMatches() {
   const matches = [...(snapshot.matches || [])].sort((a, b) => new Date(b.matchStart) - new Date(a.matchStart));
@@ -262,25 +243,25 @@ function showMatchDetails(match) {
   playerCard.append(playerRow, breakdownRow);
   body.append(playerCard);
 
-  const teamSec = document.createElement('div');
-  teamSec.className = 'match-team-section';
-
-  const teamTitle = document.createElement('div');
-  teamTitle.className = 'match-team-title';
-  const teamTitleText = document.createElement('span');
-  teamTitleText.textContent = t('teammates');
   const teammates = Array.isArray(match.teammates) ? match.teammates : [];
-  const matesSum = teammates.reduce((s, m) => s + (Number(m.chests) || 0), 0);
-  const teamTotalVal = match.teamChests ?? (match.chestsOpened + matesSum);
-  const teamTotalSmall = document.createElement('small');
-  teamTotalSmall.textContent = `${t('teamChests')}: `;
-  const teamTotalStrong = document.createElement('strong');
-  teamTotalStrong.textContent = number(teamTotalVal);
-  teamTotalSmall.append(teamTotalStrong);
-  teamTitle.append(teamTitleText, teamTotalSmall);
-  teamSec.append(teamTitle);
-
   if (teammates.length > 0) {
+    const teamSec = document.createElement('div');
+    teamSec.className = 'match-team-section';
+
+    const teamTitle = document.createElement('div');
+    teamTitle.className = 'match-team-title';
+    const teamTitleText = document.createElement('span');
+    teamTitleText.textContent = t('teammates');
+    const matesSum = teammates.reduce((s, m) => s + (Number(m.chests) || 0), 0);
+    const teamTotalVal = match.teamChests ?? (match.chestsOpened + matesSum);
+    const teamTotalSmall = document.createElement('small');
+    teamTotalSmall.textContent = `${t('teamChests')}: `;
+    const teamTotalStrong = document.createElement('strong');
+    teamTotalStrong.textContent = number(teamTotalVal);
+    teamTotalSmall.append(teamTotalStrong);
+    teamTitle.append(teamTitleText, teamTotalSmall);
+    teamSec.append(teamTitle);
+
     for (const mate of teammates) {
       const mateRow = document.createElement('div');
       mateRow.className = 'match-mate-row';
@@ -301,14 +282,8 @@ function showMatchDetails(match) {
       mateRow.append(mateNameCol, mateChestCol);
       teamSec.append(mateRow);
     }
-  } else {
-    const isSolo = /solo/.test(match.playlist?.toLowerCase() || '');
-    const emptyRow = document.createElement('div');
-    emptyRow.className = 'match-mate-empty';
-    emptyRow.textContent = isSolo ? t('solo') : t('noActivity');
-    teamSec.append(emptyRow);
+    body.append(teamSec);
   }
-  body.append(teamSec);
 
   if (match.fileName) {
     const fileRow = document.createElement('div');

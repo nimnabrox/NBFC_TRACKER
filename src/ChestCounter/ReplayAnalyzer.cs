@@ -89,7 +89,7 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
     private readonly List<GrantEvent> _grants = new();
 
     /// <summary>Bump when the analysis changes so that existing replays are re-analyzed.</summary>
-    public const int CurrentVersion = 10;
+    public const int CurrentVersion = 11;
 
     private static readonly bool ProbeDebug = Environment.GetEnvironmentVariable("CHESTCOUNTER_DEBUG") == "4";
 
@@ -552,6 +552,9 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
 
         // --- Teammates: same team as target, with chests seen searching nearby ----------------
         var teammates = new List<TeammateRecord>();
+        var playlistName = replay.GameData?.CurrentPlaylist ?? "";
+        bool isSoloMatch = Regex.IsMatch(playlistName, @"(?:Solo|DefaultSolo|Showdown_Solo|NoBuildBR_Solo|Ranked_Solo)", RegexOptions.IgnoreCase);
+
         int? team = target?.TeamIndex;
         if (team == null && target?.Id != null && replay.TeamData != null)
         {
@@ -565,13 +568,37 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
         }
         team ??= recorderPlayer?.TeamIndex;
 
-        if (team is int teamIdx)
+        if (!isSoloMatch && team is int teamIdx && teamIdx > 0)
         {
             var mates = players
                 .Where(p => p.TeamIndex == teamIdx && p.Id != target?.Id && !string.Equals(p.PlayerName?.Trim(), target?.PlayerName?.Trim(), StringComparison.OrdinalIgnoreCase) && p.IsBot != true)
                 .GroupBy(p => p.EpicId ?? p.PlayerName ?? $"pid{p.Id}")
                 .Select(g => g.First())
                 .ToList();
+
+            // In Battle Royale, a squad has at most 4 players (the player + at most 3 teammates).
+            // If mates.Count > 3, it's either Team Rumble, 50v50, creative, or unassigned team index.
+            // In that case, do not blindly treat dozens of opponents as teammates.
+            if (mates.Count > 3)
+            {
+                if (target?.Id != null && replay.TeamData != null)
+                {
+                    var teamData = replay.TeamData.FirstOrDefault(t => t.TeamIndex == teamIdx && t.PlayerIds.Contains(target.Id));
+                    if (teamData?.PartyOwnerId != null)
+                    {
+                        mates = mates.Where(m => m.Id == teamData.PartyOwnerId || m.IsPartyLeader).ToList();
+                    }
+                    else
+                    {
+                        mates.Clear();
+                    }
+                }
+                else
+                {
+                    mates.Clear();
+                }
+            }
+
             foreach (var mate in mates)
             {
                 var states = _playerStateToPlayerId.Where(kv => kv.Value == mate.Id).Select(kv => kv.Key).ToHashSet();
@@ -580,9 +607,18 @@ public sealed class ReplayAnalyzer : FortniteReplayReader.ReplayReader
                     .Where(s => s.SearcherPawn is uint p && pawns.Contains(p))
                     .GroupBy(s => ChestKinds.Classify(s.Label))
                     .ToDictionary(g => g.Key, g => g.Count());
+
+                string mateName = !string.IsNullOrWhiteSpace(mate.PlayerName)
+                    ? mate.PlayerName.Trim()
+                    : (!string.IsNullOrWhiteSpace(mate.PlayerNameCustomOverride)
+                        ? mate.PlayerNameCustomOverride.Trim()
+                        : (!string.IsNullOrWhiteSpace(mate.StreamerModeName)
+                            ? mate.StreamerModeName.Trim()
+                            : "Teammate"));
+
                 teammates.Add(new TeammateRecord
                 {
-                    Name = !string.IsNullOrWhiteSpace(mate.PlayerName) ? mate.PlayerName.Trim() : "Teammate",
+                    Name = mateName,
                     EpicId = mate.EpicId,
                     ChestsSeen = kinds.Where(k => ChestKinds.IsChest(k.Key)).Sum(k => k.Value),
                     Kinds = kinds,
