@@ -158,19 +158,6 @@ function renderMatches() {
           const openedOnly = match.chestsSearched ?? Math.max(0, match.chestsOpened - match.chestsDestroyed);
           cell.title = `${number(openedOnly)} ${t('opened')} + ${number(match.chestsDestroyed)} ${t('destroyed')}`;
         }
-        if (match.teammates && match.teammates.length > 0) {
-          const matesText = match.teammates.map(m => `${m.name}: ${number(m.chests)}`).join(', ');
-          const teamTotal = match.teamChests ?? (match.chestsOpened + match.teammates.reduce((s, m) => s + m.chests, 0));
-          cell.title = (cell.title ? cell.title + '\n' : '') + `${t('teamChests')}: ${number(teamTotal)} (${t('teammates')}: ${matesText})`;
-          const matesCount = match.teammates.reduce((s, m) => s + (Number(m.chests) || 0), 0);
-          cell.replaceChildren();
-          const mainVal = document.createElement('strong');
-          mainVal.textContent = number(match.chestsOpened);
-          const subBadge = document.createElement('small');
-          subBadge.className = 'team-chest-sub';
-          subBadge.textContent = `+${number(matesCount)} 👥`;
-          cell.append(mainVal, subBadge);
-        }
       }
       if (index === 2 && match.placement === 1) cell.className = 'win';
       row.append(cell);
@@ -242,48 +229,6 @@ function showMatchDetails(match) {
 
   playerCard.append(playerRow, breakdownRow);
   body.append(playerCard);
-
-  const teammates = Array.isArray(match.teammates) ? match.teammates : [];
-  if (teammates.length > 0) {
-    const teamSec = document.createElement('div');
-    teamSec.className = 'match-team-section';
-
-    const teamTitle = document.createElement('div');
-    teamTitle.className = 'match-team-title';
-    const teamTitleText = document.createElement('span');
-    teamTitleText.textContent = t('teammates');
-    const matesSum = teammates.reduce((s, m) => s + (Number(m.chests) || 0), 0);
-    const teamTotalVal = match.teamChests ?? (match.chestsOpened + matesSum);
-    const teamTotalSmall = document.createElement('small');
-    teamTotalSmall.textContent = `${t('teamChests')}: `;
-    const teamTotalStrong = document.createElement('strong');
-    teamTotalStrong.textContent = number(teamTotalVal);
-    teamTotalSmall.append(teamTotalStrong);
-    teamTitle.append(teamTitleText, teamTotalSmall);
-    teamSec.append(teamTitle);
-
-    for (const mate of teammates) {
-      const mateRow = document.createElement('div');
-      mateRow.className = 'match-mate-row';
-      const mateNameCol = document.createElement('div');
-      mateNameCol.className = 'match-mate-name';
-      const dot = document.createElement('span');
-      dot.className = 'mate-dot';
-      const mateName = document.createElement('span');
-      mateName.textContent = mate.name;
-      mateNameCol.append(dot, mateName);
-
-      const mateChestCol = document.createElement('div');
-      mateChestCol.className = 'match-mate-chests';
-      const mateChestVal = document.createElement('strong');
-      mateChestVal.textContent = number(mate.chests || 0);
-      mateChestCol.append(mateChestVal, document.createTextNode(' ' + t('chests')));
-
-      mateRow.append(mateNameCol, mateChestCol);
-      teamSec.append(mateRow);
-    }
-    body.append(teamSec);
-  }
 
   if (match.fileName) {
     const fileRow = document.createElement('div');
